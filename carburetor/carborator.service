@@ -1,0 +1,11 @@
+[Unit]
+Description=Carborator
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/carborator
+Restart=always
+RestartSec=3s
+
+[Install]
+WantedBy=multi-user.target
