@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-readonly PROJECT_NAME=carborator
+readonly PROJECT_NAME=carburator
 readonly TARGET_ARCH=armv7-unknown-linux-gnueabihf
 readonly SOURCE_PATH=target/${TARGET_ARCH}/release/${PROJECT_NAME}
 readonly SOURCE_SERVICE=${PROJECT_NAME}.service

@@ -1,9 +1,9 @@
 [Unit]
-Description=Carborator
+Description=Carburator
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/bin/carborator
+ExecStart=/usr/bin/carburator
 Restart=always
 RestartSec=3s
 

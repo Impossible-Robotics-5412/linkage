@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "carborator"
+name = "carburator"
 version = "0.1.0"
 dependencies = [
  "rppal",

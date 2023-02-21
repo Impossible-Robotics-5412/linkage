@@ -4,10 +4,10 @@ This program receives messages on a TCP stream and applies the requested instruc
 ```
                    _
                   | |                        _
-  ____ _____  ____| |__   ___   ____ _____ _| |_ ___   ____
- / ___|____ |/ ___)  _ \ / _ \ / ___|____ (_   _) _ \ / ___)
+  ____ _____  ____| |__  _   _  ____ _____ _| |_ ___   ____
+ / ___|____ |/ ___)  _ \| | | |/ ___|____ (_   _) _ \ / ___)
 ( (___/ ___ | |   | |_) ) |_| | |   / ___ | | || |_| | |
- \____)_____|_|   |____/ \___/|_|   \_____|  \__)___/|_|
+ \____)_____|_|   |____/|____/|_|   \_____|  \__)___/|_|
 
              By Koen & Bauke Westendorp, 2023.
 ```
@@ -99,13 +99,13 @@ We want it to start on boot, and to restart if anything has gone wrong.
 To run as daemon using systemd, start it:
 
 ```console
-systemctl start carborator.service
+systemctl start carburator.service
 ```
 
 If you wish to enable it on startup, enable it:
 
 ```console
-systemctl enable carborator.service
+systemctl enable carburator.service
 ```
 
 #### Restarting
@@ -117,12 +117,12 @@ Currently, the restarting policy is set to 3 seconds.
 The logs of the daemonized process can be inspected using:
 
 ```console
-journalctl -xeu carborator.service
+journalctl -xeu carburator.service
 ```
 
 ### Behavior
 
-When terminated (through SIGINT by Ctrl-C or through SIGTERM by `pkill carborator`), the program will set all motors to neutral before exiting.
+When terminated (through SIGINT by Ctrl-C or through SIGTERM by `pkill carburator`), the program will set all motors to neutral before exiting.
 This is does not occur when the program is killed by an actual SIGKILL.
 This means of termination can thus pose a danger of leaving the motors running until the program is restarted.
 
@@ -143,12 +143,12 @@ Go into this directory, and run:
 
 ```console
 cargo build --release
-install target/release/carborator /usr/bin/carborator
-install -Dm644 carborator.service /etc/systemd/system/carborator.service
+install target/release/carburator /usr/bin/carburator
+install -Dm644 carburator.service /etc/systemd/system/carburator.service
 sudo systemctl daemon-reload
 ```
 
-If you wish, the program can now be run by invoking the command `carborator`.
+If you wish, the program can now be run by invoking the command `carburator`.
 
 See [Daemon](#daemon) for starting or enabling the service.
 
