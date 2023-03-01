@@ -1,0 +1,9 @@
+[package]
+name = "carburetor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rppal = "0.14.1"
+simple-signal = "1.1.1"
+sys-info = "0.9.1"
