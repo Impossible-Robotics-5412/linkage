@@ -15,7 +15,9 @@ pub(crate) fn channel(runtime_stream: &mut TcpStream, receiver: Receiver<Vec<u8>
 
 pub(crate) fn handle_runtime_confirmations(runtime_stream: &mut TcpStream, linkage_address: &Address) {
     let mut buffer = [0; 8];
-    runtime_stream.read_exact(&mut buffer).unwrap();
+    runtime_stream
+        .read_exact(&mut buffer)
+        .unwrap_or_else(|error| eprintln!("ERROR: Failed to read message from runtime: {error}"));
 
     match buffer[0] {
         0x00 => {

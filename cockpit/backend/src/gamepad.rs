@@ -40,7 +40,7 @@ pub(crate) fn channel(sender: Sender<GamepadInputEvent>) {
                 code_page,
                 code_usage,
             })
-            .expect("should send GamepadInputEvent over channel")
+            .unwrap_or_else(|error| eprintln!("ERROR: Failed to send GamepadInputEvent over channel: {error}"))
     };
 
     loop {

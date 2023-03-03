@@ -16,8 +16,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     eprintln!("Connected to Runtime on address {}.", settings.runtime());
 
     let (frontend_tx, frontend_rx) = mpsc::channel();
-    thread::spawn(move || frontend::channel(&mut runtime_stream-, frontend_rx));
+    thread::spawn({
+        let mut runtime_stream = runtime_stream.try_clone().unwrap();
+        move || frontend::channel(&mut runtime_stream, frontend_rx)
+    });
     thread::spawn(move || frontend::handle_runtime_confirmations(&mut runtime_stream, settings.linkage()));
+
     frontend::listen(frontend_tx);
 
     Ok(())
