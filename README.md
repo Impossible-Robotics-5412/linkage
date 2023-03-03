@@ -15,7 +15,7 @@ that for the system. We call the whole project *linkage*.
 
   _Carburetor_ is the executable responsible for the actual communication with the motor drivers and other peripherals connected to the Pi.
   It accepts a TCP stream of control instructions and executes these.
-  The stream of control instructions is sent by the robot code, which is built on the the linkage library (e.g., _linkage-node_).
+  The stream of control instructions is sent by the robot code, which is built on the linkage library (e.g., _linkage-node_).
   On shutdown or termination, Carburetor tries its best to shut down gracefully by putting all motors it controls into a neutral state.
   In normal operation, Carburetor is started up and shut down by Runtime.
 
