@@ -18,6 +18,7 @@ pub(crate) fn handle_runtime_confirmations(
     linkage_address: &Address,
 ) {
     let mut buffer = [0; 8];
+    // FIXME: This will only read once for some reason. the websocket listener does receive the message. EOF bug?
     runtime_stream
         .read_exact(&mut buffer)
         .unwrap_or_else(|error| eprintln!("ERROR: Failed to read message from runtime: {error}"));
