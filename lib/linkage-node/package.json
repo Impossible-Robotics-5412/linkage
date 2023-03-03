@@ -1,0 +1,21 @@
+{
+  "name": "@impossiblerobotics/linkage",
+  "version": "0.0.1",
+  "source": "src/index.ts",
+  "main": "dist/linkage.cjs",
+  "module": "dist/linkage.mjs",
+  "types": "dist/types.d.ts",
+  "author": "Bauke Westendorp",
+  "license": "MIT",
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "@parcel/packager-ts": "2.8.3",
+    "@parcel/transformer-typescript-types": "2.8.3",
+    "@types/node": "^18.14.4",
+    "parcel": "^2.8.3",
+    "typescript": "^4.9.5"
+  }
+}
