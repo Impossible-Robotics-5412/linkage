@@ -65,6 +65,30 @@ that for the system. We call the whole project *linkage*.
 
 ## Contribution
 
+We welcome any and all contributions.
+
+Feel free to open up an issue if you encounter problems or want to talk about adding new features.
+Of course, we celebrate contributions in the form of code and documentation as well.
+So, pull requests and issues are very welcome.
+We will do as much as we can to guide and support new contributors through every step!
+
+Before contributing, be sure to have read our code of conduct.
+
+## Code of Conduct
+
+We ask people who are in any way part of this project to conduct themselves well.
+That means that we ask the following:
+
+- Be kind.
+- Be inclusive.
+- Be respectful.
+- Be open to feedback.
+
+If contributors and users perceive that somebody does not act according to this code, we will ask them to change their behaviour.
+In case the offence does not end after this, we will take further action, among which is excluding the offender, to ensure the safety and happiness of our contributors.
+
+This code of conduct is subject to elaboration.
+
 ## Todo
 
 - [ ] Elaborate
