@@ -38,7 +38,10 @@ impl LinkageInstruction {
     }
 }
 
-pub(crate) fn send_instruction(mut stream: &TcpStream, instruction: LinkageInstruction) -> io::Result<()> {
+pub(crate) fn send_instruction(
+    mut stream: &TcpStream,
+    instruction: LinkageInstruction,
+) -> io::Result<()> {
     stream.write(&instruction.to_bytes())?;
     eprintln!("[LinkageConnection] Sent instruction: {instruction:?}.");
     Ok(())

@@ -12,7 +12,8 @@ mod settings;
 fn main() -> Result<(), Box<dyn Error>> {
     let settings = settings()?;
 
-    let mut runtime_stream = TcpStream::connect(settings.runtime().to_string()).expect("should connect to runtime");
+    let mut runtime_stream =
+        TcpStream::connect(settings.runtime().to_string()).expect("should connect to runtime");
     eprintln!("Connected to Runtime on address {}.", settings.runtime());
 
     let (frontend_tx, frontend_rx) = mpsc::channel();
@@ -20,7 +21,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         let mut runtime_stream = runtime_stream.try_clone().unwrap();
         move || frontend::channel(&mut runtime_stream, frontend_rx)
     });
-    thread::spawn(move || frontend::handle_runtime_confirmations(&mut runtime_stream, settings.linkage()));
+    thread::spawn(move || {
+        frontend::handle_runtime_confirmations(&mut runtime_stream, settings.linkage())
+    });
 
     frontend::listen(frontend_tx);
 

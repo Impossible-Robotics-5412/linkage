@@ -13,7 +13,10 @@ pub(crate) fn channel(runtime_stream: &mut TcpStream, receiver: Receiver<Vec<u8>
     }
 }
 
-pub(crate) fn handle_runtime_confirmations(runtime_stream: &mut TcpStream, linkage_address: &Address) {
+pub(crate) fn handle_runtime_confirmations(
+    runtime_stream: &mut TcpStream,
+    linkage_address: &Address,
+) {
     let mut buffer = [0; 8];
     runtime_stream
         .read_exact(&mut buffer)
@@ -21,7 +24,8 @@ pub(crate) fn handle_runtime_confirmations(runtime_stream: &mut TcpStream, linka
 
     match buffer[0] {
         0x00 => {
-            let linkage_stream = TcpStream::connect(linkage_address.to_string()).expect("should connect to linkage");
+            let linkage_stream =
+                TcpStream::connect(linkage_address.to_string()).expect("should connect to linkage");
             eprintln!("Connected to Linkage on address {}.", linkage_address);
 
             let (gamepad_tx, gamepad_rx) = mpsc::channel();

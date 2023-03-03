@@ -40,16 +40,22 @@ pub(crate) fn channel(sender: Sender<GamepadInputEvent>) {
                 code_page,
                 code_usage,
             })
-            .unwrap_or_else(|error| eprintln!("ERROR: Failed to send GamepadInputEvent over channel: {error}"))
+            .unwrap_or_else(|error| {
+                eprintln!("ERROR: Failed to send GamepadInputEvent over channel: {error}")
+            })
     };
 
     loop {
         while let Some(gilrs::Event { id, event, time: _ }) = gilrs.next_event() {
             match event {
-                ButtonChanged(_button, value, code) => send(id, code.into_u32(), value.clamp(0.0, 1.0) * 255.0),
-                AxisChanged(_axis, value, code) => {
-                    send(id, code.into_u32(), ((value.clamp(-1.0, 1.0) + 1.0) / 2.0) * 255.0)
+                ButtonChanged(_button, value, code) => {
+                    send(id, code.into_u32(), value.clamp(0.0, 1.0) * 255.0)
                 }
+                AxisChanged(_axis, value, code) => send(
+                    id,
+                    code.into_u32(),
+                    ((value.clamp(-1.0, 1.0) + 1.0) / 2.0) * 255.0,
+                ),
                 Connected | Disconnected => {
                     let value = match event {
                         Connected => 1.0,
@@ -67,6 +73,10 @@ pub(crate) fn channel(sender: Sender<GamepadInputEvent>) {
 
 pub(crate) fn handle_input(linkage_stream: &TcpStream, receiver: Receiver<GamepadInputEvent>) {
     while let Ok(gamepad_input) = receiver.recv() {
-        linkage::send_instruction(linkage_stream, LinkageInstruction::GamepadEvent(gamepad_input)).unwrap();
+        linkage::send_instruction(
+            linkage_stream,
+            LinkageInstruction::GamepadEvent(gamepad_input),
+        )
+        .unwrap();
     }
 }
