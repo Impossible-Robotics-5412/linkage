@@ -87,7 +87,7 @@ fn main() -> io::Result<()> {
     for (n, stream) in listener.incoming().enumerate() {
         let mut stream = stream?;
 
-        // let mut state = state();
+        let mut state = state();
 
         let peer = stream.peer_addr()?;
         eprintln!("({n}) Connection established with {peer}");
@@ -99,15 +99,15 @@ fn main() -> io::Result<()> {
             };
 
             eprintln!("Received message: {buffer:?}");
-            // match buffer[0] {
-            // 0x00 => state.enable(
-            //     &settings.entrypoint(),
-            //     stream.try_clone()?,
-            //     buffer.try_into()?,
-            // ),
-            // 0x01 => state.disable(),
-            //     _ => eprintln!("Unknown message: {buffer:?}"),
-            // }
+            match buffer[0] {
+                0x00 => state.enable(
+                    &settings.entrypoint(),
+                    stream.try_clone()?,
+                    buffer.try_into()?,
+                ),
+                0x01 => state.disable(),
+                _ => eprintln!("Unknown message: {buffer:?}"),
+            }
         }
 
         eprintln!("({n}) Connection closed.");
@@ -132,13 +132,13 @@ fn start_processes(
         }
     });
 
-    let carburetor_process = Command::new("carburetor")
+    let carburetor_process = Command::new("/usr/bin/carburator")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
         .expect("failed to execute carburetor");
 
-    let linkage_process = Command::new("node")
+    let linkage_process = Command::new("/usr/bin/node")
         .current_dir("/")
         .arg(entrypoint)
         .spawn()
