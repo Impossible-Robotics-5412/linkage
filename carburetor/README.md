@@ -192,7 +192,7 @@ configured appropriately, run it with `./deploy.sh`.
 <h4>Daemonized</h4>
 </summary>
 
-If necessary, you can run `systemd-deploy.sh` to cross-compile, deploy the
+If necessary, you can run `deploy-systemd.sh` to cross-compile, deploy the
 binary, _and_ install the systemd service. It also restart the daemon with the
 new binary. However, in the way the project is used at this moment, this is no
 longer necessary, since _carburetor_ is spawned as a child process of _runtime_
