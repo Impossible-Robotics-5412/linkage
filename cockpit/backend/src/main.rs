@@ -6,9 +6,7 @@ use std::{
 mod settings;
 
 fn main() -> io::Result<()> {
-    // FIXME: Implement controller input handling and sending it to linkage.
     // FIXME: Use data from config file.
-
     ws::listen("0.0.0.0:3012", move |frontend| {
         let runtime_stream =
             TcpStream::connect("raspberrypi:8009").expect("should connect to runtime");
@@ -75,7 +73,7 @@ fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
         Some(instruction) => {
             if instruction == &LINKAGE_TX_MESSAGE_ENABLED[0] {
                 eprintln!("Linkage has been enabled");
-                // TODO: Start sending controller input events to linkage.
+                // FIXME: Start sending controller input events to linkage.
             }
         }
         None => unreachable!("Binary message should have 8 bytes."),
@@ -101,7 +99,7 @@ fn disable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
         Some(instruction) => {
             if instruction == &LINKAGE_TX_MESSAGE_DISABLED[0] {
                 eprintln!("Linkage has been disabled");
-                // TODO: Start sending controller input events to linkage.
+                // FIXME: Start sending controller input events to linkage.
             }
         }
         None => unreachable!("Binary message should have 8 bytes."),

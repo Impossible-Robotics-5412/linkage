@@ -84,6 +84,9 @@ fn main() -> io::Result<()> {
 
     eprintln!("Started Listening on {}", listener.local_addr()?);
 
+    // FIXME: Can't open new connection if the processes are running
+    // FIXME: Deadlock when pressing enable twice.
+
     for (n, stream) in listener.incoming().enumerate() {
         let mut stream = stream?;
 
@@ -118,6 +121,7 @@ fn main() -> io::Result<()> {
         }
 
         eprintln!("({n}) Connection closed.");
+        state.disable();
     }
 
     Ok(())
