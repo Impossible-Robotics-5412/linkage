@@ -1,3 +1,5 @@
+import { state } from "$lib/state";
+
 export class BackendConnection {
   private websocket: WebSocket | undefined;
 
@@ -10,8 +12,10 @@ export class BackendConnection {
 
     this.websocket = new WebSocket("ws://127.0.0.1:3012");
 
-    this.websocket.onmessage = (message) => {
-      console.log(message);
+    this.websocket.onmessage = (message: MessageEvent<Blob>) => {
+      message.data.arrayBuffer().then((buffer) => {
+        this.onMessage(Array.from(new Uint8Array(buffer)) as BackendMessage);
+      });
     };
 
     this.websocket.onopen = () => {
@@ -45,6 +49,22 @@ export class BackendConnection {
     }
 
     this.websocket.send(new Uint8Array(message));
+  }
+
+  private onMessage(message: BackendMessage) {
+    console.log(message);
+
+    if (message[0] === BackendTxMessage.ENABLED[0]) {
+      state.update(($state) => {
+        $state.enabled = true;
+        return $state;
+      });
+    } else if (message[0] === BackendTxMessage.DISABLED[0]) {
+      state.update(($state) => {
+        $state.enabled = false;
+        return $state;
+      });
+    }
   }
 }
 
