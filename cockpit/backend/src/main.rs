@@ -1,5 +1,5 @@
 use std::{
-    io::{self, Write},
+    io::{self, Read, Write},
     net::TcpStream,
 };
 
@@ -59,27 +59,64 @@ fn main() -> io::Result<()> {
 }
 
 fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
-    runtime_stream.write(&RUNTIME_TX_MESSAGE_ENABLE_LINKAGE)?;
-    // FIXME: When this returns Ok it should mean linkage has been enabled.
-    //        Right now it will just tell if the message has been sent successfully to runtime,
-    //        but it should really wait for a confirmation telling
-    //        the linkage executable has been started on the Pi.
+    runtime_stream.write(&RUNTIME_RX_MESSAGE_ENABLE_LINKAGE)?;
+
+    let mut buffer = MessageBytes::default();
+    runtime_stream.read_exact(&mut buffer)?;
+    if buffer.len() != 8 {
+        eprintln!(
+            "Binary data should have 8 bytes, but found {}",
+            buffer.len()
+        );
+        return Ok(());
+    }
+
+    match buffer.first() {
+        Some(instruction) => {
+            if instruction == &LINKAGE_TX_MESSAGE_ENABLED[0] {
+                eprintln!("Linkage has been enabled");
+                // TODO: Start sending controller input events to linkage.
+            }
+        }
+        None => unreachable!("Binary message should have 8 bytes."),
+    }
+
     Ok(())
 }
 
 fn disable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
-    runtime_stream.write(&RUNTIME_TX_MESSAGE_DISABLE_LINKAGE)?;
-    // FIXME: When this returns Ok it should mean linkage has been disabled.
-    //        Right now it will just tell if the message has been sent successfully to runtime,
-    //        but it should really wait for a confirmation telling
-    //        the linkage executable has been killed on the Pi.
+    runtime_stream.write(&RUNTIME_RX_MESSAGE_DISABLE_LINKAGE)?;
+
+    let mut buffer = MessageBytes::default();
+    runtime_stream.read_exact(&mut buffer)?;
+    if buffer.len() != 8 {
+        eprintln!(
+            "Binary data should have 8 bytes, but found {}",
+            buffer.len()
+        );
+        return Ok(());
+    }
+
+    match buffer.first() {
+        Some(instruction) => {
+            if instruction == &LINKAGE_TX_MESSAGE_DISABLED[0] {
+                eprintln!("Linkage has been disabled");
+                // TODO: Start sending controller input events to linkage.
+            }
+        }
+        None => unreachable!("Binary message should have 8 bytes."),
+    }
+
     Ok(())
 }
 
-type BackendMessage = [u8; 8];
+type MessageBytes = [u8; 8];
 
-const BACKEND_TX_MESSAGE_ENABLED_LINKAGE: BackendMessage = [0x00, 0, 0, 0, 0, 0, 0, 0];
-const BACKEND_TX_MESSAGE_DISABLED_LINKAGE: BackendMessage = [0x01, 0, 0, 0, 0, 0, 0, 0];
+const BACKEND_TX_MESSAGE_ENABLED_LINKAGE: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
+const BACKEND_TX_MESSAGE_DISABLED_LINKAGE: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
 
-const RUNTIME_TX_MESSAGE_ENABLE_LINKAGE: BackendMessage = [0x00, 0, 0, 0, 0, 0, 0, 0];
-const RUNTIME_TX_MESSAGE_DISABLE_LINKAGE: BackendMessage = [0x01, 0, 0, 0, 0, 0, 0, 0];
+const RUNTIME_RX_MESSAGE_ENABLE_LINKAGE: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
+const RUNTIME_RX_MESSAGE_DISABLE_LINKAGE: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
+
+const LINKAGE_TX_MESSAGE_ENABLED: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
+const LINKAGE_TX_MESSAGE_DISABLED: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];

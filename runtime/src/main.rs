@@ -71,7 +71,7 @@ impl State {
             State::Enabled(en) => {
                 stop_processes(&mut en.0);
                 *self = Self::Disabled;
-                eprintln!("disabled.")
+                eprintln!("disabled.");
             }
             _ => eprintln!("already disabled, doing nothing."),
         }
@@ -93,6 +93,7 @@ fn main() -> io::Result<()> {
         eprintln!("({n}) Connection established with {peer}");
 
         let mut buffer = MessageBytes::default();
+
         loop {
             if stream.read_exact(&mut buffer).is_err() {
                 break;
@@ -105,7 +106,13 @@ fn main() -> io::Result<()> {
                     stream.try_clone()?,
                     buffer.try_into()?,
                 ),
-                0x01 => state.disable(),
+                0x01 => {
+                    state.disable();
+                    let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();
+                    stream
+                        .write(&disable_bytes)
+                        .expect("should write disable confirmation message to cockpit-backend");
+                }
                 _ => eprintln!("Unknown message: {buffer:?}"),
             }
         }
@@ -128,7 +135,11 @@ fn start_processes(
         move |signals| {
             eprintln!("Caught: {signals:?}");
             let msg: MessageBytes = instruction.into();
-            stream.lock().unwrap().write(&msg).unwrap();
+            stream
+                .lock()
+                .unwrap()
+                .write(&msg)
+                .expect("should write enable confirmation message to cockpit-backend");
         }
     });
 
