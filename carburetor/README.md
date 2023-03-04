@@ -15,11 +15,12 @@ external peripherals attached to the Pi.
 ```
 
 This program serves as what can be described as a raw backend to
-[_runtime_](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime)
-APIs that allow people of all skill levels to control robots built for
-educational purposes. It provides an abstraction over the control and query of
-peripherals that can be accessed through TCP. It is designed to be run as a
-daemon.
+[_runtime_](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime).
+_runtime_ interacts starts _carburetor_ and the robot code written with the
+_linkage_ library. This library allows people of all skill levels to control
+robots built for educational purposes. It provides an abstraction over the
+control and query of peripherals that can be accessed through TCP. It is
+designed to be run as a daemon.
 
 _WARNING: This project is in a highly unstable and experimental stage. It cannot
 be relied upon. The security and safety of the operation of this program cannot
