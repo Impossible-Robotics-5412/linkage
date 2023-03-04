@@ -14,11 +14,13 @@ external peripherals attached to the Pi.
              By Koen & Bauke Westendorp, 2023.
 ```
 
-This program serves as what can be described as a raw backend to user-facing
-APIs that allow people of all skill levels to control robots built for
-educational purposes. It provides an abstraction over the control and query of
-peripherals that can be accessed through TCP. It is designed to be run as a
-daemon.
+This program serves as what can be described as a raw backend to
+[_runtime_](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime).
+_runtime_ interacts starts _carburetor_ and the robot code written with the
+_linkage_ library. This library allows people of all skill levels to control
+robots built for educational purposes. It provides an abstraction over the
+control and query of peripherals that can be accessed through TCP. It is
+designed to be run as a daemon.
 
 _WARNING: This project is in a highly unstable and experimental stage. It cannot
 be relied upon. The security and safety of the operation of this program cannot
@@ -102,12 +104,28 @@ This will (currently) return something like:
 Memory: 26% (242376 / 944268)
 ```
 
+### Behavior
+
+When terminated (through SIGINT by Ctrl-C or through SIGTERM by
+`pkill carburetor`), the program will set all motors to neutral before exiting.
+This is does not occur when the program is killed by an actual SIGKILL. This
+means of termination can thus pose a danger of leaving the motors running until
+the program is restarted.
+
+**Thus, terminate the program using SIGINT or SIGTERM, and _never_ SIGKILL.**
+
+**Use SIGKILL iff the operating environment is absolutely safe and it is
+absolutely necessary.**
+
 ### Daemon
 
-The program is intended to be run as a daemon. This is not necessary, though,
-but it does suit the use case well. We want it to start on boot, and to restart
-if anything has gone wrong.
+The program is intended to be run as a child process invoked by [_runtime_](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime).
+This is not _necessary_, though.
+In case you want to use _carburetor_ as a standalone layer between your own TCP packets and the motor controllers, you might want to run it as a daemon.
+In that use case, we want it to start on boot, and to restart if anything has gone wrong.
 
+<details>
+<summary>How to run <em>carburetor</em> using systemd</summary>
 To run as daemon using systemd, start it:
 
 ```console
@@ -131,19 +149,7 @@ The logs of the daemonized process can be inspected using:
 ```console
 journalctl -xeu carburetor.service
 ```
-
-### Behavior
-
-When terminated (through SIGINT by Ctrl-C or through SIGTERM by
-`pkill carburetor`), the program will set all motors to neutral before exiting.
-This is does not occur when the program is killed by an actual SIGKILL. This
-means of termination can thus pose a danger of leaving the motors running until
-the program is restarted.
-
-**Thus, terminate the program using SIGINT or SIGTERM, and _never_ SIGKILL.**
-
-**Use SIGKILL iff the operating environment is absolutely safe and it is
-absolutely necessary.**
+</details>
 
 ## Installation
 
@@ -152,6 +158,7 @@ absolutely necessary.**
 The following information assumes you have [Git](https://git-scm.com/) and a
 [Rust](https://rust-lang.org/) toolchain installed. Remote deployment relies on
 [`cargo-cross`](https://github.com/cross-rs/cross) for cross-compilation.
+`cross` builds the binary for the Pi in a Docker container.
 
 ### On Raspberry Pi
 
@@ -161,21 +168,35 @@ suitable location. Go into this directory, and run:
 ```console
 cargo build --release
 install target/release/carburetor /usr/bin/carburetor
+# Optionally install the service.
+# (not necessary when you run carburetor in conjunction with runtime)
 install -Dm644 carburetor.service /etc/systemd/system/carburetor.service
 sudo systemctl daemon-reload
 ```
 
 If you wish, the program can now be run by invoking the command `carburetor`.
 
-See [Daemon](#daemon) for starting or enabling the service.
+(See [Daemon](#daemon) for starting or enabling the service.)
 
 ### Remotely
 
 During development or for convenience, the `deploy.sh` file allows you to
 locally cross-compile the executable, and deploy the program to the Pi remotely.
-It also restart the daemon with the new binary.
 
 Change the parameter values in the `deploy.sh` script if necessary. When
 configured appropriately, run it with `./deploy.sh`.
 
-Consult [Logs](#logs) to inspect the logs of the service running on the Pi.
+
+<details>
+<summary>
+<h4>Daemonized</h4>
+</summary>
+
+If necessary, you can run `deploy-systemd.sh` to cross-compile, deploy the
+binary, _and_ install the systemd service. It also restart the daemon with the
+new binary. However, in the way the project is used at this moment, this is no
+longer necessary, since _carburetor_ is spawned as a child process of _runtime_
+together with the robot code entrypoint. That means that the whole lifetime of
+_carburetor_ is managed from _runtime_, and we have no need for daemonized
+operation.
+</details>
