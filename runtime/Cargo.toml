@@ -1,13 +1,11 @@
 [package]
 name = "runtime"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 
 [dependencies]
 config = "0.13.3"
 serde = "1.0.152"
 simple-signal = "1.1.1"
 xdg = "2.4.1"
- 

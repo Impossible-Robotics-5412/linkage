@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "carburetor",
+    "cockpit/backend",
+    "runtime",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Koen Westendorp <koensswestendorp@gmail.com>", "Bauke Westendorp <baukewestendorp@gmail.com>"]
