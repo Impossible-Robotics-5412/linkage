@@ -1,9 +1,8 @@
 [package]
 name = "cockpit-backend"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 
 [dependencies]
 config = { version = "0.13.3", features = ["toml"] }
