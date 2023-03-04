@@ -124,7 +124,7 @@ In case you want to use _carburetor_ as a standalone layer between your own TCP 
 In that use case, we want it to start on boot, and to restart if anything has gone wrong.
 
 <details>
-<summary>How to run _carburetor_ using systemd</summary>
+<summary>How to run <em>carburetor</em> using systemd</summary>
 To run as daemon using systemd, start it:
 
 ```console
@@ -188,7 +188,7 @@ configured appropriately, run it with `./deploy.sh`.
 
 <details>
 <summary>
-#### Daemonized
+<h4>Daemonized</h4>
 </summary>
 
 If necessary, you can run `systemd-deploy.sh` to cross-compile, deploy the
