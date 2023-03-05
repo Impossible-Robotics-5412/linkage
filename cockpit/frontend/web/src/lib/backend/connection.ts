@@ -4,6 +4,12 @@ export class BackendConnection {
   private websocket: WebSocket | undefined;
 
   constructor(public readonly host: string, public readonly port: number) {
+    this.connect();
+  }
+
+  disconnect() {
+    console.log("Disconnecting from backend.");
+    this.websocket?.close();
   }
 
   connect() {
@@ -51,8 +57,6 @@ export class BackendConnection {
   }
 
   private onMessage(message: BackendMessage) {
-    console.log(message);
-
     if (message[0] === BackendTxMessage.ENABLED[0]) {
       state.update(($state) => {
         $state.enabled = true;
