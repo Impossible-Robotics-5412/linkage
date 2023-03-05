@@ -41,46 +41,56 @@ impl TryFrom<MessageBytes> for RuntimeInstruction {
     }
 }
 
-struct Enabled(Vec<Child>);
-
-enum State {
-    Enabled(Enabled),
+enum LinkageState {
+    Enabled(Vec<Child>),
     Disabled,
 }
 
-fn state() -> State {
-    State::Disabled
+struct State {
+    backend_stream: TcpStream,
+    state: LinkageState,
 }
 
 impl State {
-    fn enable(&mut self, entrypoint: &str, backend_stream: TcpStream) {
+    fn new(backend_stream: TcpStream) -> Self {
+        Self {
+            backend_stream,
+            state: LinkageState::Disabled,
+        }
+    }
+}
+
+impl State {
+    fn enable(&mut self, entrypoint: &str) {
         eprint!("Enabling... ");
-        match self {
-            State::Disabled => {
-                let children = start_processes(entrypoint, backend_stream);
-                *self = Self::Enabled(Enabled(children));
+        match self.state {
+            LinkageState::Disabled => {
+                let children =
+                    start_processes(entrypoint, self.backend_stream.try_clone().unwrap());
+                self.state = LinkageState::Enabled(children);
                 eprintln!("enabled.");
             }
             _ => {
                 eprintln!("Already enabled, doing nothing.");
                 let message_bytes: MessageBytes = RuntimeInstruction::Enable.into();
-                let mut backend_stream = backend_stream.try_clone().unwrap();
+                let mut backend_stream = self.backend_stream.try_clone().unwrap();
                 backend_stream.write(&message_bytes).unwrap();
             }
         }
     }
-    fn disable(&mut self, backend_stream: TcpStream) -> io::Result<()> {
+
+    fn disable(&mut self) -> io::Result<()> {
         eprint!("Disabling... ");
-        match self {
-            State::Enabled(en) => {
-                stop_processes(&mut en.0)?;
-                *self = Self::Disabled;
+        match &mut self.state {
+            LinkageState::Enabled(children) => {
+                stop_processes(children)?;
+                self.state = LinkageState::Disabled;
                 eprintln!("disabled.");
             }
             _ => {
                 eprintln!("Already disabled, doing nothing.");
                 let message_bytes: MessageBytes = RuntimeInstruction::Disable.into();
-                let mut backend_stream = backend_stream.try_clone().unwrap();
+                let mut backend_stream = self.backend_stream.try_clone().unwrap();
                 backend_stream.write(&message_bytes).unwrap();
             }
         }
@@ -95,28 +105,27 @@ fn main() -> io::Result<()> {
 
     eprintln!("Started Listening on {}", listener.local_addr()?);
 
-    for (n, stream) in listener.incoming().enumerate() {
-        let mut stream = stream?;
+    for (n, backend_stream) in listener.incoming().enumerate() {
+        let mut backend_stream = backend_stream?;
+        let mut state = State::new(backend_stream.try_clone()?);
 
-        let mut state = state();
-
-        let peer = stream.peer_addr()?;
+        let peer = backend_stream.peer_addr()?;
         eprintln!("({n}) Connection established with {peer}");
 
         let mut buffer = MessageBytes::default();
 
         loop {
-            if stream.read_exact(&mut buffer).is_err() {
+            if backend_stream.read_exact(&mut buffer).is_err() {
                 break;
             };
 
             eprintln!("Received message: {buffer:?}");
             match buffer[0] {
-                0x00 => state.enable(&settings.entrypoint(), stream.try_clone()?),
+                0x00 => state.enable(&settings.entrypoint()),
                 0x01 => {
-                    state.disable(stream.try_clone()?)?;
+                    state.disable()?;
                     let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();
-                    stream
+                    backend_stream
                         .write(&disable_bytes)
                         .expect("should write disable confirmation message to cockpit-backend");
                 }
@@ -125,21 +134,21 @@ fn main() -> io::Result<()> {
         }
 
         eprintln!("({n}) Connection closed.");
-        state.disable(stream.try_clone()?)?;
+        state.disable()?;
     }
 
     Ok(())
 }
 
-fn start_processes(entrypoint: &str, stream: TcpStream) -> Vec<Child> {
+fn start_processes(entrypoint: &str, backend_stream: TcpStream) -> Vec<Child> {
     eprintln!("Starting Linkage");
 
     simple_signal::set_handler(&[Signal::Alrm], {
-        let stream = Mutex::new(stream);
+        let backend_stream = Mutex::new(backend_stream);
         move |signals| {
             eprintln!("Caught Signal: {signals:?}");
             let msg: MessageBytes = RuntimeInstruction::Enable.into();
-            stream
+            backend_stream
                 .lock()
                 .unwrap()
                 .write(&msg)
