@@ -42,7 +42,6 @@ impl TryFrom<MessageBytes> for RuntimeInstruction {
 }
 
 struct Enabled(Vec<Child>);
-struct Disabled;
 
 enum State {
     Enabled(Enabled),
@@ -54,45 +53,47 @@ fn state() -> State {
 }
 
 impl State {
-    fn enable(&mut self, entrypoint: &str, stream: TcpStream, instruction: RuntimeInstruction) {
-        eprintln!("Enabling... ");
+    fn enable(&mut self, entrypoint: &str, backend_stream: TcpStream) {
+        eprint!("Enabling... ");
         match self {
             State::Disabled => {
-                let children = start_processes(entrypoint, stream, instruction);
+                let children = start_processes(entrypoint, backend_stream);
                 *self = Self::Enabled(Enabled(children));
-                eprintln!("Enabled.");
+                eprintln!("enabled.");
             }
-            _ => eprintln!("Already enabled, doing nothing."),
+            _ => {
+                eprintln!("Already enabled, doing nothing.");
+                let message_bytes: MessageBytes = RuntimeInstruction::Enable.into();
+                let mut backend_stream = backend_stream.try_clone().unwrap();
+                backend_stream.write(&message_bytes).unwrap();
+            }
         }
     }
-    fn disable(&mut self) {
+    fn disable(&mut self, backend_stream: TcpStream) -> io::Result<()> {
         eprint!("Disabling... ");
         match self {
             State::Enabled(en) => {
-                stop_processes(&mut en.0);
+                stop_processes(&mut en.0)?;
                 *self = Self::Disabled;
                 eprintln!("disabled.");
             }
-            _ => eprintln!("already disabled, doing nothing."),
+            _ => {
+                eprintln!("Already disabled, doing nothing.");
+                let message_bytes: MessageBytes = RuntimeInstruction::Disable.into();
+                let mut backend_stream = backend_stream.try_clone().unwrap();
+                backend_stream.write(&message_bytes).unwrap();
+            }
         }
+
+        Ok(())
     }
 }
-
-impl Drop for State {
-    fn drop(&mut self) {
-        self.disable();
-    }
-}
-
 fn main() -> io::Result<()> {
     let settings = settings().unwrap();
     let address = format!("0.0.0.0:{}", settings.port());
     let listener = TcpListener::bind(address).expect("address should be valid");
 
     eprintln!("Started Listening on {}", listener.local_addr()?);
-
-    // FIXME: Can't open new connection if the processes are running
-    // FIXME: Deadlock when pressing enable twice.
 
     for (n, stream) in listener.incoming().enumerate() {
         let mut stream = stream?;
@@ -111,13 +112,9 @@ fn main() -> io::Result<()> {
 
             eprintln!("Received message: {buffer:?}");
             match buffer[0] {
-                0x00 => state.enable(
-                    &settings.entrypoint(),
-                    stream.try_clone()?,
-                    buffer.try_into()?,
-                ),
+                0x00 => state.enable(&settings.entrypoint(), stream.try_clone()?),
                 0x01 => {
-                    state.disable();
+                    state.disable(stream.try_clone()?)?;
                     let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();
                     stream
                         .write(&disable_bytes)
@@ -128,24 +125,20 @@ fn main() -> io::Result<()> {
         }
 
         eprintln!("({n}) Connection closed.");
-        state.disable();
+        state.disable(stream.try_clone()?)?;
     }
 
     Ok(())
 }
 
-fn start_processes(
-    entrypoint: &str,
-    stream: TcpStream,
-    instruction: RuntimeInstruction,
-) -> Vec<Child> {
+fn start_processes(entrypoint: &str, stream: TcpStream) -> Vec<Child> {
     eprintln!("Starting Linkage");
 
     simple_signal::set_handler(&[Signal::Alrm], {
         let stream = Mutex::new(stream);
         move |signals| {
-            eprintln!("Caught: {signals:?}");
-            let msg: MessageBytes = instruction.into();
+            eprintln!("Caught Signal: {signals:?}");
+            let msg: MessageBytes = RuntimeInstruction::Enable.into();
             stream
                 .lock()
                 .unwrap()
@@ -169,9 +162,11 @@ fn start_processes(
     vec![carburetor_process, linkage_process]
 }
 
-fn stop_processes(children: &mut Vec<Child>) {
+fn stop_processes(children: &mut Vec<Child>) -> io::Result<()> {
     for child in children {
-        // TODO: deal with result
-        child.kill().unwrap();
+        child.kill()?;
+        child.wait()?;
     }
+
+    Ok(())
 }
