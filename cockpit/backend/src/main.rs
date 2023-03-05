@@ -19,36 +19,35 @@ fn main() -> io::Result<()> {
 
             match msg {
                 ws::Message::Text(_) => todo!(),
-                ws::Message::Binary(bin) => {
-                    if bin.len() != 8 {
-                        eprintln!("Binary data should have 8 bytes, but found {}", bin.len());
+                ws::Message::Binary(buffer) => {
+                    if buffer.len() != 8 {
+                        eprintln!(
+                            "Binary data should have 8 bytes, but found {}",
+                            buffer.len()
+                        );
                         return Ok(());
                     }
 
-                    match bin.first() {
-                        Some(instruction) => match instruction {
-                            0x00 => {
-                                enable_linkage(&mut runtime_stream)?;
-                                frontend.send(ws::Message::Binary(
-                                    BACKEND_TX_MESSAGE_ENABLED_LINKAGE.into(),
-                                ))?;
-                            }
-                            0x01 => {
-                                disable_linkage(&mut runtime_stream)?;
-                                frontend.send(ws::Message::Binary(
-                                    BACKEND_TX_MESSAGE_DISABLED_LINKAGE.into(),
-                                ))?;
-                            }
-                            _ => {
-                                eprintln!("Unknown Instuction {instruction}");
-                            }
-                        },
-                        None => unreachable!("Binary message should have 8 bytes."),
-                    };
-
-                    Ok(())
+                    let instruction = buffer[0];
+                    match instruction {
+                        0x00 => {
+                            enable_linkage(&mut runtime_stream)?;
+                            frontend.send(ws::Message::Binary(
+                                BACKEND_TX_MESSAGE_ENABLED_LINKAGE.into(),
+                            ))?;
+                        }
+                        0x01 => {
+                            disable_linkage(&mut runtime_stream)?;
+                            frontend.send(ws::Message::Binary(
+                                BACKEND_TX_MESSAGE_DISABLED_LINKAGE.into(),
+                            ))?;
+                        }
+                        _ => eprintln!("Unknown Instuction {instruction}"),
+                    }
                 }
             }
+
+            Ok(())
         }
     })
     .unwrap();
@@ -61,22 +60,11 @@ fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
 
     let mut buffer = MessageBytes::default();
     runtime_stream.read_exact(&mut buffer)?;
-    if buffer.len() != 8 {
-        eprintln!(
-            "Binary data should have 8 bytes, but found {}",
-            buffer.len()
-        );
-        return Ok(());
-    }
 
-    match buffer.first() {
-        Some(instruction) => {
-            if instruction == &LINKAGE_TX_MESSAGE_ENABLED[0] {
-                eprintln!("Linkage has been enabled");
-                // FIXME: Start sending controller input events to linkage.
-            }
-        }
-        None => unreachable!("Binary message should have 8 bytes."),
+    let instruction = buffer[0];
+    if instruction == LINKAGE_TX_MESSAGE_ENABLED[0] {
+        eprintln!("Linkage has been enabled");
+        // FIXME: Start sending controller input events to linkage.
     }
 
     Ok(())
