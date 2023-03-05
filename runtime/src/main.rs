@@ -65,16 +65,18 @@ impl State {
             _ => eprintln!("Already enabled, doing nothing."),
         }
     }
-    fn disable(&mut self) {
+    fn disable(&mut self) -> io::Result<()> {
         eprint!("Disabling... ");
         match self {
             State::Enabled(en) => {
-                stop_processes(&mut en.0);
+                stop_processes(&mut en.0)?;
                 *self = Self::Disabled;
                 eprintln!("disabled.");
             }
             _ => eprintln!("already disabled, doing nothing."),
         }
+
+        Ok(())
     }
 }
 fn main() -> io::Result<()> {
@@ -110,7 +112,7 @@ fn main() -> io::Result<()> {
                     buffer.try_into()?,
                 ),
                 0x01 => {
-                    state.disable();
+                    state.disable()?;
                     let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();
                     stream
                         .write(&disable_bytes)
@@ -121,7 +123,7 @@ fn main() -> io::Result<()> {
         }
 
         eprintln!("({n}) Connection closed.");
-        state.disable();
+        state.disable()?;
     }
 
     Ok(())
@@ -162,9 +164,11 @@ fn start_processes(
     vec![carburetor_process, linkage_process]
 }
 
-fn stop_processes(children: &mut Vec<Child>) {
+fn stop_processes(children: &mut Vec<Child>) -> io::Result<()> {
     for child in children {
-        // TODO: deal with result
-        child.kill().unwrap();
+        child.kill()?;
+        child.wait()?;
     }
+
+    Ok(())
 }
