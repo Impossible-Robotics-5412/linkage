@@ -90,8 +90,8 @@ impl State {
             _ => {
                 eprintln!("Already disabled, doing nothing.");
                 let message_bytes: MessageBytes = RuntimeInstruction::Disable.into();
-                let mut backend_stream = self.backend_stream.try_clone().unwrap();
-                backend_stream.write(&message_bytes).unwrap();
+                let mut backend_stream = self.backend_stream.try_clone()?;
+                backend_stream.write(&message_bytes)?;
             }
         }
 
@@ -113,8 +113,18 @@ fn main() -> io::Result<()> {
 
     eprintln!("Started Listening on {}", listener.local_addr()?);
 
+    let (tx, rx) = std::sync::mpsc::channel();
+    simple_signal::set_handler(&[Signal::Alrm], {
+        move |signals| {
+            eprintln!("Caught Signal: {signals:?}");
+            let msg: MessageBytes = RuntimeInstruction::Enable.into();
+            tx.send(msg).expect("should be a valid channel");
+        }
+    });
+
     for (n, backend_stream) in listener.incoming().enumerate() {
         let mut backend_stream = backend_stream?;
+
         let mut state = State::new(backend_stream.try_clone()?);
 
         let peer = backend_stream.peer_addr()?;
@@ -123,6 +133,12 @@ fn main() -> io::Result<()> {
         let mut buffer = MessageBytes::default();
 
         loop {
+            if let Ok(msg) = rx.try_recv() {
+                backend_stream
+                    .write(&msg)
+                    .expect("should write enable confirmation message to cockpit-backend");
+            }
+
             if backend_stream.read_exact(&mut buffer).is_err() {
                 break;
             };
@@ -148,21 +164,8 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn start_processes(entrypoint: &str, backend_stream: TcpStream) -> Vec<Child> {
+fn start_processes(entrypoint: &str) -> Vec<Child> {
     eprintln!("Starting Linkage");
-
-    simple_signal::set_handler(&[Signal::Alrm], {
-        let backend_stream = Mutex::new(backend_stream);
-        move |signals| {
-            eprintln!("Caught Signal: {signals:?}");
-            let msg: MessageBytes = RuntimeInstruction::Enable.into();
-            backend_stream
-                .lock()
-                .unwrap()
-                .write(&msg)
-                .expect("should write enable confirmation message to cockpit-backend");
-        }
-    });
 
     let carburetor_process = Command::new("/usr/bin/carburator")
         .stdout(Stdio::null())
