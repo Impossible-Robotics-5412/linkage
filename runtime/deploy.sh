@@ -7,7 +7,7 @@ set -o xtrace
 
 readonly PROJECT_NAME=runtime
 readonly TARGET_ARCH=armv7-unknown-linux-gnueabihf
-readonly SOURCE_PATH=target/${TARGET_ARCH}/release/${PROJECT_NAME}
+readonly SOURCE_PATH=../target/${TARGET_ARCH}/release/${PROJECT_NAME}
 # readonly SOURCE_SERVICE=${PROJECT_NAME}.service
 
 # If necessary, change the following values.

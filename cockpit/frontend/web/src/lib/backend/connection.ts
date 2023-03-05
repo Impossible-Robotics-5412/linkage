@@ -3,14 +3,13 @@ import { state } from "$lib/state";
 export class BackendConnection {
   private websocket: WebSocket | undefined;
 
-  constructor() {
-    this.connect();
+  constructor(public readonly host: string, public readonly port: number) {
   }
 
   connect() {
     console.log("Connecting with backend.");
 
-    this.websocket = new WebSocket("ws://127.0.0.1:3012");
+    this.websocket = new WebSocket(`ws://${this.host}:${this.port.toFixed(0)}`);
 
     this.websocket.onmessage = (message: MessageEvent<Blob>) => {
       message.data.arrayBuffer().then((buffer) => {
