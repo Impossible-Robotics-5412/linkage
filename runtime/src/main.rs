@@ -98,6 +98,14 @@ impl State {
         Ok(())
     }
 }
+
+impl Drop for State {
+    fn drop(&mut self) {
+        self.disable()
+            .expect("should shut down child processes on drop");
+    }
+}
+
 fn main() -> io::Result<()> {
     let settings = settings().unwrap();
     let address = format!("0.0.0.0:{}", settings.port());
