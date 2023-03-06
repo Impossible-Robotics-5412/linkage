@@ -3,14 +3,20 @@ use std::{
     net::TcpStream,
 };
 
+use settings::settings;
+
 mod settings;
 
 fn main() -> io::Result<()> {
-    // FIXME: Use data from config file.
-    ws::listen("0.0.0.0:3012", move |frontend| {
-        let runtime_stream =
-            TcpStream::connect("raspberrypi:8009").expect("should connect to runtime");
-        eprintln!("Connected to Runtime on address {}.", "0.0.0.0:8009");
+    let settings = settings().unwrap();
+    let address = format!("0.0.0.0:{}", settings.cockpit_backend_port());
+    ws::listen(address, move |frontend| {
+        let runtime_stream = TcpStream::connect(settings.runtime_address().to_string())
+            .expect("should connect to runtime");
+        eprintln!(
+            "Connected to Runtime on address {}.",
+            runtime_stream.local_addr().unwrap()
+        );
 
         move |msg| {
             let mut runtime_stream = runtime_stream.try_clone().unwrap();
