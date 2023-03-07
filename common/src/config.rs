@@ -58,6 +58,8 @@ impl LinkageLib {
 pub struct Runtime {
     port: AddressPort,
     linkage_lib_entry_point: String,
+    node_path: String,
+    carburetor_path: String,
 }
 
 impl Runtime {
@@ -67,6 +69,14 @@ impl Runtime {
 
     pub fn linkage_lib_entry_point(&self) -> &String {
         &self.linkage_lib_entry_point
+    }
+
+    pub fn node_path(&self) -> &String {
+        &self.node_path
+    }
+
+    pub fn carburetor_path(&self) -> &String {
+        &self.carburetor_path
     }
 }
 
