@@ -19,7 +19,6 @@ mod instruction;
 #[cfg(not(target_arch = "armv7"))]
 use control_channel::Channel;
 
-const ADDRESS: &str = "0.0.0.0:48862";
 const WELCOME_MESSAGE: &str = r#"
                    _
                   | |                        _
@@ -40,6 +39,9 @@ const PULSE_NEUTRAL_US: u64 = 1500;
 
 fn main() -> Result<(), Box<dyn Error>> {
     eprintln!("{WELCOME_MESSAGE}");
+
+    let config = common::config::config()?;
+    let address = format!("0.0.0.0:{}", config.carburetor().port());
 
     eprintln!("Setting up...");
     let (tx0, rx0) = channel();
@@ -70,8 +72,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     thread::spawn(|| control_channel(Channel::Pwm0, rx0));
     thread::spawn(|| control_channel(Channel::Pwm1, rx1));
 
-    eprintln!("Setup completed. Listening on {ADDRESS}...");
-    let server = TcpListener::bind(ADDRESS).expect("address should be valid");
+    eprintln!("Setup completed. Listening on {}...", address);
+    let server = TcpListener::bind(address).expect("address should be valid");
     for (n, stream) in server.incoming().enumerate() {
         let mut stream = stream?;
         let peer = stream.peer_addr()?;

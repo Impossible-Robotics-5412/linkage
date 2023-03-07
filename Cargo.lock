@@ -104,6 +104,7 @@ dependencies = [
 name = "carburetor"
 version = "0.1.0"
 dependencies = [
+ "common",
  "rppal",
  "simple-signal",
  "sys-info",
