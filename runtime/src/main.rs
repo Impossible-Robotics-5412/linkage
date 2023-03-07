@@ -2,6 +2,7 @@ use std::io::{self, ErrorKind, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::process::{Child, Command, Stdio};
 
+use common::config;
 use simple_signal::Signal;
 
 type MessageBytes = [u8; 8];
@@ -56,11 +57,11 @@ impl State {
 }
 
 impl State {
-    fn enable(&mut self, entrypoint: &str) {
+    fn enable(&mut self, config: &config::Runtime) {
         eprint!("Enabling... ");
         match self.state {
             LinkageState::Disabled => {
-                let children = start_processes(entrypoint);
+                let children = start_processes(config);
                 self.state = LinkageState::Enabled(children);
                 eprintln!("enabled.");
             }
@@ -139,7 +140,7 @@ fn main() -> io::Result<()> {
 
             eprintln!("Received message: {buffer:?}");
             match buffer[0] {
-                0x00 => state.enable(&config.runtime().linkage_lib_entry_point()),
+                0x00 => state.enable(config.runtime()),
                 0x01 => {
                     state.disable()?;
                     let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();
@@ -158,18 +159,18 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn start_processes(entrypoint: &str) -> Vec<Child> {
+fn start_processes(config: &config::Runtime) -> Vec<Child> {
     eprintln!("Starting Linkage");
 
-    let carburetor_process = Command::new("/usr/bin/carburetor")
+    let carburetor_process = Command::new(config.carburetor_path())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
         .expect("failed to execute carburetor");
 
-    let linkage_process = Command::new("/usr/bin/node")
+    let linkage_process = Command::new(config.node_path())
         .current_dir("/")
-        .arg(entrypoint)
+        .arg(config.linkage_lib_entry_point())
         .spawn()
         .expect("failed to execute linkage");
 

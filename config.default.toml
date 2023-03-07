@@ -4,11 +4,13 @@ address = { host = "0.0.0.0", port = 12362 }
 [runtime]
 port = 8009
 linkage_lib_entry_point = "PLACEHOLDER"
+node_path = "NODE_PATH"
+carburetor_path = "CARBURETOR_PATH"
 
 [carburetor]
 port = 48862
 
 [cockpit_backend]
-port = 3013
+port = 3012
 runtime_address = { host = "0.0.0.0", port = 8009 }
 linkage_lib_address = { host = "0.0.0.0", port = 12362 }
