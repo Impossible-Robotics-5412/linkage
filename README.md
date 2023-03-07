@@ -98,7 +98,7 @@ This code of conduct is subject to elaboration.
     - [ ] How?
 - [ ] Installation and Usage section (see [#3](https://github.com/Impossible-Robotics-5412/linkage/issues/3))
 - [ ] Add examples (see [#2](https://github.com/Impossible-Robotics-5412/linkage/issues/2))
-- [ ] Unified configuration file (see [#4](https://github.com/Impossible-Robotics-5412/linkage/issues/4))
+- [X] Unified configuration file (see [#4](https://github.com/Impossible-Robotics-5412/linkage/issues/4))
 
 Thank you for reading about our project and take the time to look at the sky today.
 You deserve that.
