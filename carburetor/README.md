@@ -3,13 +3,15 @@ receives messages on a TCP stream and applies the requested instructions to
 motor controllers and can query the status of the system and in the future
 external peripherals attached to the Pi.
 
+<!--- figlet -f rounded carburetor --->
+
 ```
                    _
                   | |                        _
   ____ _____  ____| |__  _   _  ____ _____ _| |_ ___   ____
- / ___|____ |/ ___)  _ \| | | |/ ___|____ (_   _) _ \ / ___)
-( (___/ ___ | |   | |_) ) |_| | |   / ___ | | || |_| | |
- \____)_____|_|   |____/|____/|_|   \_____|  \__)___/|_|
+ / ___|____ |/ ___)  _ \| | | |/ ___) ___ (_   _) _ \ / ___)
+( (___/ ___ | |   | |_) ) |_| | |   | ____| | || |_| | |
+ \____)_____|_|   |____/|____/|_|   |_____)  \__)___/|_|
 
              By Koen & Bauke Westendorp, 2023.
 ```
