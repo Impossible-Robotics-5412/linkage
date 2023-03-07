@@ -3,6 +3,10 @@ use std::{
     net::TcpStream,
 };
 
+use common::messages::{
+    BackendToFrontendMessage, BackendToRuntimeMessage, Bytes, Message, RuntimeToBackendMessage,
+};
+
 fn main() -> io::Result<()> {
     let config = common::config::config().unwrap();
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
@@ -36,13 +40,13 @@ fn main() -> io::Result<()> {
                         0x00 => {
                             enable_linkage(&mut runtime_stream)?;
                             frontend.send(ws::Message::Binary(
-                                BACKEND_TX_MESSAGE_ENABLED_LINKAGE.into(),
+                                BackendToFrontendMessage::Enabled.to_bytes().to_vec(),
                             ))?;
                         }
                         0x01 => {
                             disable_linkage(&mut runtime_stream)?;
                             frontend.send(ws::Message::Binary(
-                                BACKEND_TX_MESSAGE_DISABLED_LINKAGE.into(),
+                                BackendToFrontendMessage::Disabled.to_bytes().to_vec(),
                             ))?;
                         }
                         _ => eprintln!("Unknown Instuction {instruction}"),
@@ -59,53 +63,42 @@ fn main() -> io::Result<()> {
 }
 
 fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
-    runtime_stream.write(&RUNTIME_RX_MESSAGE_ENABLE_LINKAGE)?;
+    runtime_stream.write(&BackendToRuntimeMessage::Enable.to_bytes())?;
 
-    let mut buffer = MessageBytes::default();
+    let mut buffer = Bytes::default();
     runtime_stream.read_exact(&mut buffer)?;
 
-    let instruction = buffer[0];
-    if instruction == LINKAGE_TX_MESSAGE_ENABLED[0] {
-        eprintln!("Linkage has been enabled");
-        // FIXME: Start sending controller input events to linkage.
+    let msg = RuntimeToBackendMessage::try_from(buffer).expect("should be a valid message");
+
+    match msg {
+        RuntimeToBackendMessage::Enabled => {
+            // FIXME: Start sending controller input events to linkage.
+            eprintln!("linkage has been enabled")
+        }
+        _ => unreachable!(
+            "runtime should not send back disabled message after receiving an enable message"
+        ),
     }
 
     Ok(())
 }
 
 fn disable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
-    runtime_stream.write(&RUNTIME_RX_MESSAGE_DISABLE_LINKAGE)?;
+    runtime_stream.write(&BackendToRuntimeMessage::Disable.to_bytes())?;
 
-    let mut buffer = MessageBytes::default();
+    let mut buffer = Bytes::default();
     runtime_stream.read_exact(&mut buffer)?;
-    if buffer.len() != 8 {
-        eprintln!(
-            "Binary data should have 8 bytes, but found {}",
-            buffer.len()
-        );
-        return Ok(());
-    }
 
-    match buffer.first() {
-        Some(instruction) => {
-            if instruction == &LINKAGE_TX_MESSAGE_DISABLED[0] {
-                eprintln!("Linkage has been disabled");
-                // FIXME: Start sending controller input events to linkage.
-            }
+    let msg = RuntimeToBackendMessage::try_from(buffer).expect("should be a valid message");
+
+    match msg {
+        RuntimeToBackendMessage::Disabled => {
+            eprintln!("linkage has been disabled");
         }
-        None => unreachable!("Binary message should have 8 bytes."),
+        _ => unreachable!(
+            "runtime should not send back enabled message after receiving a disable message"
+        ),
     }
 
     Ok(())
 }
-
-type MessageBytes = [u8; 8];
-
-const BACKEND_TX_MESSAGE_ENABLED_LINKAGE: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
-const BACKEND_TX_MESSAGE_DISABLED_LINKAGE: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
-
-const RUNTIME_RX_MESSAGE_ENABLE_LINKAGE: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
-const RUNTIME_RX_MESSAGE_DISABLE_LINKAGE: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
-
-const LINKAGE_TX_MESSAGE_ENABLED: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
-const LINKAGE_TX_MESSAGE_DISABLED: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];

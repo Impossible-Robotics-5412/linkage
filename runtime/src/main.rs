@@ -1,11 +1,11 @@
 mod processes;
 mod state;
 
-use state::State;
 use std::io::{self, Read};
 use std::net::TcpListener;
 
-pub(crate) type MessageBytes = [u8; 8];
+use common::messages::{BackendToRuntimeMessage, Bytes};
+use state::State;
 
 fn main() -> io::Result<()> {
     let config = common::config::config().expect("should get config");
@@ -20,17 +20,24 @@ fn main() -> io::Result<()> {
 
     let mut state = State::new(backend.try_clone()?);
 
-    let mut buffer = MessageBytes::default();
+    let mut buffer = Bytes::default();
     loop {
         if backend.try_clone()?.read_exact(&mut buffer).is_err() {
             break;
         };
 
-        eprintln!("Received message: {buffer:?}");
-        match buffer[0] {
-            0x00 => state.enable(config.runtime()),
-            0x01 => state.disable()?,
-            _ => eprintln!("Unknown message: {buffer:?}"),
+        let msg = match BackendToRuntimeMessage::try_from(buffer) {
+            Ok(m) => m,
+            Err(e) => {
+                eprintln!("Unknown message: {e:?}");
+                continue;
+            }
+        };
+
+        eprintln!("Received message: {buffer:?} ({msg:?})");
+        match msg {
+            BackendToRuntimeMessage::Enable => state.enable(config.runtime()),
+            BackendToRuntimeMessage::Disable => state.disable()?,
         }
     }
 
