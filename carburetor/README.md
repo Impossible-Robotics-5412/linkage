@@ -3,6 +3,8 @@ receives messages on a TCP stream and applies the requested instructions to
 motor controllers and can query the status of the system and in the future
 external peripherals attached to the Pi.
 
+<!--- figlet -f rounded carburetor --->
+
 ```
                    _
                   | |                        _
