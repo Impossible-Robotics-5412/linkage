@@ -1,13 +1,8 @@
 use std::io::{self, ErrorKind, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::process::{Child, Command, Stdio};
-use std::sync::Mutex;
 
 use simple_signal::Signal;
-
-use crate::settings::settings;
-
-mod settings;
 
 type MessageBytes = [u8; 8];
 
@@ -106,8 +101,8 @@ impl Drop for State {
 }
 
 fn main() -> io::Result<()> {
-    let settings = settings().unwrap();
-    let address = format!("0.0.0.0:{}", settings.port());
+    let config = common::config::config().unwrap();
+    let address = format!("0.0.0.0:{}", config.runtime().port());
     let listener = TcpListener::bind(address).expect("address should be valid");
 
     eprintln!("Started Listening on {}", listener.local_addr()?);
@@ -144,7 +139,7 @@ fn main() -> io::Result<()> {
 
             eprintln!("Received message: {buffer:?}");
             match buffer[0] {
-                0x00 => state.enable(&settings.entrypoint()),
+                0x00 => state.enable(&config.runtime().linkage_lib_entry_point()),
                 0x01 => {
                     state.disable()?;
                     let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();

@@ -772,10 +772,8 @@ dependencies = [
 name = "runtime"
 version = "0.1.0"
 dependencies = [
- "config",
- "serde",
+ "common",
  "simple-signal",
- "xdg",
 ]
 
 [[package]]
