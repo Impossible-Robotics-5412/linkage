@@ -65,8 +65,7 @@ impl State {
         eprint!("Enabling... ");
         match self.state {
             LinkageState::Disabled => {
-                let children =
-                    start_processes(entrypoint, self.backend_stream.try_clone().unwrap());
+                let children = start_processes(entrypoint);
                 self.state = LinkageState::Enabled(children);
                 eprintln!("enabled.");
             }
@@ -167,7 +166,7 @@ fn main() -> io::Result<()> {
 fn start_processes(entrypoint: &str) -> Vec<Child> {
     eprintln!("Starting Linkage");
 
-    let carburetor_process = Command::new("/usr/bin/carburator")
+    let carburetor_process = Command::new("/usr/bin/carburetor")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
