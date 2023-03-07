@@ -1,18 +1,14 @@
-[linkage-lib]
-host = "0.0.0.0"
-port = 12362
+[linkage_lib]
+address = { host = "0.0.0.0", port = 12362 }
 
 [runtime]
 port = 8009
 linkage_lib_entry_point = "PLACEHOLDER"
 
 [carburetor]
-host = "0.0.0.0"
 port = 48862
 
 [cockpit_backend]
 port = 3013
-runtime_host = "0.0.0.0"
-runtime_port = 8009
-linkage_lib_host = "0.0.0.0"
-linkage_lib_port = 12362
+runtime_address = { host = "0.0.0.0", port = 8009 }
+linkage_lib_address = { host = "0.0.0.0", port = 12362 }
