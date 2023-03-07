@@ -57,16 +57,19 @@ impl Speed {
     }
 
     /// Creates a new [`Speed`] with full forward force.
+    #[allow(dead_code)]
     pub(crate) fn forward() -> Self {
         Self::new(1.0).unwrap()
     }
 
     /// Creates a new [`Speed`] with full reverse force.
+    #[allow(dead_code)]
     pub(crate) fn backward() -> Self {
         Self::new(-1.0).unwrap()
     }
 
     /// Returns the duration of this [`Speed`].
+    #[allow(dead_code)]
     pub(crate) fn duration(&self) -> Duration {
         let micros = PULSE_NEUTRAL_US as i32 + (PULSE_DELTA_US as f32 * self.0) as i32;
         Duration::from_micros(micros as u64)

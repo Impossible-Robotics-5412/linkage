@@ -6,6 +6,7 @@ use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
 
+#[cfg(target_arch = "armv7")]
 use rppal::pwm::Channel;
 use simple_signal::{self, Signal};
 
@@ -14,6 +15,9 @@ use crate::instruction::{decode, Instruction, MessageBytes, Speed};
 
 mod control_channel;
 mod instruction;
+
+#[cfg(not(target_arch = "armv7"))]
+use control_channel::Channel;
 
 const ADDRESS: &str = "0.0.0.0:48862";
 const WELCOME_MESSAGE: &str = r#"
@@ -27,11 +31,12 @@ const WELCOME_MESSAGE: &str = r#"
              By Koen & Bauke Westendorp, 2023.
 "#;
 
+#[allow(dead_code)]
 const PERIOD_MS: u64 = 20; // 20 ms = 50 Hz
+#[allow(dead_code)]
 const PULSE_DELTA_US: u64 = 500;
+#[allow(dead_code)]
 const PULSE_NEUTRAL_US: u64 = 1500;
-// const PULSE_MIN_US: u64 = PULSE_NEUTRAL_US - PULSE_DELTA_US;
-// const PULSE_MAX_US: u64 = PULSE_NEUTRAL_US + PULSE_DELTA_US;
 
 fn main() -> Result<(), Box<dyn Error>> {
     eprintln!("{WELCOME_MESSAGE}");
