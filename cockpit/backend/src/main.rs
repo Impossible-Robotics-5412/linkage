@@ -3,16 +3,13 @@ use std::{
     net::TcpStream,
 };
 
-use settings::settings;
-
-mod settings;
-
 fn main() -> io::Result<()> {
-    let settings = settings().unwrap();
-    let address = format!("0.0.0.0:{}", settings.cockpit_backend_port());
+    let config = common::config::config().unwrap();
+    let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
     ws::listen(address, move |frontend| {
-        let runtime_stream = TcpStream::connect(settings.runtime_address().to_string())
-            .expect("should connect to runtime");
+        let runtime_stream =
+            TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
+                .expect("should connect to runtime");
         eprintln!(
             "Connected to Runtime on address {}.",
             runtime_stream.local_addr().unwrap()
