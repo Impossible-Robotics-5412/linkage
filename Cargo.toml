@@ -1,11 +1,10 @@
 [workspace]
-members = [
-    "carburetor",
-    "cockpit/backend",
-    "runtime",
-]
+members = ["carburetor", "cockpit/backend", "runtime", "common"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-authors = ["Koen Westendorp <koensswestendorp@gmail.com>", "Bauke Westendorp <baukewestendorp@gmail.com>"]
+authors = [
+    "Koen Westendorp <koensswestendorp@gmail.com>",
+    "Bauke Westendorp <baukewestendorp@gmail.com>",
+]

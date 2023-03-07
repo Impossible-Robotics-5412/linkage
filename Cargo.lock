@@ -104,6 +104,7 @@ dependencies = [
 name = "carburetor"
 version = "0.1.0"
 dependencies = [
+ "common",
  "rppal",
  "simple-signal",
  "sys-info",
@@ -131,11 +132,18 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "cockpit-backend"
 version = "0.1.0"
 dependencies = [
- "config",
+ "common",
  "gilrs",
- "serde",
  "simple-signal",
  "ws",
+]
+
+[[package]]
+name = "common"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "serde",
  "xdg",
 ]
 
@@ -762,10 +770,8 @@ dependencies = [
 name = "runtime"
 version = "0.1.0"
 dependencies = [
- "config",
- "serde",
+ "common",
  "simple-signal",
- "xdg",
 ]
 
 [[package]]
