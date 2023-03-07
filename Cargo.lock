@@ -142,6 +142,11 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
+dependencies = [
+ "config",
+ "serde",
+ "xdg",
+]
 
 [[package]]
 name = "config"
