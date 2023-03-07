@@ -20,8 +20,8 @@ fn main() -> io::Result<()> {
     for backend in listener.incoming() {
         let backend = backend?;
 
-        let mut buffer = Bytes::default();
         let mut state = State::new(backend.try_clone()?, alrm_signal_receiver.clone());
+        let mut buffer = Bytes::default();
         loop {
             if backend.try_clone()?.read_exact(&mut buffer).is_err() {
                 break;
