@@ -1,41 +1,15 @@
-use std::io::{self, ErrorKind, Read, Write};
+use std::io::{self, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::process::{Child, Command, Stdio};
+use std::sync::mpsc::{Receiver, Sender};
 
 use common::config;
 use simple_signal::Signal;
 
 type MessageBytes = [u8; 8];
 
-#[derive(Debug, Clone, Copy)]
-pub(crate) enum RuntimeInstruction {
-    Enable,
-    Disable,
-}
-
-impl Into<MessageBytes> for RuntimeInstruction {
-    fn into(self) -> MessageBytes {
-        match self {
-            RuntimeInstruction::Enable => [0x00, 0, 0, 0, 0, 0, 0, 0],
-            RuntimeInstruction::Disable => [0x01, 0, 0, 0, 0, 0, 0, 0],
-        }
-    }
-}
-
-impl TryFrom<MessageBytes> for RuntimeInstruction {
-    type Error = io::Error;
-
-    fn try_from(value: MessageBytes) -> Result<RuntimeInstruction, io::Error> {
-        match value[0] {
-            0x00 => Ok(RuntimeInstruction::Enable),
-            0x01 => Ok(RuntimeInstruction::Disable),
-            _ => Err(io::Error::new(
-                ErrorKind::Other,
-                "Failed to get instruction from byte {value:x}",
-            )),
-        }
-    }
-}
+const RUNTIME_TX_ENABLED: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
+const RUNTIME_RX_DISABLED: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
 
 enum LinkageState {
     Enabled(Vec<Child>),
@@ -43,52 +17,54 @@ enum LinkageState {
 }
 
 struct State {
-    backend_stream: TcpStream,
+    backend: TcpStream,
     state: LinkageState,
+    alrm_signal_receiver: Receiver<()>,
 }
 
 impl State {
     fn new(backend_stream: TcpStream) -> Self {
+        let (alrm_signal_sender, alrm_signal_receiver) = std::sync::mpsc::channel();
+        handle_alrm_signal(alrm_signal_sender);
+
         Self {
-            backend_stream,
+            backend: backend_stream,
             state: LinkageState::Disabled,
+            alrm_signal_receiver,
         }
     }
 }
 
 impl State {
     fn enable(&mut self, config: &config::Runtime) {
-        eprint!("Enabling... ");
+        eprintln!("Enabling Linakge... ");
         match self.state {
             LinkageState::Disabled => {
                 let children = start_processes(config);
+
+                self.alrm_signal_receiver.recv().unwrap();
+
                 self.state = LinkageState::Enabled(children);
-                eprintln!("enabled.");
+                eprintln!("Linkage Enabled.");
             }
-            _ => {
-                eprintln!("Already enabled, doing nothing.");
-                let message_bytes: MessageBytes = RuntimeInstruction::Enable.into();
-                let mut backend_stream = self.backend_stream.try_clone().unwrap();
-                backend_stream.write(&message_bytes).unwrap();
-            }
+            _ => eprintln!("Already enabled, doing nothing."),
         }
+
+        self.backend.write(&RUNTIME_TX_ENABLED).unwrap();
     }
 
     fn disable(&mut self) -> io::Result<()> {
-        eprint!("Disabling... ");
+        eprintln!("Disabling Linkage... ");
         match &mut self.state {
             LinkageState::Enabled(children) => {
                 stop_processes(children)?;
                 self.state = LinkageState::Disabled;
-                eprintln!("disabled.");
+                eprintln!("Linkage Disabled.");
             }
-            _ => {
-                eprintln!("Already disabled, doing nothing.");
-                let message_bytes: MessageBytes = RuntimeInstruction::Disable.into();
-                let mut backend_stream = self.backend_stream.try_clone()?;
-                backend_stream.write(&message_bytes)?;
-            }
+            _ => eprintln!("Already disabled, doing nothing."),
         }
+
+        self.backend.write(&RUNTIME_RX_DISABLED)?;
 
         Ok(())
     }
@@ -102,61 +78,44 @@ impl Drop for State {
 }
 
 fn main() -> io::Result<()> {
-    let config = common::config::config().unwrap();
+    let config = common::config::config().expect("should get config");
     let address = format!("0.0.0.0:{}", config.runtime().port());
     let listener = TcpListener::bind(address).expect("address should be valid");
-
     eprintln!("Started Listening on {}", listener.local_addr()?);
 
-    let (tx, rx) = std::sync::mpsc::channel();
+    let (backend, _) = listener.accept()?;
+    let peer = backend.peer_addr()?;
+    eprintln!("Connection established with {peer}");
+
+    let mut state = State::new(backend.try_clone()?);
+
+    let mut buffer = MessageBytes::default();
+    loop {
+        if backend.try_clone()?.read_exact(&mut buffer).is_err() {
+            break;
+        };
+
+        eprintln!("Received message: {buffer:?}");
+        match buffer[0] {
+            0x00 => state.enable(config.runtime()),
+            0x01 => state.disable()?,
+            _ => eprintln!("Unknown message: {buffer:?}"),
+        }
+    }
+
+    eprintln!("Connection closed.");
+    state.disable()?;
+
+    Ok(())
+}
+
+fn handle_alrm_signal(sender: Sender<()>) {
     simple_signal::set_handler(&[Signal::Alrm], {
         move |signals| {
             eprintln!("Caught Signal: {signals:?}");
-            let msg: MessageBytes = RuntimeInstruction::Enable.into();
-            tx.send(msg).expect("should be a valid channel");
+            sender.send(()).expect("should be a valid channel");
         }
     });
-
-    for (n, backend_stream) in listener.incoming().enumerate() {
-        let mut backend_stream = backend_stream?;
-
-        let mut state = State::new(backend_stream.try_clone()?);
-
-        let peer = backend_stream.peer_addr()?;
-        eprintln!("({n}) Connection established with {peer}");
-
-        let mut buffer = MessageBytes::default();
-
-        loop {
-            if let Ok(msg) = rx.try_recv() {
-                backend_stream
-                    .write(&msg)
-                    .expect("should write enable confirmation message to cockpit-backend");
-            }
-
-            if backend_stream.read_exact(&mut buffer).is_err() {
-                break;
-            };
-
-            eprintln!("Received message: {buffer:?}");
-            match buffer[0] {
-                0x00 => state.enable(config.runtime()),
-                0x01 => {
-                    state.disable()?;
-                    let disable_bytes: MessageBytes = RuntimeInstruction::Disable.into();
-                    backend_stream
-                        .write(&disable_bytes)
-                        .expect("should write disable confirmation message to cockpit-backend");
-                }
-                _ => eprintln!("Unknown message: {buffer:?}"),
-            }
-        }
-
-        eprintln!("({n}) Connection closed.");
-        state.disable()?;
-    }
-
-    Ok(())
 }
 
 fn start_processes(config: &config::Runtime) -> Vec<Child> {
