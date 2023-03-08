@@ -4,7 +4,6 @@ use std::{
     io::{self, Write},
     net::TcpStream,
     process::Child,
-    sync::mpsc::Receiver,
 };
 
 use common::{
@@ -20,14 +19,14 @@ pub(crate) enum LinkageState {
 pub(crate) struct State {
     backend: TcpStream,
     state: LinkageState,
-    alrm_signal_receiver: Receiver<()>,
+    alrm_signal_receiver: crossbeam::channel::Receiver<()>,
 }
 
 impl State {
-    pub(crate) fn new(backend_stream: TcpStream) -> Self {
-        let (alrm_signal_sender, alrm_signal_receiver) = std::sync::mpsc::channel();
-        processes::handle_alrm_signal(alrm_signal_sender);
-
+    pub(crate) fn new(
+        backend_stream: TcpStream,
+        alrm_signal_receiver: crossbeam::channel::Receiver<()>,
+    ) -> Self {
         Self {
             backend: backend_stream,
             state: LinkageState::Disabled,
@@ -38,7 +37,7 @@ impl State {
 
 impl State {
     pub(crate) fn enable(&mut self, config: &config::Runtime) {
-        eprintln!("Enabling Linakge... ");
+        eprint!("Enabling Linakge... ");
         match self.state {
             LinkageState::Disabled => {
                 let children = processes::start_processes(config);
@@ -59,7 +58,7 @@ impl State {
     }
 
     pub(crate) fn disable(&mut self) -> io::Result<()> {
-        eprintln!("Disabling Linkage... ");
+        eprint!("Disabling Linkage... ");
         match &mut self.state {
             LinkageState::Enabled(children) => {
                 processes::stop_processes(children)?;
