@@ -1,24 +1,25 @@
 use std::{
     io,
     process::{Child, Command, Stdio},
-    sync::mpsc::Sender,
 };
 
 use common::config;
 use simple_signal::Signal;
 
-pub(crate) fn handle_alrm_signal(sender: Sender<()>) {
+pub(crate) fn handle_alrm_signal(sender: crossbeam::channel::Sender<()>) {
+    eprintln!("Start listening for ALRM Signal");
+
     simple_signal::set_handler(&[Signal::Alrm], {
-        move |signals| {
-            eprintln!("Caught Signal: {signals:?}");
-            sender.send(()).expect("should be a valid channel");
+        move |_signals| {
+            eprintln!("Caught ALRM signal");
+            sender
+                .send(())
+                .expect("failed to send ALRM signal over channel");
         }
     });
 }
 
 pub(crate) fn start_processes(config: &config::Runtime) -> Vec<Child> {
-    eprintln!("Starting Linkage");
-
     let carburetor_process = Command::new(config.carburetor_path())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
