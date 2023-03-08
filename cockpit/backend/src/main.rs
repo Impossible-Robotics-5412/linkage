@@ -4,17 +4,18 @@ use std::{
 };
 
 use common::messages::{
-    BackendToFrontendMessage, BackendToRuntimeMessage, Bytes, Message, RuntimeToBackendMessage,
+    BackendToFrontendMessage, BackendToRuntimeMessage, Bytes, FrontendToBackendMessage, Message,
+    RuntimeToBackendMessage,
 };
 
 fn main() -> io::Result<()> {
     let config = common::config::config().unwrap();
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
     ws::listen(address, move |frontend| {
+        // FIXME: We still crash when Runtime is not found or isn't running. see issue #24
         let runtime_stream =
             TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
                 .expect("should connect to runtime");
-        // FIXME: We still crash when Runtime is not found or isn't running. see issue #24
 
         eprintln!(
             "Connected to Runtime on address {}.",
@@ -37,21 +38,32 @@ fn main() -> io::Result<()> {
                         return Ok(());
                     }
 
-                    let instruction = buffer[0];
-                    match instruction {
-                        0x00 => {
+                    let buffer: Bytes = buffer
+                        .try_into()
+                        .expect("should be able to convert 8 byte Vec<u8> to Bytes");
+
+                    let msg = match FrontendToBackendMessage::try_from(buffer) {
+                        Ok(m) => m,
+                        Err(e) => {
+                            eprintln!("Unknown message: {e:?}");
+                            return Ok(());
+                        }
+                    };
+
+                    eprintln!("Received message: {buffer:?} ({msg:?})");
+                    match msg {
+                        FrontendToBackendMessage::Enable => {
                             enable_linkage(&mut runtime_stream)?;
                             frontend.send(ws::Message::Binary(
                                 BackendToFrontendMessage::Enabled.to_bytes().to_vec(),
                             ))?;
                         }
-                        0x01 => {
+                        FrontendToBackendMessage::Disable => {
                             disable_linkage(&mut runtime_stream)?;
                             frontend.send(ws::Message::Binary(
                                 BackendToFrontendMessage::Disabled.to_bytes().to_vec(),
                             ))?;
                         }
-                        _ => eprintln!("Unknown Instuction {instruction}"),
                     }
                 }
             }
