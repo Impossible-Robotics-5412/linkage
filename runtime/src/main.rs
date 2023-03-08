@@ -38,7 +38,7 @@ fn main() -> io::Result<()> {
                 }
             };
 
-            eprintln!("Received message: {buffer:?} ({msg:?})");
+            eprintln!("Received message: {msg:?} {buffer:?}");
             match msg {
                 BackendToRuntimeMessage::Enable => state.enable(config.runtime()),
                 BackendToRuntimeMessage::Disable => state.disable()?,
