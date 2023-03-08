@@ -20,14 +20,15 @@ fn main() -> io::Result<()> {
     for backend in listener.incoming() {
         let backend = backend?;
 
+        let peer = backend.peer_addr()?;
+        eprintln!("Connection established with {peer}");
+
         let mut state = State::new(backend.try_clone()?, alrm_signal_receiver.clone());
         let mut buffer = Bytes::default();
         loop {
             if backend.try_clone()?.read_exact(&mut buffer).is_err() {
                 break;
             };
-            let peer = backend.peer_addr()?;
-            eprintln!("Connection established with {peer}");
 
             let msg = match BackendToRuntimeMessage::try_from(buffer) {
                 Ok(m) => m,
@@ -42,9 +43,9 @@ fn main() -> io::Result<()> {
                 BackendToRuntimeMessage::Enable => state.enable(config.runtime()),
                 BackendToRuntimeMessage::Disable => state.disable()?,
             }
-
-            eprintln!("Connection with {peer} closed.");
         }
+
+        eprintln!("Connection with {peer} closed.");
     }
 
     Ok(())
