@@ -10,6 +10,8 @@ fn main() -> io::Result<()> {
         let runtime_stream =
             TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
                 .expect("should connect to runtime");
+        // FIXME: We still crash when Runtime is not found or isn't running. see issue #24
+
         eprintln!(
             "Connected to Runtime on address {}.",
             runtime_stream.local_addr().unwrap()
