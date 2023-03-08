@@ -25,8 +25,6 @@ fn main() -> io::Result<()> {
         move |msg| {
             let mut runtime_stream = runtime_stream.try_clone().unwrap();
 
-            eprintln!("Received message from frontend: {msg:?}");
-
             match msg {
                 ws::Message::Text(_) => todo!(),
                 ws::Message::Binary(buffer) => {
@@ -50,7 +48,7 @@ fn main() -> io::Result<()> {
                         }
                     };
 
-                    eprintln!("Received message: {buffer:?} ({msg:?})");
+                    eprintln!("Received message: {msg:?} {buffer:?}");
                     match msg {
                         FrontendToBackendMessage::Enable => {
                             enable_linkage(&mut runtime_stream)?;
@@ -87,7 +85,7 @@ fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
     match msg {
         RuntimeToBackendMessage::Enabled => {
             // FIXME: Start sending controller input events to linkage.
-            eprintln!("linkage has been enabled")
+            eprintln!("Linkage has been enabled")
         }
         _ => unreachable!(
             "runtime should not send back disabled message after receiving an enable message"
@@ -107,7 +105,7 @@ fn disable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
 
     match msg {
         RuntimeToBackendMessage::Disabled => {
-            eprintln!("linkage has been disabled");
+            eprintln!("Linkage has been disabled");
         }
         _ => unreachable!(
             "runtime should not send back enabled message after receiving a disable message"
