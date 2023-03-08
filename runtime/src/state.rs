@@ -1,14 +1,15 @@
-use crate::{processes, MessageBytes};
+use crate::processes;
 
-use common::config;
 use std::{
     io::{self, Write},
     net::TcpStream,
     process::Child,
 };
 
-const RUNTIME_TX_ENABLED: MessageBytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
-const RUNTIME_TX_DISABLED: MessageBytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
+use common::{
+    config,
+    messages::{Message, RuntimeToBackendMessage},
+};
 
 pub(crate) enum LinkageState {
     Enabled(Vec<Child>),
@@ -52,7 +53,7 @@ impl State {
         }
 
         self.backend
-            .write(&RUNTIME_TX_ENABLED)
+            .write(&RuntimeToBackendMessage::Enabled.to_bytes())
             .expect("should send the ENABLED message to cockpit-backend");
     }
 
@@ -68,7 +69,7 @@ impl State {
         }
 
         self.backend
-            .write(&RUNTIME_TX_DISABLED)
+            .write(&RuntimeToBackendMessage::Disabled.to_bytes())
             .expect("should send the DISABLED message to cockpit-backend");
 
         Ok(())

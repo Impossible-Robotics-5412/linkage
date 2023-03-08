@@ -9,3 +9,4 @@ edition = "2021"
 config = { version = "0.13.3", features = ["toml"] }
 serde = "1.0.152"
 xdg = "2.4.1"
+message_derive = { path = "message_derive" }
