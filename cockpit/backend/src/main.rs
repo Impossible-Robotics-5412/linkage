@@ -12,7 +12,6 @@ fn main() -> io::Result<()> {
     let config = common::config::config().unwrap();
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
     ws::listen(address, move |frontend| {
-        // FIXME: We still crash when Runtime is not found or isn't running. see issue #24
         let runtime_stream =
             TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
                 .expect("should connect to runtime");
@@ -51,13 +50,25 @@ fn main() -> io::Result<()> {
                     eprintln!("Received message: {msg:?} {buffer:?}");
                     match msg {
                         FrontendToBackendMessage::Enable => {
-                            enable_linkage(&mut runtime_stream)?;
+                            if let Err(error) = enable_linkage(&mut runtime_stream) {
+                                eprintln!(
+                                    "Connection with runtime broke. ({error})\nTo connect  again, \
+                                    restart runtime and reconnect cockpit-backend to runtime"
+                                );
+                                return Ok(());
+                            };
                             frontend.send(ws::Message::Binary(
                                 BackendToFrontendMessage::Enabled.to_bytes().to_vec(),
                             ))?;
                         }
                         FrontendToBackendMessage::Disable => {
-                            disable_linkage(&mut runtime_stream)?;
+                            if let Err(error) = disable_linkage(&mut runtime_stream) {
+                                eprintln!(
+                                    "Connection with runtime broke. ({error})\nTo connect  again, \
+                                    restart runtime and reconnect cockpit-backend to runtime"
+                                );
+                                return Ok(());
+                            };
                             frontend.send(ws::Message::Binary(
                                 BackendToFrontendMessage::Disabled.to_bytes().to_vec(),
                             ))?;
