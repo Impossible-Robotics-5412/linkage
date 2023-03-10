@@ -1,0 +1,19 @@
+{
+  "name": "linkage-lib-node-example",
+  "version": "0.0.1",
+  "description": "Example code for Linkage Lib Node",
+  "main": "build/main.js",
+  "scripts": {
+    "deploy": "yarn build && rsync -aP ./build pi@raspberrypi:linkage/ && ssh pi@raspberrypi \"cd linkage && npm install @impossiblerobotics/linkage\"",
+    "build": "rm -rf ./build && yarn tsc",
+    "start": "yarn build && node ./build/main.js"
+  },
+  "author": "Bauke Westendorp",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@impossiblerobotics/linkage": "latest"
+  }
+}
