@@ -88,6 +88,6 @@ const BackendRxMessage: Record<string, BackendMessage> = {
 };
 
 const BackendTxMessage: Record<string, BackendMessage> = {
-  ENABLED: [0x00, 0, 0, 0, 0, 0, 0, 0],
-  DISABLED: [0x01, 0, 0, 0, 0, 0, 0, 0],
+  ENABLED: [0x08, 0, 0, 0, 0, 0, 0, 0],
+  DISABLED: [0x09, 0, 0, 0, 0, 0, 0, 0],
 };
