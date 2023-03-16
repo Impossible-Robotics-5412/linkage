@@ -1,5 +1,6 @@
 import { GamepadManager } from "../gamepad";
 import { createServer, Server } from "net";
+import { ConfigManager } from "../config/config_manager";
 
 enum CockpitInstruction {
   GAMEPAD_EVENT = 0x00,
@@ -72,10 +73,11 @@ export class CockpitConnection {
       console.log(`[CockpitConnection] Failed to connect: ${error}.`);
     });
 
-    // FIXME: the port should be in a config file.
-    const port = 12362;
+    const port = ConfigManager.shared.config?.port;
     this.server.listen(port, () => {
-      console.log(`[CockpitConnection] Started listening on port ${port}.`);
+      console.log(
+        `[CockpitConnection] Started listening on port ${port}.`,
+      );
     });
   }
 

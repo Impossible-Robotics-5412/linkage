@@ -13,5 +13,8 @@
   "devDependencies": {
     "@types/node": "^18.15.3",
     "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "toml": "^3.0.0"
   }
 }

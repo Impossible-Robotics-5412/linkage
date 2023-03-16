@@ -45,12 +45,17 @@ impl Config {
 
 #[derive(Deserialize)]
 pub struct LinkageLib {
-    address: Address,
+    port: AddressPort,
+    carburetor_address: Address,
 }
 
 impl LinkageLib {
-    pub fn address(&self) -> &Address {
-        &self.address
+    pub fn port(&self) -> &AddressPort {
+        &self.port
+    }
+
+    pub fn carburetor_address(&self) -> &Address {
+        &self.carburetor_address
     }
 }
 

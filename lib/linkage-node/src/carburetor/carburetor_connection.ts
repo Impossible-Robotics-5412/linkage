@@ -1,4 +1,5 @@
 import { createConnection, Socket } from "net";
+import { ConfigManager } from "../config/config_manager";
 import { clampMotorValue } from "../util";
 
 export class CarburetorConnection {
@@ -12,8 +13,15 @@ export class CarburetorConnection {
         this.close();
       }
 
-      // FIXME: the hostname and port should be in a config file.
-      this.connection = createConnection({ host: "0.0.0.0", port: 48862 });
+      const carburetorAddress = ConfigManager.shared.config?.carburetorAddress;
+      if (!carburetorAddress) {
+        throw new Error("Carburetor address not found in config");
+      }
+
+      this.connection = createConnection({
+        host: carburetorAddress.host,
+        port: carburetorAddress.port,
+      });
 
       this.connection.on("connect", () => {
         console.log(`[CarburetorConnection] Connected.`);
