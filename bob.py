@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import argparse
 import subprocess
@@ -15,6 +15,7 @@ def cargo_build(package=None, release=False):
 
 def build_cockpit_frontend():
     print("👷🏼‍♂️ Bob: Building frontend...")
+    subprocess.run(["npm", "install"], cwd="cockpit/frontend/web")
     subprocess.run(["npm", "run", "build"], cwd="cockpit/frontend/web")
 
 
@@ -36,13 +37,18 @@ def build_carburetor():
 
 def build_lib():
     print("👷🏼‍♂️ Bob: Building linkage lib...")
+    subprocess.run(["npm", "install"], cwd="lib/linkage-node")
     subprocess.run(["npm", "run", "build"], cwd="lib/linkage-node")
 
 
 def build_lib_examples():
     print("👷🏼‍♂️ Bob: Building linkage lib examples...")
-    # TODO: Implement linking, then building.
-    assert False, "not yet implemented!"
+    subprocess.run(["npm", "link"], cwd="lib/linkage-node")
+    subprocess.run(
+        ["npm", "link", "@impossiblerobotics/linkage", "--save"],
+        cwd="examples/lib/linkage-node",
+    )
+    subprocess.run(["npm", "run", "build"], cwd="examples/lib/linkage-node")
 
 
 if __name__ == "__main__":
@@ -68,6 +74,7 @@ if __name__ == "__main__":
             "carburetor",
             "lib",
             "lib-examples",
+            "lib-examples-only",
         ],
     )
     args = parser.parse_args()
@@ -78,8 +85,7 @@ if __name__ == "__main__":
             build_cockpit_frontend()
             cargo_build()
             build_lib()
-            # TODO: Enable this when this works. See function implementaion.
-            # build_lib_examples()
+            build_lib_examples()
 
         case "cockpit":
             print("👷🏼‍♂️ Bob: Building cockpit frontend and backend...")
@@ -101,6 +107,10 @@ if __name__ == "__main__":
         case "lib-examples":
             print("👷🏼‍♂️ Bob: Building linkage lib and its examples...")
             build_lib()
+            build_lib_examples()
+
+        case "lib-examples-only":
+            print("👷🏼‍♂️ Bob: Building only linkage lib examples...")
             build_lib_examples()
 
         case "lib":

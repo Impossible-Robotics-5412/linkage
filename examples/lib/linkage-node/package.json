@@ -11,5 +11,8 @@
   "license": "MIT",
   "devDependencies": {
     "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@impossiblerobotics/linkage": "file:../../../lib/linkage-node"
   }
 }
