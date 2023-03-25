@@ -17,8 +17,8 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
         unsafe { mem::transmute_copy::<GamepadId, usize>(&gamepad_id) as u8 }
     }
 
-    let send = |gamepad_id: GamepadId, code: u32, value: f32| {
-        let value = value as u8;
+    let send = |gamepad_id: GamepadId, code: u32, value: u8| {
+        let value = value;
         let gamepad_id = gamepad_id_into_u8(gamepad_id);
         let code_page = (code >> 16) as u8;
         let code_usage = (code & 0xff) as u8;
@@ -39,17 +39,17 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
         while let Some(gilrs::Event { id, event, time: _ }) = gilrs.next_event() {
             match event {
                 ButtonChanged(_button, value, code) => {
-                    send(id, code.into_u32(), value.clamp(0.0, 1.0) * 255.0)
+                    send(id, code.into_u32(), (value.clamp(0.0, 1.0) * 255.0) as u8)
                 }
                 AxisChanged(_axis, value, code) => send(
                     id,
                     code.into_u32(),
-                    ((value.clamp(-1.0, 1.0) + 1.0) / 2.0) * 255.0,
+                    (((value.clamp(-1.0, 1.0) + 1.0) / 2.0) * 255.0) as u8,
                 ),
                 Connected | Disconnected => {
                     let value = match event {
-                        Connected => 1.0,
-                        Disconnected => 0.0,
+                        Connected => 1,
+                        Disconnected => 0,
                         _ => unreachable!(),
                     };
 
