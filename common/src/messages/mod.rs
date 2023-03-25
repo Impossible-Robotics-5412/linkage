@@ -87,10 +87,10 @@ pub enum BackendToFrontendMessage {
 #[derive(Debug, Clone, Copy)]
 pub enum BackendToLinkage {
     GamepadInputEvent {
-        pub value: u8,
-        pub id: u8,
-        pub code_page: u8,
-        pub code_usage: u8,
+        value: u8,
+        id: u8,
+        code_page: u8,
+        code_usage: u8,
     },
 }
 
@@ -120,7 +120,7 @@ impl From<BackendToLinkage> for Bytes {
     fn from(value: BackendToLinkage) -> Self {
         #[allow(unused_parens)]
         match value {
-            Self::GamepadInputEvent {
+            BackendToLinkage::GamepadInputEvent {
                 value,
                 id,
                 code_page,
