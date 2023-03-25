@@ -4,6 +4,10 @@ import argparse
 import subprocess
 
 
+def styled_print(message):
+    print(f"[👷🏼‍♂️ Bob]: {message}")
+
+
 def cargo_build(package=None, release=False):
     args = ["cargo", "build"]
     if package:
@@ -14,35 +18,35 @@ def cargo_build(package=None, release=False):
 
 
 def build_cockpit_frontend():
-    print("👷🏼‍♂️ Bob: Building frontend...")
+    styled_print("Building frontend...")
     subprocess.run(["npm", "install"], cwd="cockpit/frontend/web")
     subprocess.run(["npm", "run", "build"], cwd="cockpit/frontend/web")
 
 
 def build_cockpit_backend():
-    print("👷🏼‍♂️ Bob: Building backend...")
+    styled_print("Building backend...")
     # TODO: Add ability to use a --release flag for build subcommand.
     cargo_build("cockpit-backend")
 
 
 def build_runtime():
-    print("👷🏼‍♂️ Bob: Building runtime...")
+    styled_print("Building runtime...")
     cargo_build("runtime")
 
 
 def build_carburetor():
-    print("👷🏼‍♂️ Bob: Building carburetor...")
+    styled_print("Building carburetor...")
     cargo_build("carburetor")
 
 
 def build_lib():
-    print("👷🏼‍♂️ Bob: Building linkage lib...")
+    styled_print("Building linkage lib...")
     subprocess.run(["npm", "install"], cwd="lib/linkage-node")
     subprocess.run(["npm", "run", "build"], cwd="lib/linkage-node")
 
 
 def build_lib_examples():
-    print("👷🏼‍♂️ Bob: Building linkage lib examples...")
+    styled_print("Building linkage lib examples...")
     subprocess.run(["npm", "link"], cwd="lib/linkage-node")
     subprocess.run(
         ["npm", "link", "@impossiblerobotics/linkage", "--save"],
@@ -81,14 +85,14 @@ if __name__ == "__main__":
 
     match args.part:
         case "all":
-            print("👷🏼‍♂️ Bob: Building all parts...")
+            styled_print("Building all parts...")
             build_cockpit_frontend()
             cargo_build()
             build_lib()
             build_lib_examples()
 
         case "cockpit":
-            print("👷🏼‍♂️ Bob: Building cockpit frontend and backend...")
+            styled_print("Building cockpit frontend and backend...")
             build_cockpit_frontend()
             build_cockpit_backend()
 
@@ -105,19 +109,18 @@ if __name__ == "__main__":
             build_carburetor()
 
         case "lib-examples":
-            print("👷🏼‍♂️ Bob: Building linkage lib and its examples...")
+            styled_print("Building linkage lib and its examples...")
             build_lib()
             build_lib_examples()
 
         case "lib-examples-only":
-            print("👷🏼‍♂️ Bob: Building only linkage lib examples...")
             build_lib_examples()
 
         case "lib":
             build_lib()
 
         case unknown:
-            print("👷🏼‍♂️ Bob: ERROR: Part '{unknown}' not recognized")
+            styled_print("ERROR: Part '{unknown}' not recognized")
 
-    print("👷🏼‍♂️ Bob: Done!")
+    styled_print("Done!")
     exit(0)
