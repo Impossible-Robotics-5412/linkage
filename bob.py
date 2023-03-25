@@ -83,44 +83,44 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    match args.part:
-        case "all":
-            styled_print("Building all parts...")
-            build_cockpit_frontend()
-            cargo_build()
-            build_lib()
-            build_lib_examples()
+    if args.part == "all":
+        styled_print("Building all parts...")
+        build_cockpit_frontend()
+        cargo_build()
+        build_lib()
+        build_lib_examples()
 
-        case "cockpit":
-            styled_print("Building cockpit frontend and backend...")
-            build_cockpit_frontend()
-            build_cockpit_backend()
+    elif args.part == "cockpit":
+        styled_print("Building cockpit frontend and backend...")
+        build_cockpit_frontend()
+        build_cockpit_backend()
 
-        case "cockpit-frontend":
-            build_cockpit_frontend()
+    elif args.part == "cockpit-frontend":
+        build_cockpit_frontend()
 
-        case "cockpit-backend":
-            build_cockpit_backend()
+    elif args.part == "cockpit-backend":
+        build_cockpit_backend()
 
-        case "runtime":
-            build_runtime()
+    elif args.part == "runtime":
+        build_runtime()
 
-        case "carburetor":
-            build_carburetor()
+    elif args.part == "carburetor":
+        build_carburetor()
 
-        case "lib-examples":
-            styled_print("Building linkage lib and its examples...")
-            build_lib()
-            build_lib_examples()
+    elif args.part == "lib-examples":
+        styled_print("Building linkage lib and its examples...")
+        build_lib()
+        build_lib_examples()
 
-        case "lib-examples-only":
-            build_lib_examples()
+    elif args.part == "lib-examples-only":
+        styled_print("Building only linkage lib examples...")
+        build_lib_examples()
 
-        case "lib":
-            build_lib()
+    elif args.part == "lib":
+        build_lib()
 
-        case unknown:
-            styled_print("ERROR: Part '{unknown}' not recognized")
+    else:
+        styled_print("ERROR: Part '{unknown}' not recognized")
 
     styled_print("Done!")
     exit(0)
