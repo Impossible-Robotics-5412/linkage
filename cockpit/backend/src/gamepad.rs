@@ -9,9 +9,9 @@ use std::{
     sync::mpsc::{Receiver, Sender},
 };
 
-use crate::linkage;
+use linkage_lib::LinkageInstruction;
 
-use linkage::LinkageInstruction;
+use crate::linkage_lib;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct GamepadInputEvent {
@@ -73,8 +73,7 @@ pub(crate) fn channel(sender: Sender<GamepadInputEvent>) {
 
 pub(crate) fn handle_input(linkage_stream: &TcpStream, receiver: Receiver<GamepadInputEvent>) {
     while let Ok(gamepad_input) = receiver.recv() {
-        dbg!(gamepad_input);
-        linkage::send_instruction(
+        linkage_lib::send_instruction(
             linkage_stream,
             LinkageInstruction::GamepadEvent(gamepad_input),
         )

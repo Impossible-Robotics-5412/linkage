@@ -1,9 +1,10 @@
 use std::{
     io::{self, Write},
     net::TcpStream,
+    sync::mpsc::channel,
 };
 
-use crate::gamepad::GamepadInputEvent;
+use crate::gamepad::{self, GamepadInputEvent};
 
 type MessageBytes = [u8; 8];
 
@@ -45,4 +46,18 @@ pub(crate) fn send_instruction(
     stream.write(&instruction.to_bytes())?;
     eprintln!("[LinkageConnection] Sent instruction: {instruction:?}.");
     Ok(())
+}
+
+pub(crate) fn start_communication() {
+    // NOTE: If we want to send controller info to frontend, we should start listening for
+    //       Controller input immediately after starting, and not just when enabling Linkage-lib.
+    let (linkage_tx, linkage_rx) = channel();
+    std::thread::spawn(move || gamepad::channel(linkage_tx));
+
+    std::thread::spawn(move || {
+        // FIXME: Use address from settings
+        let linkage_stream = TcpStream::connect("0.0.0.0:12362").unwrap();
+
+        gamepad::handle_input(&linkage_stream, linkage_rx);
+    });
 }
