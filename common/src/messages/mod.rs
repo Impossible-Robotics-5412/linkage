@@ -82,3 +82,50 @@ pub enum BackendToFrontendMessage {
     #[message(BACKEND_IS_DISABLED)]
     Disabled,
 }
+
+// Backend ------> Linkage Lib
+#[derive(Debug, Clone, Copy)]
+pub enum BackendToLinkage {
+    GamepadInputEvent {
+        pub value: u8,
+        pub id: u8,
+        pub code_page: u8,
+        pub code_usage: u8,
+    },
+}
+
+impl Message for BackendToLinkage {
+    fn to_bytes(&self) -> Bytes {
+        Bytes::from(*self)
+    }
+}
+
+impl TryFrom<Bytes> for BackendToLinkage {
+    type Error = MessageError;
+
+    fn try_from(value: Bytes) -> Result<Self, Self::Error> {
+        match value {
+            [0x20, 0, 0, 0, value, id, code_page, code_usage] => Ok(Self::GamepadInputEvent {
+                value,
+                id,
+                code_page,
+                code_usage,
+            }),
+            bytes => Err(MessageError::UnknownMessage(bytes)),
+        }
+    }
+}
+
+impl From<BackendToLinkage> for Bytes {
+    fn from(value: BackendToLinkage) -> Self {
+        #[allow(unused_parens)]
+        match value {
+            Self::GamepadInputEvent {
+                value,
+                id,
+                code_page,
+                code_usage,
+            } => [0x20, 0, 0, 0, value, id, code_page, code_usage],
+        }
+    }
+}
