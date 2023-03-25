@@ -1,12 +1,16 @@
 use std::{
     io::{self, Read, Write},
     net::TcpStream,
+    sync::mpsc::channel,
 };
 
 use common::messages::{
     BackendToFrontendMessage, BackendToRuntimeMessage, Bytes, FrontendToBackendMessage, Message,
     RuntimeToBackendMessage,
 };
+
+mod gamepad;
+mod linkage;
 
 fn main() -> io::Result<()> {
     let config = common::config::config().unwrap();
@@ -95,8 +99,21 @@ fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
 
     match msg {
         RuntimeToBackendMessage::Enabled => {
-            // FIXME: Start sending controller input events to linkage.
-            eprintln!("Linkage has been enabled")
+            eprintln!("Linkage has been enabled");
+
+            // FIXME: Refactor
+            let (linkage_tx, linkage_rx) = channel();
+
+            std::thread::spawn(move || {
+                gamepad::channel(linkage_tx);
+            });
+
+            std::thread::spawn(move || {
+                // FIXME: Use address from settings
+                let linkage_stream = TcpStream::connect("0.0.0.0:12362").unwrap();
+
+                gamepad::handle_input(&linkage_stream, linkage_rx);
+            });
         }
         _ => unreachable!(
             "runtime should not send back disabled message after receiving an enable message"
