@@ -14,7 +14,7 @@ pub(crate) fn handle_alrm_signal(sender: crossbeam::channel::Sender<()>) {
             eprintln!("Caught ALRM signal");
             sender
                 .send(())
-                .expect("failed to send ALRM signal over channel");
+                .expect("should send ALRM signal over channel");
         }
     });
 }
@@ -24,13 +24,15 @@ pub(crate) fn start_processes(config: &config::Runtime) -> Vec<Child> {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
-        .expect("failed to execute carburetor");
+        .expect("should execute carburetor");
 
+    // FIXME: Add error message when Node is not found.
     let linkage_process = Command::new(config.node_path())
         .current_dir("/")
         .arg(config.linkage_lib_entry_point())
         .spawn()
-        .expect("failed to execute linkage");
+        .expect("should execute linkage");
+
 
     vec![carburetor_process, linkage_process]
 }
