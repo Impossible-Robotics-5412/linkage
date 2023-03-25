@@ -48,16 +48,15 @@ pub(crate) fn send_instruction(
     Ok(())
 }
 
-pub(crate) fn start_communication() {
+pub(crate) fn start_communication(linkage_address: String) {
     // NOTE: If we want to send controller info to frontend, we should start listening for
     //       Controller input immediately after starting, and not just when enabling Linkage-lib.
     let (linkage_tx, linkage_rx) = channel();
     std::thread::spawn(move || gamepad::channel(linkage_tx));
 
     std::thread::spawn(move || {
-        // FIXME: Use address from settings
-        let linkage_stream = TcpStream::connect("0.0.0.0:12362").unwrap();
-
+        let linkage_stream =
+            TcpStream::connect(linkage_address).expect("should connect to Linkage-lib");
         gamepad::handle_input(&linkage_stream, linkage_rx);
     });
 }

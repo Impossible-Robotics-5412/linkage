@@ -14,7 +14,10 @@ mod linkage_lib;
 fn main() -> io::Result<()> {
     let config = common::config::config().unwrap();
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
+
     ws::listen(address, move |frontend| {
+        let linkage_lib_address = config.cockpit_backend().linkage_lib_address().to_string();
+
         let runtime_stream =
             TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
                 .expect("should connect to runtime");
@@ -53,7 +56,9 @@ fn main() -> io::Result<()> {
                     eprintln!("Received message: {msg:?} {buffer:?}");
                     match msg {
                         FrontendToBackendMessage::Enable => {
-                            if let Err(error) = enable_linkage(&mut runtime_stream) {
+                            if let Err(error) =
+                                enable_linkage(&mut runtime_stream, linkage_lib_address.clone())
+                            {
                                 eprintln!(
                                     "Connection with runtime broke. ({error})\nTo connect  again, \
                                     restart runtime and reconnect cockpit-backend to runtime"
@@ -88,7 +93,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
+fn enable_linkage(runtime_stream: &mut TcpStream, linkage_address: String) -> io::Result<()> {
     runtime_stream.write(&BackendToRuntimeMessage::Enable.to_bytes())?;
 
     let mut buffer = Bytes::default();
@@ -99,7 +104,7 @@ fn enable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
     match msg {
         RuntimeToBackendMessage::Enabled => {
             eprintln!("Linkage has been enabled");
-            linkage_lib::start_communication();
+            linkage_lib::start_communication(linkage_address);
         }
         _ => unreachable!(
             "runtime should only send back ENABLED message after receiving an ENABLE message"
