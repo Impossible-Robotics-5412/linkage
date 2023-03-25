@@ -3,7 +3,7 @@ import { createServer, Server } from "net";
 import { ConfigManager } from "../config/config_manager";
 
 enum CockpitInstruction {
-  GAMEPAD_EVENT = 0x00,
+  GAMEPAD_EVENT = 0x20,
 }
 
 interface CockpitMessage {
@@ -93,10 +93,10 @@ export class CockpitConnection {
 
   private onMessage(message: CockpitMessage): void {
     if (message.instruction === CockpitInstruction.GAMEPAD_EVENT) {
-      const value = message.data1;
-      const gamepadId = message.data2;
-      const codePage = message.data3;
-      const codeUsage = message.data4;
+      const value = message.data4;
+      const gamepadId = message.data5;
+      const codePage = message.data6;
+      const codeUsage = message.data7;
 
       GamepadManager.shared.parseGamepadEvent(
         gamepadId,
