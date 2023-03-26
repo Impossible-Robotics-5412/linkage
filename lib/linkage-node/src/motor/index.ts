@@ -1,1 +1,1 @@
-export * from "./spark_motor";
+export * from './spark_motor';

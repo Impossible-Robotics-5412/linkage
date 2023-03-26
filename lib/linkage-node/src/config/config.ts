@@ -1,11 +1,11 @@
 export interface Config {
-  port: Port;
-  carburetorAddress: Address;
+	port: Port;
+	carburetorAddress: Address;
 }
 
 export interface Address {
-  host: Host;
-  port: Port;
+	host: Host;
+	port: Port;
 }
 
 export type Host = string;

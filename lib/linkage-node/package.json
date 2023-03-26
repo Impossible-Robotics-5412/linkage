@@ -1,20 +1,20 @@
 {
-  "name": "@impossiblerobotics/linkage",
-  "version": "0.0.2",
-  "source": "src/index.ts",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "author": "Bauke Westendorp",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch"
-  },
-  "devDependencies": {
-    "@types/node": "^18.15.3",
-    "typescript": "^4.9.5"
-  },
-  "dependencies": {
-    "toml": "^3.0.0"
-  }
+	"name": "@impossiblerobotics/linkage",
+	"version": "0.0.2",
+	"source": "src/index.ts",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"author": "Bauke Westendorp",
+	"license": "MIT",
+	"scripts": {
+		"build": "tsc",
+		"watch": "tsc --watch"
+	},
+	"devDependencies": {
+		"@types/node": "^18.15.3",
+		"typescript": "^4.9.5"
+	},
+	"dependencies": {
+		"toml": "^3.0.0"
+	}
 }

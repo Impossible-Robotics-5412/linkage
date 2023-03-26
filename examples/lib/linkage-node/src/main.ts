@@ -1,29 +1,31 @@
 import {
-  GamepadManager,
-  Robot,
-  SparkMotor,
-  Subsystem,
-} from "@impossiblerobotics/linkage";
+	GamepadManager,
+	Robot,
+	SparkMotor,
+	Subsystem
+} from '@impossiblerobotics/linkage';
 
 class DriveSubsystem extends Subsystem {
-  private leftMotor = new SparkMotor(0);
-  private rightMotor = new SparkMotor(1);
+	private leftMotor = new SparkMotor(0);
+	private rightMotor = new SparkMotor(1);
 
-  public tick(): void {
-    const leftJoystickY = GamepadManager.shared.primaryGamepad.leftJoystickY;
-    const rightJoystickY = GamepadManager.shared.primaryGamepad.rightJoystickY;
+	public tick(): void {
+		const leftJoystickY =
+			GamepadManager.shared.primaryGamepad.leftJoystickY;
+		const rightJoystickY =
+			GamepadManager.shared.primaryGamepad.rightJoystickY;
 
-    this.leftMotor.setSpeedPercentage(leftJoystickY);
-    this.rightMotor.setSpeedPercentage(rightJoystickY);
-  }
+		this.leftMotor.setSpeedPercentage(leftJoystickY);
+		this.rightMotor.setSpeedPercentage(rightJoystickY);
+	}
 }
 
 class TestRobot extends Robot {
-  public constructor() {
-    super();
+	public constructor() {
+		super();
 
-    this.registerSubsystem(new DriveSubsystem(this));
-  }
+		this.registerSubsystem(new DriveSubsystem(this));
+	}
 }
 
 new TestRobot().run();
