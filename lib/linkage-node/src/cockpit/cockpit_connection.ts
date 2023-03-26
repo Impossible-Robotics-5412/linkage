@@ -93,20 +93,20 @@ export class CockpitConnection {
 
   private onMessage(message: CockpitMessage): void {
     if (message.instruction === CockpitInstruction.GAMEPAD_EVENT) {
-      const value = message.data4;
-      const gamepadId = message.data5;
-      const codePage = message.data6;
-      const codeUsage = message.data7;
+      const gamepadId = message.data4;
+      const eventType = message.data5;
+      const control = message.data6;
+      const value = message.data7;
 
       GamepadManager.shared.parseGamepadEvent(
         gamepadId,
-        codePage,
-        codeUsage,
-        value,
+        eventType,
+        control,
+        value
       );
     } else {
       console.log(
-        `[CockpitConnection] Invalid instruction: ${message.instruction}.`,
+        `[CockpitConnection] Invalid instruction: ${message.instruction}.`
       );
     }
   }

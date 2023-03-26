@@ -1,9 +1,10 @@
-import { clamp, mapRange } from "../util";
+import { clamp, mapRange } from '../util';
 import {
-  CodePage,
-  GamepadButtonPageCode,
-  GamepadGenericDesktopPageCode,
-} from "./codes";
+  AxisControl,
+  ButtonControl,
+  Control,
+  EventType
+} from './gamepad_manager';
 
 /**
  * Represents the state of a xbox game controller.
@@ -87,6 +88,11 @@ export class PsController {
   leftJoystickY = 0;
 
   /**
+   * @returns Whether or not the left joystick button is pressed.
+   */
+  leftJoystickButton = false;
+
+  /**
    * The X axis of the right joystick.
    *
    * @returns A value between -1.0 and 1.0 indicating completely to the left and completely to the right respectively. A value of 0.0 means it is horizontally centered.
@@ -101,6 +107,11 @@ export class PsController {
   rightJoystickY = 0;
 
   /**
+   * @returns Whether or not the right joystick button is pressed.
+   */
+  rightJoystickButton = false;
+
+  /**
    * @returns Whether or not the share button is pressed.
    */
   share = false;
@@ -110,74 +121,94 @@ export class PsController {
    */
   options = false;
 
-  public setValue(codePage: number, codeUsage: number, value: number): void {
-    if (codePage === CodePage.BUTTON_PAGE) {
-      switch (codeUsage) {
-        case GamepadButtonPageCode.USAGE_BTN_SIMPLE_0:
-          this.square = value > 127;
-          break;
-        case GamepadButtonPageCode.USAGE_BTN_SIMPLE_1:
-          this.cross = value > 127;
-          break;
-        case GamepadButtonPageCode.USAGE_BTN_SIMPLE_2:
-          this.circle = value > 127;
-          break;
-        case GamepadButtonPageCode.USAGE_BTN_SIMPLE_3:
-          this.triangle = value > 127;
-          break;
+  /**
+   * @returns Whether or not the home button is pressed.
+   */
+  home = false;
 
-        case GamepadButtonPageCode.USAGE_BTN_DPAD_UP:
-          this.dpadUp = value > 127;
+  public setValue(eventType: EventType, control: Control, value: number): void {
+    if (eventType === EventType.AXIS_CHANGED) {
+      switch (control as AxisControl) {
+        case AxisControl.LEFT_STICK_X:
+          this.leftJoystickX = clamp(value / 255, 0, 1);
           break;
-        case GamepadButtonPageCode.USAGE_BTN_DPAD_RIGHT:
-          this.dpadRight = value > 127;
+        case AxisControl.LEFT_STICK_Y:
+          this.leftJoystickY = clamp(value / 255, 0, 1);
           break;
-        case GamepadButtonPageCode.USAGE_BTN_DPAD_DOWN:
-          this.dpadDown = value > 127;
+        case AxisControl.RIGHT_STICK_X:
+          this.rightJoystickX = clamp(value / 255, 0, 1);
           break;
-        case GamepadButtonPageCode.USAGE_BTN_DPAD_LEFT:
-          this.dpadLeft = value > 127;
+        case AxisControl.RIGHT_STICK_Y:
+          this.rightJoystickY = clamp(value / 255, 0, 1);
           break;
-
-        case GamepadButtonPageCode.USAGE_BTN_LT:
-          this.leftBumper = value > 127;
+        case AxisControl.DPAD_X:
+          this.dpadLeft = false;
+          this.dpadRight = false;
+          if (value <= -0.5) this.dpadLeft = true;
+          else if (value >= 0.5) this.dpadRight = true;
           break;
-        case GamepadButtonPageCode.USAGE_BTN_RT:
-          this.rightBumper = value > 127;
+        case AxisControl.DPAD_Y:
+          this.dpadDown = false;
+          this.dpadUp = false;
+          if (value <= -0.5) this.dpadDown = true;
+          else if (value >= 0.5) this.dpadUp = true;
           break;
-
-        case GamepadButtonPageCode.USAGE_BTN_START:
-          this.share = value > 127;
-          break;
-        case GamepadButtonPageCode.USAGE_BTN_SELECT:
-          this.options = value > 127;
-          break;
-
         default:
           break;
       }
-    } else if (codePage === CodePage.GENERIC_DESKTOP) {
-      switch (codeUsage) {
-        case GamepadGenericDesktopPageCode.USAGE_AXIS_RSTICKX:
+    } else if (eventType === EventType.BUTTON_CHANGED) {
+      switch (control as ButtonControl) {
+        case ButtonControl.SOUTH:
+          this.cross = value >= 127;
+          break;
+        case ButtonControl.EAST:
+          this.circle = value >= 127;
+          break;
+        case ButtonControl.NORTH:
+          this.triangle = value >= 127;
+          break;
+        case ButtonControl.WEST:
+          this.square = value >= 127;
+          break;
+        case ButtonControl.LEFT_TRIGGER:
+          this.leftBumper = value >= 127;
+          break;
+        case ButtonControl.LEFT_TRIGGER_2:
           this.leftTrigger = clamp(value / 255, 0, 1);
           break;
-        case GamepadGenericDesktopPageCode.USAGE_AXIS_RSTICKY:
+        case ButtonControl.RIGHT_TRIGGER:
+          this.rightBumper = value >= 127;
+          break;
+        case ButtonControl.RIGHT_TRIGGER_2:
           this.rightTrigger = clamp(value / 255, 0, 1);
           break;
-
-        case GamepadGenericDesktopPageCode.USAGE_AXIS_LSTICKX:
-          this.leftJoystickX = mapRange(value, 0, 255, -1, 1);
+        case ButtonControl.SELECT:
+          this.share = value >= 127;
           break;
-        case GamepadGenericDesktopPageCode.USAGE_AXIS_LSTICKY:
-          this.leftJoystickY = mapRange(value, 0, 255, -1, 1);
+        case ButtonControl.START:
+          this.options = value >= 127;
           break;
-        case GamepadGenericDesktopPageCode.USAGE_AXIS_RT2:
-          this.rightJoystickX = mapRange(value, 0, 255, -1, 1);
+        case ButtonControl.MODE:
+          this.home = value >= 127;
           break;
-        case GamepadGenericDesktopPageCode.USAGE_AXIS_LT2:
-          this.rightJoystickY = mapRange(value, 0, 255, -1, 1);
+        case ButtonControl.LEFT_THUMB:
+          this.leftJoystickButton = value >= 127;
           break;
-
+        case ButtonControl.RIGHT_THUMB:
+          this.rightJoystickButton = value >= 127;
+          break;
+        case ButtonControl.DPAD_UP:
+          this.dpadUp = value >= 127;
+          break;
+        case ButtonControl.DPAD_DOWN:
+          this.dpadDown = value >= 127;
+          break;
+        case ButtonControl.DPAD_LEFT:
+          this.dpadLeft = value >= 127;
+          break;
+        case ButtonControl.DPAD_RIGHT:
+          this.dpadRight = value >= 127;
+          break;
         default:
           break;
       }

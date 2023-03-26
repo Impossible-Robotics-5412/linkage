@@ -87,10 +87,10 @@ pub enum BackendToFrontendMessage {
 #[derive(Debug, Clone, Copy)]
 pub enum BackendToLinkage {
     GamepadInputEvent {
+        gamepad_id: u8,
+        event_type: u8,
+        control: u8,
         value: u8,
-        id: u8,
-        code_page: u8,
-        code_usage: u8,
     },
 }
 
@@ -105,12 +105,14 @@ impl TryFrom<Bytes> for BackendToLinkage {
 
     fn try_from(value: Bytes) -> Result<Self, Self::Error> {
         match value {
-            [0x20, 0, 0, 0, value, id, code_page, code_usage] => Ok(Self::GamepadInputEvent {
-                value,
-                id,
-                code_page,
-                code_usage,
-            }),
+            [0x20, 0, 0, 0, gamepad_id, event_type, control, value] => {
+                Ok(Self::GamepadInputEvent {
+                    gamepad_id,
+                    event_type,
+                    control,
+                    value,
+                })
+            }
             bytes => Err(MessageError::UnknownMessage(bytes)),
         }
     }
@@ -121,11 +123,11 @@ impl From<BackendToLinkage> for Bytes {
         #[allow(unused_parens)]
         match value {
             BackendToLinkage::GamepadInputEvent {
+                gamepad_id,
+                event_type,
+                control,
                 value,
-                id,
-                code_page,
-                code_usage,
-            } => [0x20, 0, 0, 0, value, id, code_page, code_usage],
+            } => [0x20, 0, 0, 0, gamepad_id, event_type, control, value],
         }
     }
 }
