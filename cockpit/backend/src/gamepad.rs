@@ -10,22 +10,12 @@ use gilrs::{
 
 use common::messages::{BackendToLinkage, Message};
 
+#[repr(u8)]
 enum EventType {
-    ButtonChanged,
-    AxisChanged,
-    Connected,
-    Disconnected,
-}
-
-impl From<EventType> for u8 {
-    fn from(value: EventType) -> Self {
-        match value {
-            EventType::ButtonChanged => 0,
-            EventType::AxisChanged => 1,
-            EventType::Connected => 2,
-            EventType::Disconnected => 3,
-        }
-    }
+    ButtonChanged = 0,
+    AxisChanged = 1,
+    Connected = 2,
+    Disconnected = 3,
 }
 
 pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
@@ -40,7 +30,7 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
 
         let message = BackendToLinkage::GamepadInputEvent {
             gamepad_id,
-            event_type: event_type.into(),
+            event_type: event_type as u8,
             control,
             value,
         };
