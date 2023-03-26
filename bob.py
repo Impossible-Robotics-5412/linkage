@@ -100,14 +100,32 @@ def build(args: Namespace):
     styled_print("Done!")
     exit(0)
 
+
+def format():
+    styled_print("Formatting entire project...")
+    styled_print("Running prettier")
+    subprocess.run(["npx", "prettier", "-w", "--config", ".prettierrc", "."])
+    styled_print("Running black")
+    subprocess.run(["black", "."])
+    styled_print("Running rustfmt")
+    subprocess.run(["cargo", "fmt"])
+    styled_print("Done!")
+    exit()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Build script for the many moving parts of Linkage",
+        description="Manager script for the many moving parts of Linkage",
         epilog="Koen Westendorp & Bauke Westendorp, 2023",
     )
 
-    subparsers = parser.add_subparsers(title="subarguments", dest="subcommand", required=True)
-    build_subcommand = subparsers.add_parser("build", help="build the moving parts of linkage")
+    subparsers = parser.add_subparsers(
+        title="subarguments", dest="subcommand", required=True
+    )
+    build_subcommand = subparsers.add_parser(
+        "build", help="build the moving parts of linkage"
+    )
+    format_subcommand = subparsers.add_parser("format", help="format all files")
     # deploy_subcommand = subparsers.add_parser("deploy", help="deploy the moving parts of linkage")
     # test_subcommand = subparsers.add_parser("test", help="test the moving parts of linkage")
 
@@ -126,11 +144,18 @@ if __name__ == "__main__":
             "lib-examples-only",
         ],
     )
-    build_subcommand.add_argument("--release", "-r", help="compile rust binaries in release mode", action="store_true")
+    build_subcommand.add_argument(
+        "--release",
+        "-r",
+        help="compile rust binaries in release mode",
+        action="store_true",
+    )
 
     args = parser.parse_args()
 
     if args.subcommand == "build":
         build(args)
+    elif args.subcommand == "format":
+        format()
     else:
         styled_print("ERROR: Unknown subcommond '{args.subcommand}'")
