@@ -17,5 +17,4 @@ readonly TARGET_BIN=${TARGET_PATH}/${PROJECT_NAME}
 cross build --release --target=${TARGET_ARCH}
 rsync -aP ${SOURCE_PATH} ${TARGET_HOST}:${TARGET_PATH}/
 ssh -t ${TARGET_HOST} \
-    "sudo install ${TARGET_BIN} /usr/bin/${PROJECT_NAME} && \
-    /usr/bin/${PROJECT_NAME}"
+    "sudo install ${TARGET_BIN} /usr/bin/${PROJECT_NAME}"
