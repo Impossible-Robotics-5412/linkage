@@ -88,7 +88,7 @@ def build(args: Namespace):
         build_runtime(release=args.release)
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
-    elif args.part == "lib-exampls":
+    elif args.part == "lib-example":
         styled_print("Building linkage lib and its example...")
         build_lib()
         build_lib_example()
@@ -114,6 +114,11 @@ def deploy_carburetor():
     subprocess.run(["./deploy.sh"], cwd="carburetor")
 
 
+def deploy_example():
+    styled_print("Deploying example...")
+    subprocess.run(["./deploy.sh"], cwd="examples/lib/linkage-node")
+
+
 def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
@@ -123,6 +128,8 @@ def deploy(args: Namespace):
         deploy_runtime()
     elif args.part == "carburetor":
         deploy_carburetor()
+    elif args.part == "lib-example":
+        deploy_example()
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
