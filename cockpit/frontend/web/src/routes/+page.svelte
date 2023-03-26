@@ -7,7 +7,7 @@
 
 	let backend: BackendConnection | undefined;
 
-	$state.host = data.serverNetworkInterfaceInfo?.address ?? '0.0.0.0';
+	$state.host = data.ipAddress ?? '0.0.0.0';
 
 	reconnect();
 

@@ -1,15 +1,13 @@
 import type { PageServerLoad } from "./$types";
-import { networkInterfaces } from "os";
+import * as ip from 'ip';
 
 export const ssr = false;
 export const prerender = false;
 
 export const load = (({}) => {
-  var en0 = networkInterfaces()["en0"];
-  let serverNetworkInterfaceInfo =
-    en0?.filter((item) => item.family === "IPv4")[0];
-
+  const ipAddress = ip.address();
+  
   return {
-    serverNetworkInterfaceInfo,
+    ipAddress,
   };
 }) satisfies PageServerLoad;
