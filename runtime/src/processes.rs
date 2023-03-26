@@ -33,7 +33,6 @@ pub(crate) fn start_processes(config: &config::Runtime) -> Vec<Child> {
         .spawn()
         .expect("should execute linkage");
 
-
     vec![carburetor_process, linkage_process]
 }
 
