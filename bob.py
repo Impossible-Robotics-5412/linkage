@@ -18,6 +18,18 @@ def cargo_build(package=None, release=False):
     subprocess.run(args)
 
 
+def format():
+    styled_print("Formatting entire project...")
+    styled_print("Running prettier...")
+    subprocess.run(["npx", "prettier", "-w", "--config", ".prettierrc", "."])
+    styled_print("Running black...")
+    subprocess.run(["black", "."])
+    styled_print("Running rustfmt...")
+    subprocess.run(["cargo", "fmt"])
+    styled_print("Done!")
+    exit(0)
+
+
 def build_cockpit_frontend():
     styled_print("Building frontend...")
     subprocess.run(["npm", "install"], cwd="cockpit/frontend/web")
@@ -64,36 +76,27 @@ def build(args: Namespace):
         build_lib()
         build_lib_examples()
         build_cockpit_frontend()
-
     elif args.part == "cockpit":
         styled_print("Building cockpit frontend and backend...")
         build_cockpit_frontend()
         build_cockpit_backend(release=args.release)
-
     elif args.part == "cockpit-frontend":
         build_cockpit_frontend()
-
     elif args.part == "cockpit-backend":
         build_cockpit_backend(release=args.release)
-
     elif args.part == "runtime":
         build_runtime(release=args.release)
-
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
-
     elif args.part == "lib-examples":
         styled_print("Building linkage lib and its examples...")
         build_lib()
         build_lib_examples()
-
     elif args.part == "lib-examples-only":
         styled_print("Building only linkage lib examples...")
         build_lib_examples()
-
     elif args.part == "lib":
         build_lib()
-
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
@@ -101,16 +104,27 @@ def build(args: Namespace):
     exit(0)
 
 
-def format():
-    styled_print("Formatting entire project...")
-    styled_print("Running prettier")
-    subprocess.run(["npx", "prettier", "-w", "--config", ".prettierrc", "."])
-    styled_print("Running black")
-    subprocess.run(["black", "."])
-    styled_print("Running rustfmt")
-    subprocess.run(["cargo", "fmt"])
-    styled_print("Done!")
-    exit()
+def deploy_runtime():
+    styled_print("Deploying runtime...")
+    subprocess.run(["./deploy.sh"], cwd="runtime")
+
+
+def deploy_carburetor():
+    styled_print("Deploying carburetor...")
+    subprocess.run(["./deploy.sh"], cwd="carburetor")
+
+
+def deploy(args: Namespace):
+    if args.part == "all":
+        styled_print("Deploying all parts...")
+        deploy_runtime()
+        deploy_carburetor()
+    elif args.part == "runtime":
+        deploy_runtime()
+    elif args.part == "carburetor":
+        deploy_carburetor()
+    else:
+        styled_print("ERROR: Part '{unknown}' not recognized")
 
 
 if __name__ == "__main__":
@@ -122,12 +136,12 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(
         title="subarguments", dest="subcommand", required=True
     )
+
+    format_subcommand = subparsers.add_parser("format", help="format all files")
+
     build_subcommand = subparsers.add_parser(
         "build", help="build the moving parts of linkage"
     )
-    format_subcommand = subparsers.add_parser("format", help="format all files")
-    # deploy_subcommand = subparsers.add_parser("deploy", help="deploy the moving parts of linkage")
-    # test_subcommand = subparsers.add_parser("test", help="test the moving parts of linkage")
 
     build_subcommand.add_argument(
         "part",
@@ -151,11 +165,24 @@ if __name__ == "__main__":
         action="store_true",
     )
 
+    deploy_subcommand = subparsers.add_parser(
+        "deploy",
+        help="deploy the moving parts of linkage",
+    )
+
+    deploy_subcommand.add_argument(
+        "part",
+        help="the part of linkage to deploy",
+        choices=["all", "runtime", "carburetor"],
+    )
+
     args = parser.parse_args()
 
-    if args.subcommand == "build":
-        build(args)
-    elif args.subcommand == "format":
+    if args.subcommand == "format":
         format()
+    elif args.subcommand == "build":
+        build(args)
+    elif args.subcommand == "deploy":
+        deploy(args)
     else:
         styled_print("ERROR: Unknown subcommond '{args.subcommand}'")
