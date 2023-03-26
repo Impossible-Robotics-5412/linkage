@@ -47,9 +47,10 @@ def build_lib():
 
 def build_lib_examples():
     styled_print("Building linkage lib examples...")
-    subprocess.run(["npm", "link"], cwd="lib/linkage-node")
+    # FIXME: We need to use sudo here because of permission issues, but we should try to find a workaround for this...
+    subprocess.run(["sudo", "npm", "link"], cwd="lib/linkage-node")
     subprocess.run(
-        ["npm", "link", "@impossiblerobotics/linkage", "--save"],
+        ["sudo", "npm", "link", "@impossiblerobotics/linkage", "--save"],
         cwd="examples/lib/linkage-node",
     )
     subprocess.run(["npm", "run", "build"], cwd="examples/lib/linkage-node")
