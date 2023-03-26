@@ -58,8 +58,8 @@ def build_lib():
     subprocess.run(["npm", "run", "build"], cwd="lib/linkage-node")
 
 
-def build_lib_examples():
-    styled_print("Building linkage lib examples...")
+def build_lib_example():
+    styled_print("Building linkage lib example...")
     # FIXME: We need to use sudo here because of permission issues, but we should try to find a workaround for this...
     subprocess.run(["sudo", "npm", "link"], cwd="lib/linkage-node")
     subprocess.run(
@@ -74,7 +74,7 @@ def build(args: Namespace):
         styled_print("Building all parts...")
         cargo_build(release=args.release)
         build_lib()
-        build_lib_examples()
+        build_lib_example()
         build_cockpit_frontend()
     elif args.part == "cockpit":
         styled_print("Building cockpit frontend and backend...")
@@ -88,13 +88,13 @@ def build(args: Namespace):
         build_runtime(release=args.release)
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
-    elif args.part == "lib-examples":
-        styled_print("Building linkage lib and its examples...")
+    elif args.part == "lib-exampls":
+        styled_print("Building linkage lib and its example...")
         build_lib()
-        build_lib_examples()
-    elif args.part == "lib-examples-only":
-        styled_print("Building only linkage lib examples...")
-        build_lib_examples()
+        build_lib_example()
+    elif args.part == "lib-example-only":
+        styled_print("Building only linkage lib example...")
+        build_lib_example()
     elif args.part == "lib":
         build_lib()
     else:
@@ -154,8 +154,8 @@ if __name__ == "__main__":
             "runtime",
             "carburetor",
             "lib",
-            "lib-examples",
-            "lib-examples-only",
+            "lib-example",
+            "lib-example-only",
         ],
     )
     build_subcommand.add_argument(
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     deploy_subcommand.add_argument(
         "part",
         help="the part of linkage to deploy",
-        choices=["all", "runtime", "carburetor"],
+        choices=["all", "runtime", "carburetor", "lib-example"],
     )
 
     args = parser.parse_args()
