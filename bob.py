@@ -85,10 +85,10 @@ if __name__ == "__main__":
 
     if args.part == "all":
         styled_print("Building all parts...")
-        build_cockpit_frontend()
         cargo_build()
         build_lib()
         build_lib_examples()
+        build_cockpit_frontend()
 
     elif args.part == "cockpit":
         styled_print("Building cockpit frontend and backend...")
