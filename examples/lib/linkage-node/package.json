@@ -5,7 +5,7 @@
   "main": "build/main.js",
   "scripts": {
     "deploy": "npm run build && rsync -aP ./build pi@raspberrypi:linkage/ && ssh pi@raspberrypi \"cd linkage && npm install @impossiblerobotics/linkage\"",
-    "build": "rm -rf ./build && npm run tsc"
+    "build": "rm -rf ./build && npm exec tsc"
   },
   "author": "Bauke Westendorp",
   "license": "MIT",
