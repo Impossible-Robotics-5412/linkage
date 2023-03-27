@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { BackendConnection } from '$lib/backend/connection';
 	import { state } from '$lib/state';
-	import type { PageData } from './$types';
 
 	export let data: { ipAddress: string };
 
