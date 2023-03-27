@@ -233,6 +233,9 @@ def install():
         install_rust()
     styled_print("Rust is installed")
 
+    # FIXME: Check if libudev has been installed already. (maybe use `pkg-config --modversion udev`)
+    #        libudev is needed for getting the gamepad input. That means libudev only is needed when you
+    #        run cockpit-backend on the pi.
     install_libudev()
     styled_print("libudev is installed")
 

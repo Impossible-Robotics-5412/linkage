@@ -6,7 +6,7 @@ set -o pipefail
 set -o xtrace
 
 readonly BUILD_FOLDER=build
-readonly TARGET_PATH=/home/pi/linkage
+readonly TARGET_PATH=/home/pi/robot_code
 readonly TARGET_HOST=pi@raspberrypi
 
 npm run build
