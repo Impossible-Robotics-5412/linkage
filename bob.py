@@ -254,26 +254,27 @@ def install():
 
 
 def run(args: Namespace):
-    # FIXME: Implement --release flag for running releases
     # FIXME: Implement --no-build flag for running without building, because why not
 
     if args.part == "runtime":
-        build_runtime()
+        build_runtime(release=args.release)
         styled_print("Running runtime...")
-        cargo_run(package="runtime")
+        cargo_run(package="runtime", release=args.release)
     elif args.part == "cockpit-frontend":
         styled_print("Running Cockpit-frontend...")
-        # FIXME: Implement running `npm run build && npm run preview` as --release option,
-        #        Or in combination with build_cockpit_frontend()
-        subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
+        if args.release:
+            build_cockpit_frontend()
+            subprocess.run(["npm", "run", "preview"], cwd="cockpit/frontend/web")
+        else:
+            subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
     elif args.part == "cockpit-backend":
-        build_cockpit_backend()
+        build_cockpit_backend(release=args.release)
         styled_print("Running Cockpit-backend...")
-        cargo_run(package="cockpit-backend")
+        cargo_run(package="cockpit-backend", release=args.release)
     elif args.part == "carburetor":
-        build_carburetor()
+        build_carburetor(release=args.release)
         styled_print("Running Carburetor")
-        cargo_run(package="carburetor")
+        cargo_run(package="carburetor", release=args.release)
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
@@ -355,6 +356,13 @@ if __name__ == "__main__":
             "cockpit-backend",
             "carburetor",
         ],
+    )
+
+    run_subcommand.add_argument(
+        "--release",
+        "-r",
+        help="compile rust binaries in release mode",
+        action="store_true",
     )
 
     # Parsing
