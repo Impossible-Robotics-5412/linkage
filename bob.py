@@ -210,6 +210,11 @@ def install_rust():
     )
 
 
+def install_libudev():
+    styled_print("Installing libudev")
+    subprocess.run(["sudo", "apt-get", "install", "-y", "libudev-dev"])
+
+
 def install():
     node_path = "/usr/bin/node"
     cargo_path = f"{home_dir()}/.cargo/bin/cargo"
@@ -227,6 +232,9 @@ def install():
     if not path.isfile(cargo_path):
         install_rust()
     styled_print("Rust is installed")
+
+    install_libudev()
+    styled_print("libudev is installed")
 
     build_carburetor(cargo_path, release=True)
     build_runtime(cargo_path, release=True)
