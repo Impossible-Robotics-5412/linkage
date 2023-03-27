@@ -233,6 +233,7 @@ def install():
         install_rust()
     styled_print("Rust is installed")
 
+    # FIXME: Check if libudev has been installed already. (maybe use `pkg-config --modversion udev`)
     install_libudev()
     styled_print("libudev is installed")
 
