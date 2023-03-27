@@ -3,7 +3,7 @@
 	import { state } from '$lib/state';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data: { ipAddress: string };
 
 	let backend: BackendConnection | undefined;
 
