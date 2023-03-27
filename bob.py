@@ -68,7 +68,6 @@ def build_cockpit_frontend():
 
 def build_cockpit_backend(cargo_path=None, release=False):
     styled_print("Building backend...")
-    # TODO: Add ability to use a --release flag for build subcommand.
     cargo_build(cargo_path, "cockpit-backend", release=release)
 
 
