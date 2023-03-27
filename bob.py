@@ -33,11 +33,9 @@ def cargo_build(cargo_path=None, package=None, release=False):
     if release:
         args.append("--release")
 
-    # To prevent super long updating of crates.io index
-    env = environ.copy()
-    env["CARGO_REGISTRIES_CRATES_IO_PROTOCOL"] = "sparse"
+    subprocess.run(args, cwd=linkage_dir())
 
-    subprocess.run(args, cwd=linkage_dir(), env=env)
+
 
 
 def format():
