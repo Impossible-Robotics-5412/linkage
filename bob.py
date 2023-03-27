@@ -252,30 +252,47 @@ def install():
     styled_print("Done")
 
 
+def run_runtime(release=False, no_build=False):
+    if not no_build:
+        build_runtime(release=release)
+    styled_print("Running runtime...")
+    cargo_run(package="runtime", release=release)
+
+
+def run_carburetor(release=False, no_build=False):
+    if not no_build:
+        build_carburetor(release=release)
+    styled_print("Running Carburetor")
+    cargo_run(package="carburetor", release=release)
+
+
+def run_cockpit_frontend(release=False, no_build=False):
+    if release:
+        if not no_build:
+            build_cockpit_frontend()
+        styled_print("Running Cockpit-frontend...")
+        subprocess.run(["npm", "run", "preview"], cwd="cockpit/frontend/web")
+    else:
+        styled_print("Running Cockpit-frontend...")
+        subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
+
+
+def run_cockpit_backend(release=False, no_build=False):
+    if not no_build:
+        build_cockpit_backend(release=release)
+    styled_print("Running Cockpit-backend...")
+    cargo_run(package="cockpit-backend", release=release)
+
+
 def run(args: Namespace):
     if args.part == "runtime":
-        if not args.no_build:
-            build_runtime(release=args.release)
-        styled_print("Running runtime...")
-        cargo_run(package="runtime", release=args.release)
-    elif args.part == "cockpit-frontend":
-        styled_print("Running Cockpit-frontend...")
-        if args.release:
-            if not args.no_build:
-                build_cockpit_frontend()
-            subprocess.run(["npm", "run", "preview"], cwd="cockpit/frontend/web")
-        else:
-            subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
-    elif args.part == "cockpit-backend":
-        if not args.no_build:
-            build_cockpit_backend(release=args.release)
-        styled_print("Running Cockpit-backend...")
-        cargo_run(package="cockpit-backend", release=args.release)
+        run_runtime(release=args.release, no_build=args.no_build)
     elif args.part == "carburetor":
-        if not args.no_build:
-            build_carburetor(release=args.release)
-        styled_print("Running Carburetor")
-        cargo_run(package="carburetor", release=args.release)
+        run_carburetor(release=args.release, no_build=args.no_build)
+    elif args.part == "cockpit-frontend":
+        run_cockpit_frontend(release=args.release, no_build=args.no_build)
+    elif args.part == "cockpit-backend":
+        run_cockpit_backend(release=args.release, no_build=args.no_build)
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
