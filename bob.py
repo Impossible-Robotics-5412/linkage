@@ -70,18 +70,18 @@ def build_runtime(cargo_path=None, release=False):
 
 
 def build_carburetor(cargo_path=None, release=False):
-    styled_print("Building carburetor...")
+    styled_print("Building Carburetor...")
     cargo_build(cargo_path, "carburetor", release=release)
 
 
 def build_lib():
-    styled_print("Building linkage lib...")
+    styled_print("Building Linkage-lib...")
     subprocess.run(["npm", "install"], cwd="lib/linkage-node")
     subprocess.run(["npm", "run", "build"], cwd="lib/linkage-node")
 
 
 def build_lib_example():
-    styled_print("Building linkage lib example...")
+    styled_print("Building Linkage-lib example...")
     # FIXME: We need to use sudo here because of permission issues, but we should try to find a workaround for this...
     subprocess.run(["sudo", "npm", "link"], cwd="lib/linkage-node")
     subprocess.run(
@@ -111,11 +111,11 @@ def build(args: Namespace):
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
     elif args.part == "lib-example":
-        styled_print("Building linkage lib and its example...")
+        styled_print("Building Linkage-lib and its example...")
         build_lib()
         build_lib_example()
     elif args.part == "lib-example-only":
-        styled_print("Building only linkage lib example...")
+        styled_print("Building only Linkage-lib example...")
         build_lib_example()
     elif args.part == "lib":
         build_lib()
@@ -127,17 +127,17 @@ def build(args: Namespace):
 
 
 def deploy_runtime():
-    styled_print("Deploying runtime...")
+    styled_print("Deploying Runtime...")
     subprocess.run(["./deploy.sh"], cwd="runtime")
 
 
 def deploy_carburetor():
-    styled_print("Deploying carburetor...")
+    styled_print("Deploying Carburetor...")
     subprocess.run(["./deploy.sh"], cwd="carburetor")
 
 
 def deploy_example():
-    styled_print("Deploying example...")
+    styled_print("Deploying Linkage-lib example...")
     subprocess.run(["./deploy.sh"], cwd="examples/lib/linkage-node")
 
 
@@ -237,7 +237,7 @@ def install():
     #        libudev is needed for getting the gamepad input. That means libudev only is needed when you
     #        run cockpit-backend on the pi.
     install_libudev()
-    styled_print("libudev is installed")
+    styled_print("Libudev is installed")
 
     build_carburetor(cargo_path, release=True)
     build_runtime(cargo_path, release=True)
