@@ -36,6 +36,16 @@ def cargo_build(cargo_path=None, package=None, release=False):
     subprocess.run(args, cwd=linkage_dir())
 
 
+def cargo_run(cargo_path=None, package=None, release=False):
+    cargo = "cargo" if not cargo_path else cargo_path
+
+    args = [cargo, "run"]
+    if package:
+        args.append(f"--package={package}")
+    if release:
+        args.append("--release")
+
+    subprocess.run(args, cwd=linkage_dir())
 
 
 def format():
@@ -243,6 +253,34 @@ def install():
     styled_print("Done")
 
 
+def run(args: Namespace):
+    # FIXME: Implement --release flag for running releases
+    # FIXME: Implement --no-build flag for running without building, because why not
+
+    if args.part == "runtime":
+        build_runtime()
+        styled_print("Running runtime...")
+        cargo_run(package="runtime")
+    elif args.part == "cockpit-frontend":
+        styled_print("Running Cockpit-frontend...")
+        # FIXME: Implement running `npm run build && npm run preview` as --release option,
+        #        Or in combination with build_cockpit_frontend()
+        subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
+    elif args.part == "cockpit-backend":
+        build_cockpit_backend()
+        styled_print("Running Cockpit-backend...")
+        cargo_run(package="cockpit-backend")
+    elif args.part == "carburetor":
+        build_carburetor()
+        styled_print("Running Carburetor")
+        cargo_run(package="carburetor")
+    else:
+        styled_print("ERROR: Part '{unknown}' not recognized")
+
+    styled_print("Done!")
+    exit(0)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Manager script for the many moving parts of Linkage",
@@ -302,6 +340,23 @@ if __name__ == "__main__":
         help="Run this command on a Raspberry Pi to install all the moving parts of linkage to make it ready for deploying Linkage-lib programs.",
     )
 
+    # Run subcommand
+    run_subcommand = subparsers.add_parser(
+        "run",
+        help="run moving parts of linkage",
+    )
+
+    run_subcommand.add_argument(
+        "part",
+        help="the part of linkage to run",
+        choices=[
+            "runtime",
+            "cockpit-frontend",
+            "cockpit-backend",
+            "carburetor",
+        ],
+    )
+
     # Parsing
     args = parser.parse_args()
 
@@ -313,5 +368,7 @@ if __name__ == "__main__":
         deploy(args)
     elif args.subcommand == "install":
         install()
+    elif args.subcommand == "run":
+        run(args)
     else:
         styled_print("ERROR: Unknown subcommond '{args.subcommand}'")
