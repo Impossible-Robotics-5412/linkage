@@ -3,19 +3,41 @@
 import argparse
 from argparse import Namespace
 import subprocess
+import platform
+import shutil
+from os import makedirs, path, environ
 
 
 def styled_print(message):
     print(f"[👷🏼‍♂️ Bob]: {message}")
 
 
-def cargo_build(package=None, release=False):
-    args = ["cargo", "build"]
+def linkage_dir():
+    return path.dirname(path.abspath(__file__))
+
+
+def home_dir():
+    return path.expanduser("~pi")
+
+
+def is_raspberry_pi():
+    return platform.machine() == "armv7l"
+
+
+def cargo_build(cargo_path=None, package=None, release=False):
+    cargo = "cargo" if not cargo_path else cargo_path
+
+    args = [cargo, "build"]
     if package:
         args.append(f"--package={package}")
     if release:
         args.append("--release")
-    subprocess.run(args)
+
+    # To prevent super long updating of crates.io index
+    env = environ.copy()
+    env["CARGO_REGISTRIES_CRATES_IO_PROTOCOL"] = "sparse"
+
+    subprocess.run(args, cwd=linkage_dir(), env=env)
 
 
 def format():
@@ -36,20 +58,20 @@ def build_cockpit_frontend():
     subprocess.run(["npm", "run", "build"], cwd="cockpit/frontend/web")
 
 
-def build_cockpit_backend(release=False):
+def build_cockpit_backend(cargo_path=None, release=False):
     styled_print("Building backend...")
     # TODO: Add ability to use a --release flag for build subcommand.
-    cargo_build("cockpit-backend", release=release)
+    cargo_build(cargo_path, "cockpit-backend", release=release)
 
 
-def build_runtime(release=False):
+def build_runtime(cargo_path=None, release=False):
     styled_print("Building runtime...")
-    cargo_build("runtime", release=release)
+    cargo_build(cargo_path, "runtime", release=release)
 
 
-def build_carburetor(release=False):
+def build_carburetor(cargo_path=None, release=False):
     styled_print("Building carburetor...")
-    cargo_build("carburetor", release=release)
+    cargo_build(cargo_path, "carburetor", release=release)
 
 
 def build_lib():
@@ -134,6 +156,84 @@ def deploy(args: Namespace):
         styled_print("ERROR: Part '{unknown}' not recognized")
 
 
+def create_config_file():
+    config_folder_path = f"{home_dir()}/.config/linkage"
+    config_file_path = f"{config_folder_path}/config.toml"
+
+    example_config_file_path = f"{linkage_dir()}/examples/config/config.pi.default.toml"
+
+    # FIXME: It's kind of weird that we get the config from the examples folder.
+    styled_print(f"Creating default config file at {config_file_path}")
+    makedirs(config_folder_path, exist_ok=True)
+    shutil.copy(
+        src=example_config_file_path,
+        dst=config_file_path,
+    )
+
+
+def install_node_js():
+    styled_print("Installing NodeJS")
+    curl = subprocess.Popen(
+        [
+            "curl",
+            "-fsSL",
+            "https://deb.nodesource.com/setup_lts.x",
+        ],
+        stdout=subprocess.PIPE,
+    )
+    subprocess.run(
+        [
+            "sudo",
+            "-E",
+            "bash",
+            "-",
+        ],
+        stdin=curl.stdout,
+    )
+
+    subprocess.run(["sudo", "apt-get", "install", "-y", "nodejs"])
+
+
+def install_rust():
+    styled_print("Installing Rust")
+    curl = subprocess.Popen(
+        [
+            "curl",
+            "https://sh.rustup.rs",
+            "-sSf",
+        ],
+        stdout=subprocess.PIPE,
+    )
+    subprocess.run(
+        ["sh"],
+        stdin=curl.stdout,
+    )
+
+
+def install():
+    node_path = "/usr/bin/node"
+    cargo_path = f"{home_dir()}/.cargo/bin/cargo"
+
+    if not is_raspberry_pi():
+        print("You should only run this command on a Raspberry Pi!")
+        exit(1)
+
+    create_config_file()
+
+    if not path.isfile(node_path):
+        install_node_js()
+    styled_print("NodeJS is installed")
+
+    if not path.isfile(cargo_path):
+        install_rust()
+    styled_print("Rust is installed")
+
+    build_carburetor(cargo_path, release=True)
+    build_runtime(cargo_path, release=True)
+
+    styled_print("Done")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Manager script for the many moving parts of Linkage",
@@ -144,8 +244,10 @@ if __name__ == "__main__":
         title="subarguments", dest="subcommand", required=True
     )
 
+    # Format subcommand
     format_subcommand = subparsers.add_parser("format", help="format all files")
 
+    # Build subcommand
     build_subcommand = subparsers.add_parser(
         "build", help="build the moving parts of linkage"
     )
@@ -165,6 +267,7 @@ if __name__ == "__main__":
             "lib-example-only",
         ],
     )
+
     build_subcommand.add_argument(
         "--release",
         "-r",
@@ -172,6 +275,7 @@ if __name__ == "__main__":
         action="store_true",
     )
 
+    # Deploy subcommand
     deploy_subcommand = subparsers.add_parser(
         "deploy",
         help="deploy the moving parts of linkage",
@@ -183,6 +287,13 @@ if __name__ == "__main__":
         choices=["all", "runtime", "carburetor", "lib-example"],
     )
 
+    # Install subcommand
+    install_subcommand = subparsers.add_parser(
+        "install",
+        help="Run this command on a Raspberry Pi to install all the moving parts of linkage to make it ready for deploying Linkage-lib programs.",
+    )
+
+    # Parsing
     args = parser.parse_args()
 
     if args.subcommand == "format":
@@ -191,5 +302,7 @@ if __name__ == "__main__":
         build(args)
     elif args.subcommand == "deploy":
         deploy(args)
+    elif args.subcommand == "install":
+        install()
     else:
         styled_print("ERROR: Unknown subcommond '{args.subcommand}'")

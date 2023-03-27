@@ -4,9 +4,9 @@ port = 12362
 
 [runtime]
 port = 8009
-linkage_lib_entry_point = "/home/pi/linkage/examples/lib/linkage-node/build/main.js"
+linkage_lib_entry_point = "/home/pi/robot_code/build/main.js"
 node_path = "/usr/bin/node"
-carburetor_path = "/home/pi/linkage/target/debug/carburetor"
+carburetor_path = "/home/pi/linkage/target/release/carburetor"
 
 [carburetor]
 port = 48862
