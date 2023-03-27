@@ -254,25 +254,27 @@ def install():
 
 
 def run(args: Namespace):
-    # FIXME: Implement --no-build flag for running without building, because why not
-
     if args.part == "runtime":
-        build_runtime(release=args.release)
+        if not args.no_build:
+            build_runtime(release=args.release)
         styled_print("Running runtime...")
         cargo_run(package="runtime", release=args.release)
     elif args.part == "cockpit-frontend":
         styled_print("Running Cockpit-frontend...")
         if args.release:
-            build_cockpit_frontend()
+            if not args.no_build:
+                build_cockpit_frontend()
             subprocess.run(["npm", "run", "preview"], cwd="cockpit/frontend/web")
         else:
             subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
     elif args.part == "cockpit-backend":
-        build_cockpit_backend(release=args.release)
+        if not args.no_build:
+            build_cockpit_backend(release=args.release)
         styled_print("Running Cockpit-backend...")
         cargo_run(package="cockpit-backend", release=args.release)
     elif args.part == "carburetor":
-        build_carburetor(release=args.release)
+        if not args.no_build:
+            build_carburetor(release=args.release)
         styled_print("Running Carburetor")
         cargo_run(package="carburetor", release=args.release)
     else:
@@ -362,6 +364,12 @@ if __name__ == "__main__":
         "--release",
         "-r",
         help="compile rust binaries in release mode",
+        action="store_true",
+    )
+
+    run_subcommand.add_argument(
+        "--no-build",
+        help="don't build part before running",
         action="store_true",
     )
 
