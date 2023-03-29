@@ -36,7 +36,7 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
         };
 
         sender.send(message).unwrap_or_else(|error| {
-            eprintln!("ERROR: Failed to send GamepadInputEvent over channel: {error}")
+            println!("ERROR: Failed to send GamepadInputEvent over channel: {error}")
         })
     };
 
@@ -69,6 +69,6 @@ pub(crate) fn handle_input(linkage_stream: &TcpStream, receiver: Receiver<Backen
         stream
             .write(&message.to_bytes())
             .expect("should be able to write to TCP connection with Linkage lib");
-        eprintln!("[LinkageConnection] Sent message: {message:?}.");
+        println!("[LinkageConnection] Sent message: {message:?}.");
     }
 }
