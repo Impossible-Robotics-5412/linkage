@@ -1,34 +1,12 @@
 <script lang="ts">
-	import { BackendConnection } from '$lib/backend/connection';
+	import { Backend } from '$lib/client/backend';
+	import { backendState } from '$lib/client/backend-state';
 	import { state } from '$lib/state';
-
-	export let data: { ipAddress: string };
-
-	let backend: BackendConnection | undefined;
-
-	$state.host = data.ipAddress ?? '0.0.0.0';
-
-	reconnect();
-
-	function reconnect() {
-		backend?.disconnect();
-		backend = new BackendConnection($state.host, $state.port);
-	}
 </script>
 
 <div>
-	<button on:click={() => backend?.enableLinkage()}>Enable</button>
-	<button on:click={() => backend?.disableLinkage()}>Disable</button>
-	{$state.enabled ? 'Enabled' : 'Disabled'}
+	<button on:click={() => Backend.shared.enableLinkage()}>Enable</button>
+	<button on:click={() => Backend.shared.disableLinkage()}>Disable</button>
+	<pre>Robot Code Status: {$state.enabled ? 'Enabled' : 'Disabled'}</pre>
+	<pre>Backend Status:    {$backendState.status}</pre>
 </div>
-
-<br />
-
-<form on:submit={reconnect}>
-	<label for="backend-host">Backend Host</label>
-	<input bind:value={$state.host} type="text" name="backend-host" id="backend-host" />
-	<br />
-	<label for="backend-port">Backend Port</label>
-	<input bind:value={$state.port} type="number" name="backend-port" id="backend-port" />
-	<input type="submit" value="Reconnect" />
-</form>
