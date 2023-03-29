@@ -14,6 +14,11 @@ export class Backend {
 	private commSocket: WebSocket | undefined;
 	private loggerSocket: WebSocket | undefined;
 
+	private _loggerStream: ReadableStream | undefined;
+	public get loggerStream(): ReadableStream | undefined {
+		return this._loggerStream;
+	}
+
 	constructor() {
 		this.connect();
 	}
@@ -84,13 +89,20 @@ export class Backend {
 				resolve();
 			};
 
-			this.loggerSocket.onmessage = msg => {
-				const message: LoggerMessage = JSON.parse(msg.data);
-				// FIXME Show this log in the ui:
-				console.log(
-					`[CockpitBackend (${message.stream})] ${message.data}`
-				);
-			};
+			this._loggerStream = new ReadableStream({
+				start: controller => {
+					if (!this.loggerSocket) return;
+
+					this.loggerSocket.onmessage = msg => {
+						const message: LoggerMessage = JSON.parse(msg.data);
+
+						controller.enqueue(message);
+						console.log(
+							`[CockpitBackend (${message.stream})] ${message.data}`
+						);
+					};
+				}
+			});
 		});
 	}
 
