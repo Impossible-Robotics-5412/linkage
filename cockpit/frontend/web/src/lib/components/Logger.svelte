@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { LoggerMessage } from "../../types/logger-message";
+	import type { LoggerMessage } from '../../types/logger-message';
 
-    export let stream: ReadableStream
+	export let stream: ReadableStream;
 
 	let messages: LoggerMessage[] = [];
 	let loggerElement: HTMLElement;
@@ -14,7 +14,7 @@
 				console.log('End of stream');
 				break;
 			}
-			
+
 			messages = [...messages, value];
 		}
 	}
@@ -25,15 +25,18 @@
 
 	function scrollToBottom() {
 		if (loggerElement) {
-			const isScrolledToBottom = loggerElement.scrollHeight - loggerElement.clientHeight <= loggerElement.scrollTop + 10;
+			const isScrolledToBottom =
+				loggerElement.scrollHeight - loggerElement.clientHeight <=
+				loggerElement.scrollTop + 10;
 			if (!isScrolledToBottom) return;
-			
-			// FIXME: This setTimeout is needed because otherwise it 
-			//        will scroll to the second to last element. 
+
+			// FIXME: This setTimeout is needed because otherwise it
+			//        will scroll to the second to last element.
 			//        Not sure why but it is't all that clean...
 			setTimeout(() => {
-				loggerElement.scrollTop = loggerElement.scrollHeight - loggerElement.clientHeight;
-			})
+				loggerElement.scrollTop =
+					loggerElement.scrollHeight - loggerElement.clientHeight;
+			});
 		}
 	}
 

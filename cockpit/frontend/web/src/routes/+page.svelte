@@ -5,7 +5,8 @@
 	import { state } from '$lib/state';
 
 	let showLogger = false;
-	$: if ($backendState.status === BackendStatus.LOGGER_STARTED) showLogger = true;
+	$: if ($backendState.status === BackendStatus.LOGGER_STARTED)
+		showLogger = true;
 </script>
 
 <div>
@@ -15,10 +16,9 @@
 	<pre>Backend Status:    {$backendState.status}</pre>
 </div>
 
-
 <h2>Backend Log</h2>
 {#if showLogger}
 	{#if Backend.shared.loggerStream}
-		<Logger stream={Backend.shared.loggerStream}/>
+		<Logger stream={Backend.shared.loggerStream} />
 	{/if}
 {/if}
