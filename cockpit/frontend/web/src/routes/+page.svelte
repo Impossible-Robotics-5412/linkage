@@ -1,24 +1,44 @@
 <script lang="ts">
-	import { Backend } from '$lib/client/backend';
-	import { backendState, BackendStatus } from '$lib/client/backend-state';
+	import { Backend } from '$lib/client/backend/backend';
+	import { backendState, BackendStatus } from '$lib/client/backend/state';
+	import Container from '$lib/components/Container.svelte';
+	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
 	import Logger from '$lib/components/Logger.svelte';
-	import { state } from '$lib/state';
+	import Status from '$lib/components/Status.svelte';
 
-	let showLogger = false;
+	let loggerStream: ReadableStream | undefined;
 	$: if ($backendState.status === BackendStatus.LOGGER_STARTED)
-		showLogger = true;
+		loggerStream = Backend.shared.loggerStream;
 </script>
 
-<div>
-	<button on:click={() => Backend.shared.enableLinkage()}>Enable</button>
-	<button on:click={() => Backend.shared.disableLinkage()}>Disable</button>
-	<pre>Robot Code Status: {$state.enabled ? 'Enabled' : 'Disabled'}</pre>
-	<pre>Backend Status:    {$backendState.status}</pre>
-</div>
+<main>
+	<Container>
+		<div class="window">
+			<Status />
+			<Logger stream={loggerStream} />
 
-<h2>Backend Log</h2>
-{#if showLogger}
-	{#if Backend.shared.loggerStream}
-		<Logger stream={Backend.shared.loggerStream} />
-	{/if}
-{/if}
+			<EnableDisableRobotButton />
+		</div>
+	</Container>
+</main>
+
+<style lang="scss">
+	main {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		width: 100vw;
+		height: 100vh;
+	}
+
+	.window {
+		display: grid;
+		grid-template-columns: 25% auto;
+		grid-template-rows: auto min-content;
+		gap: 1.5rem;
+
+		width: 840px;
+		height: 320px;
+	}
+</style>
