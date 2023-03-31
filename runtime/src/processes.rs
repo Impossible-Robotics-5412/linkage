@@ -1,17 +1,17 @@
-use std::{
-    io,
-    process::{Child, Command, Stdio},
-};
-
 use common::config;
+
+use std::io;
+use std::process::{Child, Command, Stdio};
+
+use log::info;
 use simple_signal::Signal;
 
 pub(crate) fn handle_alrm_signal(sender: crossbeam::channel::Sender<()>) {
-    eprintln!("Start listening for ALRM Signal");
+    info!("Start listening for ALRM Signal");
 
     simple_signal::set_handler(&[Signal::Alrm], {
         move |_signals| {
-            eprintln!("Caught ALRM signal");
+            info!("Caught ALRM signal");
             sender
                 .send(())
                 .expect("should send ALRM signal over channel");
