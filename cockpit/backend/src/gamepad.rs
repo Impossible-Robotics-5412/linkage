@@ -1,3 +1,5 @@
+use common::messages::{BackendToLinkage, Message};
+
 use std::io::Write;
 use std::mem;
 use std::net::TcpStream;
@@ -7,8 +9,7 @@ use gilrs::{
     EventType::{AxisChanged, ButtonChanged, Connected, Disconnected},
     GamepadId, Gilrs,
 };
-
-use common::messages::{BackendToLinkage, Message};
+use log::{debug, error};
 
 #[repr(u8)]
 enum EventType {
@@ -36,7 +37,7 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
         };
 
         sender.send(message).unwrap_or_else(|error| {
-            println!("ERROR: Failed to send GamepadInputEvent over channel: {error}")
+            error!("Failed to send GamepadInputEvent over channel: {error}")
         })
     };
 
@@ -69,6 +70,6 @@ pub(crate) fn handle_input(linkage_stream: &TcpStream, receiver: Receiver<Backen
         stream
             .write(&message.to_bytes())
             .expect("should be able to write to TCP connection with Linkage lib");
-        println!("[LinkageConnection] Sent message: {message:?}.");
+        debug!("Sent message: {message:?}");
     }
 }
