@@ -51,7 +51,22 @@ def cargo_run(cargo_path=None, package=None, release=False):
 def format():
     styled_print("Formatting entire project...")
     styled_print("Running prettier...")
-    subprocess.run(["npx", "prettier", "-w", "--config", ".prettierrc", "."])
+    # FIXME: Refactoring svelte files via prettier is not working using the config.
+    #        In VS Code it works fine as long as you add
+    #
+    #        "prettier.documentSelectors": ["**/*.svelte"]
+    #
+    #        to your settings.json
+    subprocess.run(
+        [
+            "npx",
+            "prettier",
+            "--write",
+            "--config",
+            ".prettierrc.json",
+            ".",
+        ]
+    )
     styled_print("Running black...")
     subprocess.run(["black", "."])
     styled_print("Running rustfmt...")

@@ -6,6 +6,9 @@ use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
 
+use common::logging::setup_logger;
+
+use log::{debug, error, info};
 #[cfg(target_arch = "armv7")]
 use rppal::pwm::Channel;
 use simple_signal::{self, Signal};
@@ -38,12 +41,14 @@ const PULSE_DELTA_US: u64 = 500;
 const PULSE_NEUTRAL_US: u64 = 1500;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    eprintln!("{WELCOME_MESSAGE}");
+    setup_logger(7644)?;
+
+    info!("{WELCOME_MESSAGE}");
 
     let config = common::config::config()?;
     let address = format!("0.0.0.0:{}", config.carburetor().port());
 
-    eprintln!("Setting up...");
+    info!("Setting up...");
     let (tx0, rx0) = channel();
     let (tx1, rx1) = channel();
 
@@ -51,10 +56,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let tx0 = tx0.clone();
         let tx1 = tx1.clone();
         move |signals| {
-            eprintln!("Caught: {signals:?}");
+            info!("Caught: {signals:?}");
 
             // Clean up by putting both at neutral.
-            eprintln!("Cleaning up...");
+            info!("Cleaning up...");
             tx0.send(Speed::neutral()).unwrap();
             tx1.send(Speed::neutral()).unwrap();
 
@@ -63,22 +68,22 @@ fn main() -> Result<(), Box<dyn Error>> {
             // been carried out.
             thread::sleep(Duration::from_millis(10));
 
-            eprintln!("Bye!");
+            info!("Bye!");
             exit(0)
         }
     });
 
-    eprintln!("Spawning device control threads...");
+    info!("Spawning device control threads...");
     thread::spawn(|| control_channel(Channel::Pwm0, rx0));
     thread::spawn(|| control_channel(Channel::Pwm1, rx1));
 
-    eprintln!("Setup completed. Listening on {}...", address);
+    info!("Setup completed. Listening on {}...", address);
     let server = TcpListener::bind(address).expect("address should be valid");
     for (n, stream) in server.incoming().enumerate() {
         let mut stream = stream?;
         let peer = stream.peer_addr()?;
         let local = stream.local_addr()?;
-        eprintln!("({n}) Received stream from {peer} on {local}.",);
+        info!("({n}) Received stream from {peer} on {local}.",);
 
         let mut buf = MessageBytes::default();
         loop {
@@ -91,15 +96,14 @@ fn main() -> Result<(), Box<dyn Error>> {
                 Err(e) => return Err(e)?,
             }
 
-            eprintln!("Received the following message:");
-            eprintln!("|\t{buf:?}");
+            debug!("Received message: {buf:?}");
 
             // Decode the received json into a Vec of instructions.
             let instruction = match decode(buf) {
                 Some(instr) => instr,
                 None => {
-                    eprintln!("|\tThis message was invalid.");
-                    writeln!(stream, "Invalid message: {buf:?}.")?;
+                    error!("|\tInvalid message: {buf:?}");
+                    writeln!(stream, "Invalid message: {buf:?}")?;
                     continue;
                 }
             };
@@ -110,7 +114,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         0 => tx0.clone(),
                         1 => tx1.clone(),
                         channel => {
-                            eprintln!("|\tInstruction channel {channel} does not exist.");
+                            error!("|\tInstruction channel {channel} does not exist.");
                             continue;
                         }
                     };
@@ -126,22 +130,22 @@ fn main() -> Result<(), Box<dyn Error>> {
                     let free = info.free;
                     let used = total - free;
                     let percentage = (used as f32 / total as f32) * 100.0;
-                    eprintln!("Reported memory status to {peer}.");
+                    debug!("Reported memory status to {peer}.");
                     writeln!(stream, "Memory: {percentage:.0}% ({used} / {total})")?
                 }
                 Instruction::Cpu => {
                     let load = sys_info::loadavg()?.one;
-                    eprintln!("Reported cpu status to {peer}.");
+                    debug!("Reported cpu status to {peer}.");
                     writeln!(stream, "Cpu: {load}")?
                 }
             }
         }
 
         // Clean up by putting both at neutral.
-        eprintln!("({n}) Connection closed. Resetting motors to neutral.");
+        info!("({n}) Connection closed. Resetting motors to neutral.");
         tx0.send(Speed::neutral()).unwrap();
         tx1.send(Speed::neutral()).unwrap();
-        eprintln!("Still listening...");
+        info!("Still listening...");
     }
 
     unreachable!("server.incoming() cannot return None")

@@ -1,28 +1,32 @@
-use std::{
-    io::{self, Read, Write},
-    net::TcpStream,
-};
-
+use common::logging::setup_logger;
 use common::messages::{
     BackendToFrontendMessage, BackendToRuntimeMessage, Bytes, FrontendToBackendMessage, Message,
     RuntimeToBackendMessage,
 };
 
+use std::error::Error;
+use std::io::{self, Read, Write};
+use std::net::TcpStream;
+
+use log::{debug, error, info};
+
 mod gamepad;
 mod linkage_lib;
 
-fn main() -> io::Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
+    setup_logger(7642)?;
+
     let config = common::config::config().unwrap();
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
 
-    ws::listen(address, move |frontend| {
+    ws::listen(&address, move |frontend| {
         let linkage_lib_address = config.cockpit_backend().linkage_lib_address().to_string();
 
         let runtime_stream =
             TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
                 .expect("should connect to runtime");
 
-        eprintln!(
+        info!(
             "Connected to Runtime on address {}.",
             runtime_stream.local_addr().unwrap()
         );
@@ -34,7 +38,7 @@ fn main() -> io::Result<()> {
                 ws::Message::Text(_) => todo!(),
                 ws::Message::Binary(buffer) => {
                     if buffer.len() != 8 {
-                        eprintln!(
+                        error!(
                             "Binary data should have 8 bytes, but found {}",
                             buffer.len()
                         );
@@ -48,18 +52,18 @@ fn main() -> io::Result<()> {
                     let msg = match FrontendToBackendMessage::try_from(buffer) {
                         Ok(m) => m,
                         Err(e) => {
-                            eprintln!("Unknown message: {e:?}");
+                            error!("Unknown message: {e:?}");
                             return Ok(());
                         }
                     };
 
-                    eprintln!("Received message: {msg:?} {buffer:?}");
+                    debug!("Received message: {msg:?} {buffer:?}");
                     match msg {
                         FrontendToBackendMessage::Enable => {
                             if let Err(error) =
                                 enable_linkage(&mut runtime_stream, linkage_lib_address.clone())
                             {
-                                eprintln!(
+                                error!(
                                     "Connection with runtime broke. ({error})\nTo connect  again, \
                                     restart runtime and reconnect cockpit-backend to runtime"
                                 );
@@ -71,7 +75,7 @@ fn main() -> io::Result<()> {
                         }
                         FrontendToBackendMessage::Disable => {
                             if let Err(error) = disable_linkage(&mut runtime_stream) {
-                                eprintln!(
+                                error!(
                                     "Connection with runtime broke. ({error})\nTo connect  again, \
                                     restart runtime and reconnect cockpit-backend to runtime"
                                 );
@@ -88,7 +92,7 @@ fn main() -> io::Result<()> {
             Ok(())
         }
     })
-    .unwrap();
+    .expect(format!("should start listening on {address}").as_str());
 
     Ok(())
 }
@@ -103,7 +107,7 @@ fn enable_linkage(runtime_stream: &mut TcpStream, linkage_address: String) -> io
 
     match msg {
         RuntimeToBackendMessage::Enabled => {
-            eprintln!("Linkage has been enabled");
+            info!("Linkage has been enabled");
             linkage_lib::start_communication(linkage_address);
         }
         _ => unreachable!(
@@ -124,7 +128,7 @@ fn disable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
 
     match msg {
         RuntimeToBackendMessage::Disabled => {
-            eprintln!("Linkage has been disabled");
+            info!("Linkage has been disabled");
         }
         _ => unreachable!(
             "runtime only send back DISABLED message after receiving a DISABLE message"

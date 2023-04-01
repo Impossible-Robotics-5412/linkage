@@ -1,15 +1,13 @@
 use crate::processes;
 
-use std::{
-    io::{self, Write},
-    net::TcpStream,
-    process::Child,
-};
+use common::config;
+use common::messages::{Message, RuntimeToBackendMessage};
 
-use common::{
-    config,
-    messages::{Message, RuntimeToBackendMessage},
-};
+use std::io::{self, Write};
+use std::net::TcpStream;
+use std::process::Child;
+
+use log::info;
 
 pub(crate) enum LinkageState {
     Enabled(Vec<Child>),
@@ -37,7 +35,7 @@ impl State {
 
 impl State {
     pub(crate) fn enable(&mut self, config: &config::Runtime) {
-        eprint!("Enabling Linakge... ");
+        info!("Enabling Linakge... ");
         match self.state {
             LinkageState::Disabled => {
                 let children = processes::start_processes(config);
@@ -47,9 +45,9 @@ impl State {
                     .expect("should receive alrm signal");
 
                 self.state = LinkageState::Enabled(children);
-                eprintln!("Linkage Enabled.");
+                info!("Linkage Enabled.");
             }
-            _ => eprintln!("Already enabled, doing nothing."),
+            _ => info!("Already enabled, doing nothing."),
         }
 
         self.backend
@@ -58,14 +56,14 @@ impl State {
     }
 
     pub(crate) fn disable(&mut self) -> io::Result<()> {
-        eprint!("Disabling Linkage... ");
+        info!("Disabling Linkage... ");
         match &mut self.state {
             LinkageState::Enabled(children) => {
                 processes::stop_processes(children)?;
                 self.state = LinkageState::Disabled;
-                eprintln!("Linkage Disabled.");
+                info!("Linkage Disabled.");
             }
-            _ => eprintln!("Already disabled, doing nothing."),
+            _ => info!("Already disabled, doing nothing."),
         }
 
         self.backend

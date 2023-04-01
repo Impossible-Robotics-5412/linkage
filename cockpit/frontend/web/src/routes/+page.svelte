@@ -1,35 +1,38 @@
 <script lang="ts">
-	import { BackendConnection } from '$lib/backend/connection';
-	import { state } from '$lib/state';
-	import type { PageData } from './$types';
-
-	export let data: { ipAddress: string };
-
-	let backend: BackendConnection | undefined;
-
-	$state.host = data.ipAddress ?? '0.0.0.0';
-
-	reconnect();
-
-	function reconnect() {
-		backend?.disconnect();
-		backend = new BackendConnection($state.host, $state.port);
-	}
+	import Container from '$lib/components/Container.svelte';
+	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
+	import Loggers from '$lib/components/Loggers.svelte';
+	import Status from '$lib/components/Status.svelte';
 </script>
 
-<div>
-	<button on:click={() => backend?.enableLinkage()}>Enable</button>
-	<button on:click={() => backend?.disableLinkage()}>Disable</button>
-	{$state.enabled ? 'Enabled' : 'Disabled'}
-</div>
+<main>
+	<Container>
+		<div class="window">
+			<Status />
+			<Loggers />
 
-<br />
+			<EnableDisableRobotButton />
+		</div>
+	</Container>
+</main>
 
-<form on:submit={reconnect}>
-	<label for="backend-host">Backend Host</label>
-	<input bind:value={$state.host} type="text" name="backend-host" id="backend-host" />
-	<br />
-	<label for="backend-port">Backend Port</label>
-	<input bind:value={$state.port} type="number" name="backend-port" id="backend-port" />
-	<input type="submit" value="Reconnect" />
-</form>
+<style lang="scss">
+	main {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		width: 100vw;
+		height: 100vh;
+	}
+
+	.window {
+		display: grid;
+		grid-template-columns: 25% auto;
+		grid-template-rows: auto min-content;
+		gap: 1.5rem;
+
+		width: 840px;
+		height: 320px;
+	}
+</style>
