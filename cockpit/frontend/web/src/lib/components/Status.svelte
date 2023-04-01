@@ -37,7 +37,7 @@
 			status={cockpitBackendStatus} />
 
 		<StatusItem
-			info={`Robot Code ${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
+			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
 			label="Robot Code"
 			status={robotCodeStatus} />
 	</div>
