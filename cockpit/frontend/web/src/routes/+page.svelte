@@ -1,21 +1,30 @@
 <script lang="ts">
-	import { Backend } from '$lib/client/backend/backend';
-	import { backendState, BackendStatus } from '$lib/client/backend/state';
+	import { ProcessLogger } from '$lib/client/process-logger';
 	import Container from '$lib/components/Container.svelte';
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
 	import Logger from '$lib/components/Logger.svelte';
 	import Status from '$lib/components/Status.svelte';
+	import { onMount } from 'svelte';
 
-	let loggerStream: ReadableStream | undefined;
-	$: if ($backendState.status === BackendStatus.LOGGER_STARTED)
-		loggerStream = Backend.shared.loggerStream;
+	const runtimeLogger = new ProcessLogger(
+		'ws://0.0.0.0:7640',
+		'RuntimeLogger'
+	);
+	const backendLogger = new ProcessLogger(
+		'ws://0.0.0.0:7642',
+		'BackendLogger'
+	);
+	const carburetorLogger = new ProcessLogger(
+		'ws://0.0.0.0:7644',
+		'CarburetorLogger'
+	);
 </script>
 
 <main>
 	<Container>
 		<div class="window">
 			<Status />
-			<Logger stream={loggerStream} />
+			<Logger processLogger={runtimeLogger} />
 
 			<EnableDisableRobotButton />
 		</div>

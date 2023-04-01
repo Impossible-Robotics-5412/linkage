@@ -2,9 +2,11 @@ import { BackendProcess } from '$lib/server/backend-process';
 import type { FrontendResponse } from '../../../types/frontend-response';
 import type { RequestHandler } from './$types';
 
+const backendProcess = new BackendProcess();
+
 export const POST = (async () => {
 	try {
-		BackendProcess.shared.start();
+		await backendProcess.start();
 		return new Response(
 			JSON.stringify({
 				success: true,

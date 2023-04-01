@@ -1,13 +1,15 @@
 <script lang="ts">
+	import type { ProcessLogger } from '$lib/client/process-logger';
 	import type { LoggerMessage } from '../../types/logger-message';
 	import Container from './Container.svelte';
 
-	export let stream: ReadableStream | undefined;
+	export let stream: ReadableStream | undefined = undefined;
+	export let processLogger: ProcessLogger | undefined = undefined;
 
 	let messages: LoggerMessage[] = [];
 	let loggerElement: HTMLElement;
 
-	async function startReading(stream: ReadableStream) {
+	async function startReadingStream(stream: ReadableStream) {
 		const reader = stream.getReader();
 		while (true) {
 			const { done, value } = await reader.read();
@@ -18,6 +20,12 @@
 
 			messages = [...messages, value];
 		}
+	}
+
+	async function startReadingProcessLogger(processLogger: ProcessLogger) {
+		processLogger.start().then(async stream => {
+			await startReadingStream(stream);
+		});
 	}
 
 	function scrollToBottom() {
@@ -39,27 +47,32 @@
 	}
 
 	$: if (messages) scrollToBottom();
-	$: if (stream) startReading(stream);
+	$: {
+		if (stream) startReadingStream(stream);
+		else if (processLogger) startReadingProcessLogger(processLogger);
+	}
 </script>
 
 <Container noPadding>
 	<div slot="header">
-		<h3>Cockpit Backend Log</h3>
+		<h3>Runtime Log</h3>
 	</div>
 
 	<div class="lines" bind:this={loggerElement}>
 		{#each messages as message}
-			<div
+			<!-- <div
 				class="line"
 				class:out={message.stream === 'out'}
 				class:err={message.stream === 'err'}>
 				<span>{message.data}</span>
+			</div> -->
+			<div class="line out">
+				<span>{message}</span>
 			</div>
 		{/each}
 	</div>
 </Container>
 
-<!-- <div bind:this={loggerElement} class="lines" /> -->
 <style lang="scss">
 	$error-border-color: $c-red;
 

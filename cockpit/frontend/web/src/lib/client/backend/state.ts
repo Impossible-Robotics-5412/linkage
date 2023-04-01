@@ -5,8 +5,6 @@ export enum BackendStatus {
 	CONNECTING,
 	PROCESS_STARTING,
 	PROCESS_STARTED,
-	LOGGER_STARTING,
-	LOGGER_STARTED,
 	COMMUNICATION_STARTING,
 	COMMUNICATION_STARTED,
 	CONNECTED
@@ -30,10 +28,6 @@ export function getBackendStatusLabel(status: BackendStatus) {
 			return 'Process starting';
 		case BackendStatus.PROCESS_STARTED:
 			return 'Process started';
-		case BackendStatus.LOGGER_STARTING:
-			return 'Logger starting';
-		case BackendStatus.LOGGER_STARTED:
-			return 'Logger started';
 		case BackendStatus.COMMUNICATION_STARTING:
 			return 'Communication starting';
 		case BackendStatus.COMMUNICATION_STARTED:

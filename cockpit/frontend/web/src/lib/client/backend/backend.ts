@@ -1,6 +1,5 @@
 import { robotCodeState } from '$lib/client/robot-code/state';
 import type { FrontendResponse } from '../../../types/frontend-response';
-import type { LoggerMessage } from '../../../types/logger-message';
 import {
 	BackendToFrontendMessage,
 	FrontendToBackendMessage,
@@ -12,12 +11,6 @@ export class Backend {
 	static shared = new Backend();
 
 	private commSocket: WebSocket | undefined;
-	private loggerSocket: WebSocket | undefined;
-
-	private _loggerStream: ReadableStream | undefined;
-	public get loggerStream(): ReadableStream | undefined {
-		return this._loggerStream;
-	}
 
 	constructor() {
 		this.connect();
@@ -28,14 +21,12 @@ export class Backend {
 		this.setStatus(BackendStatus.CONNECTING);
 
 		await this.startBackend();
-		await this.startBackendLoggerListener();
 		await this.startBackendCommunication();
 
 		this.setStatus(BackendStatus.CONNECTED);
 	}
 
 	disconnect() {
-		this.loggerSocket?.close();
 		this.commSocket?.close();
 		this.setStatus(BackendStatus.DISCONNECTED);
 	}
@@ -73,37 +64,6 @@ export class Backend {
 		}
 
 		return data;
-	}
-
-	private async startBackendLoggerListener() {
-		return new Promise<void>(resolve => {
-			this.setStatus(BackendStatus.LOGGER_STARTING);
-			if (this.loggerSocket?.readyState === WebSocket.OPEN) {
-				return;
-			}
-
-			this.loggerSocket = new WebSocket('ws://0.0.0.0:4276');
-
-			this.loggerSocket.onopen = () => {
-				this.setStatus(BackendStatus.LOGGER_STARTED);
-				resolve();
-			};
-
-			this._loggerStream = new ReadableStream({
-				start: controller => {
-					if (!this.loggerSocket) return;
-
-					this.loggerSocket.onmessage = msg => {
-						const message: LoggerMessage = JSON.parse(msg.data);
-
-						controller.enqueue(message);
-						console.log(
-							`[CockpitBackend (${message.stream})] ${message.data}`
-						);
-					};
-				}
-			});
-		});
 	}
 
 	private async startBackendCommunication() {
