@@ -16,7 +16,7 @@ export class BackendProcess {
 
 			// FIXME: This should not be a relative path.
 			this.backendProcess = spawn(
-				'../../../target/debug/cockpit-backend'
+				'../../../target/release/cockpit-backend'
 			);
 
 			this.backendProcess.on('spawn', resolve);

@@ -5,7 +5,6 @@
 		type Log,
 		type ProcessLogger
 	} from '$lib/client/process-logger';
-	import Container from './Container.svelte';
 
 	export let stream: ReadableStream | undefined = undefined;
 	export let processLogger: ProcessLogger | undefined = undefined;
@@ -57,28 +56,22 @@
 	}
 </script>
 
-<Container noPadding>
-	<div slot="header">
-		<h3>Runtime Log</h3>
-	</div>
-
-	<div class="lines" bind:this={loggerElement}>
-		{#each logs as log}
-			<div
-				class="line"
-				class:level-error={log.level === LogLevel.ERROR}
-				class:level-warn={log.level === LogLevel.WARN}
-				class:level-info={log.level === LogLevel.INFO}
-				class:level-debug={log.level === LogLevel.DEBUG}
-				class:level-trace={log.level === LogLevel.TRACE}>
-				<span>[{logLevelLabel(log.level)}] {log.msg}</span>
-			</div>
-		{/each}
-	</div>
-</Container>
+<div class="logger-output" bind:this={loggerElement}>
+	{#each logs as log}
+		<div
+			class="line"
+			class:level-error={log.level === LogLevel.ERROR}
+			class:level-warn={log.level === LogLevel.WARN}
+			class:level-info={log.level === LogLevel.INFO}
+			class:level-debug={log.level === LogLevel.DEBUG}
+			class:level-trace={log.level === LogLevel.TRACE}>
+			<span>[{logLevelLabel(log.level)}] {log.msg}</span>
+		</div>
+	{/each}
+</div>
 
 <style lang="scss">
-	.lines {
+	.logger-output {
 		font-size: 14px;
 		height: 100%;
 		overflow: scroll;

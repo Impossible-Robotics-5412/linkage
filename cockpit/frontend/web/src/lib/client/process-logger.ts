@@ -49,10 +49,7 @@ export function logLevelLabel(level: LogLevel) {
 }
 
 export class ProcessLogger {
-	constructor(
-		public readonly address: string,
-		public readonly name: string
-	) {}
+	constructor(public readonly address: string) {}
 
 	public start() {
 		return new Promise<ReadableStream<Log>>((resolve, reject) => {

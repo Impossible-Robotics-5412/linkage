@@ -1,29 +1,15 @@
 <script lang="ts">
-	import { ProcessLogger } from '$lib/client/process-logger';
 	import Container from '$lib/components/Container.svelte';
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
-	import Logger from '$lib/components/Logger.svelte';
+	import Loggers from '$lib/components/Loggers.svelte';
 	import Status from '$lib/components/Status.svelte';
-
-	const runtimeLogger = new ProcessLogger(
-		'ws://0.0.0.0:7640',
-		'RuntimeLogger'
-	);
-	const backendLogger = new ProcessLogger(
-		'ws://0.0.0.0:7642',
-		'BackendLogger'
-	);
-	const carburetorLogger = new ProcessLogger(
-		'ws://0.0.0.0:7644',
-		'CarburetorLogger'
-	);
 </script>
 
 <main>
 	<Container>
 		<div class="window">
 			<Status />
-			<Logger processLogger={runtimeLogger} />
+			<Loggers />
 
 			<EnableDisableRobotButton />
 		</div>
