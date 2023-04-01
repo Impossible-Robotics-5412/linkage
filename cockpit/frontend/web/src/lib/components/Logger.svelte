@@ -1,12 +1,16 @@
 <script lang="ts">
-	import type { ProcessLogger } from '$lib/client/process-logger';
-	import type { LoggerMessage } from '../../types/logger-message';
+	import {
+		LogLevel,
+		logLevelLabel,
+		type Log,
+		type ProcessLogger
+	} from '$lib/client/process-logger';
 	import Container from './Container.svelte';
 
 	export let stream: ReadableStream | undefined = undefined;
 	export let processLogger: ProcessLogger | undefined = undefined;
 
-	let messages: LoggerMessage[] = [];
+	let logs: Log[] = [];
 	let loggerElement: HTMLElement;
 
 	async function startReadingStream(stream: ReadableStream) {
@@ -18,7 +22,7 @@
 				break;
 			}
 
-			messages = [...messages, value];
+			logs = [value, ...logs];
 		}
 	}
 
@@ -46,7 +50,7 @@
 		}
 	}
 
-	$: if (messages) scrollToBottom();
+	$: if (logs) scrollToBottom();
 	$: {
 		if (stream) startReadingStream(stream);
 		else if (processLogger) startReadingProcessLogger(processLogger);
@@ -59,27 +63,28 @@
 	</div>
 
 	<div class="lines" bind:this={loggerElement}>
-		{#each messages as message}
-			<!-- <div
+		{#each logs as log}
+			<div
 				class="line"
-				class:out={message.stream === 'out'}
-				class:err={message.stream === 'err'}>
-				<span>{message.data}</span>
-			</div> -->
-			<div class="line out">
-				<span>{message}</span>
+				class:level-error={log.level === LogLevel.ERROR}
+				class:level-warn={log.level === LogLevel.WARN}
+				class:level-info={log.level === LogLevel.INFO}
+				class:level-debug={log.level === LogLevel.DEBUG}
+				class:level-trace={log.level === LogLevel.TRACE}>
+				<span>[{logLevelLabel(log.level)}] {log.msg}</span>
 			</div>
 		{/each}
 	</div>
 </Container>
 
 <style lang="scss">
-	$error-border-color: $c-red;
-
 	.lines {
 		font-size: 14px;
 		height: 100%;
 		overflow: scroll;
+		display: flex;
+		flex-direction: column-reverse;
+		margin-top: -1px;
 	}
 
 	.line {
@@ -87,15 +92,35 @@
 		width: 100%;
 		box-sizing: border-box;
 
-		border-bottom: 1px solid $c-gray-2;
+		border-top: 1px solid $c-gray-2;
+	}
 
-		&:not(.err):has(+ .line.err) {
-			border-bottom-color: $error-border-color;
+	@mixin log-level($selector, $text-color, $color, $border-color: $c-gray-2) {
+		.line#{$selector} {
+			background: $color;
+			border-top-color: $border-color;
+
+			color: $text-color;
+
+			&:not(#{$selector}):has(+ .line#{$selector}) {
+				border-top-color: $border-color;
+			}
 		}
 	}
 
-	.line.err {
-		background: scale-color($c-red, $alpha: -85%);
-		border-bottom-color: $error-border-color;
-	}
+	@include log-level(
+		'.level-error',
+		$c-primary,
+		scale-color($c-red, $alpha: -85%),
+		$c-red
+	);
+	@include log-level(
+		'.level-warn',
+		$c-primary,
+		scale-color($c-orange, $alpha: -85%),
+		$c-orange
+	);
+	@include log-level('.level-info', $c-primary, $c-background);
+	@include log-level('.level-debug', $c-secondary, $c-background);
+	@include log-level('.level-trace', $c-secondary, $c-background);
 </style>

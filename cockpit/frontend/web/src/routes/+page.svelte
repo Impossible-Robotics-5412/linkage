@@ -4,7 +4,6 @@
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
 	import Logger from '$lib/components/Logger.svelte';
 	import Status from '$lib/components/Status.svelte';
-	import { onMount } from 'svelte';
 
 	const runtimeLogger = new ProcessLogger(
 		'ws://0.0.0.0:7640',
