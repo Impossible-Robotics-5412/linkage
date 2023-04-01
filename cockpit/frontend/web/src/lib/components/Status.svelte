@@ -43,10 +43,20 @@
 	</div>
 </Container>
 
-<style>
+<style lang="scss">
 	.status {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+
+		& :global(> *) {
+			border-bottom: 1px solid $c-gray-1;
+			padding-bottom: 0.5rem;
+
+			&:last-child {
+				border-bottom: none;
+				padding-bottom: 0;
+			}
+		}
 	}
 </style>
