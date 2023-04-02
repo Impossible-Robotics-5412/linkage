@@ -9,10 +9,6 @@
 	}
 
 	const tabs: Record<string, Tab> = {
-		runtime: {
-			name: 'Runtime',
-			processLogger: new ProcessLogger('ws://0.0.0.0:7640')
-		},
 		backend: {
 			name: 'Cockpit Backend',
 			processLogger: new ProcessLogger('ws://0.0.0.0:7642')

@@ -19,7 +19,12 @@ export class BackendProcess {
 				'../../../target/debug/cockpit-backend'
 			);
 
-			this.backendProcess.on('spawn', resolve);
+			this.backendProcess.on('spawn', () => {
+				// FIXME: We should wait until the server has been started. this shouldn't be done like this.
+				setTimeout(() => {
+					resolve();
+				}, 1000);
+			});
 			this.backendProcess.on('error', reject);
 			this.backendProcess.on('exit', this.stopBackendProcess);
 			this.backendProcess.on('close', this.stopBackendProcess);

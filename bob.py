@@ -86,11 +86,6 @@ def build_cockpit_backend(cargo_path=None, release=False):
     cargo_build(cargo_path, "cockpit-backend", release=release)
 
 
-def build_runtime(cargo_path=None, release=False):
-    styled_print("Building runtime...")
-    cargo_build(cargo_path, "runtime", release=release)
-
-
 def build_carburetor(cargo_path=None, release=False):
     styled_print("Building Carburetor...")
     cargo_build(cargo_path, "carburetor", release=release)
@@ -128,8 +123,6 @@ def build(args: Namespace):
         build_cockpit_frontend()
     elif args.part == "cockpit-backend":
         build_cockpit_backend(release=args.release)
-    elif args.part == "runtime":
-        build_runtime(release=args.release)
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
     elif args.part == "lib-example":
@@ -148,11 +141,6 @@ def build(args: Namespace):
     exit(0)
 
 
-def deploy_runtime():
-    styled_print("Deploying Runtime...")
-    subprocess.run(["./deploy.sh"], cwd="runtime")
-
-
 def deploy_carburetor():
     styled_print("Deploying Carburetor...")
     subprocess.run(["./deploy.sh"], cwd="carburetor")
@@ -166,10 +154,7 @@ def deploy_example():
 def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
-        deploy_runtime()
         deploy_carburetor()
-    elif args.part == "runtime":
-        deploy_runtime()
     elif args.part == "carburetor":
         deploy_carburetor()
     elif args.part == "lib-example":
@@ -262,16 +247,8 @@ def install():
     styled_print("Libudev is installed")
 
     build_carburetor(cargo_path, release=True)
-    build_runtime(cargo_path, release=True)
 
     styled_print("Done")
-
-
-def run_runtime(release=False, no_build=False):
-    if not no_build:
-        build_runtime(release=release)
-    styled_print("Running runtime...")
-    cargo_run(package="runtime", release=release)
 
 
 def run_carburetor(release=False, no_build=False):
@@ -300,9 +277,7 @@ def run_cockpit_backend(release=False, no_build=False):
 
 
 def run(args: Namespace):
-    if args.part == "runtime":
-        run_runtime(release=args.release, no_build=args.no_build)
-    elif args.part == "carburetor":
+    if args.part == "carburetor":
         run_carburetor(release=args.release, no_build=args.no_build)
     elif args.part == "cockpit-frontend":
         run_cockpit_frontend(release=args.release, no_build=args.no_build)
@@ -341,7 +316,6 @@ if __name__ == "__main__":
             "cockpit",
             "cockpit-frontend",
             "cockpit-backend",
-            "runtime",
             "carburetor",
             "lib",
             "lib-example",
@@ -365,7 +339,7 @@ if __name__ == "__main__":
     deploy_subcommand.add_argument(
         "part",
         help="the part of linkage to deploy",
-        choices=["all", "runtime", "carburetor", "lib-example"],
+        choices=["all", "carburetor", "lib-example"],
     )
 
     # Install subcommand
@@ -384,7 +358,6 @@ if __name__ == "__main__":
         "part",
         help="the part of linkage to run",
         choices=[
-            "runtime",
             "cockpit-frontend",
             "cockpit-backend",
             "carburetor",

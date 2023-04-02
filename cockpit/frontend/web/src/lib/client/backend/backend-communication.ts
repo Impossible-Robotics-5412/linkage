@@ -7,8 +7,8 @@ import {
 } from './message';
 import { backendState, BackendStatus } from './state';
 
-export class Backend {
-	static shared = new Backend();
+export class BackendCommunication {
+	static shared = new BackendCommunication();
 
 	private commSocket: WebSocket | undefined;
 

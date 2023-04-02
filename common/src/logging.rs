@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 use bus::Bus;
+use log::info;
 use serde::Serialize;
 
 #[derive(Clone, Serialize)]
@@ -29,6 +30,8 @@ pub fn setup_logger(port: AddressPort) -> Result<(), Box<dyn Error>> {
     });
 
     start_websocket_server(port, log_bus);
+
+    info!("Logger has been started on port {port}");
 
     Ok(())
 }
@@ -67,6 +70,8 @@ fn start_websocket_server(port: AddressPort, log_bus: Arc<Mutex<Bus<String>>>) {
         ws::listen(format!("0.0.0.0:{port}"), |frontend| {
             let log_bus = log_bus.clone();
             thread::spawn({
+                // FIXME: We should support sending a backlog of all messages
+                //        sent before connecting with the logger.
                 let mut log_bus_rx = log_bus.lock().unwrap().add_rx();
 
                 move || loop {

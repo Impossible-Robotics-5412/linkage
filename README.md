@@ -17,7 +17,6 @@ that for the system. We call the whole project *linkage*.
   It accepts a TCP stream of control instructions and executes these.
   The stream of control instructions is sent by the robot code, which is built on the linkage library (e.g., _linkage-node_).
   On shutdown or termination, Carburetor tries its best to shut down gracefully by putting all motors it controls into a neutral state.
-  In normal operation, Carburetor is started up and shut down by Runtime.
 
 - **cockpit**
 
@@ -29,14 +28,13 @@ that for the system. We call the whole project *linkage*.
 
     - [**backend**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/cockpit/backend)
 
-      The _cockpit-backend_ is responsible for the communication between the user-facing _cockpit-frontend_ and _runtime_.
+      The _cockpit-backend_ is responsible for the communication between the user-facing _cockpit-frontend_ and the linkage library (e.g., _linkage-node_).
       It runs on a computer in the same local network as the robot pilot computer, and the Raspberry Pi embedded in the robot.
 
     - [**frontend**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/cockpit/web/frontend)/web
 
       The web _cockpit-frontend_ serves a webpage over the local network through which the robot pilot can control the robot.
-      The _frontend_ sends enable and disable instructions to the _backend_ over a WebSocket connection, and the _backend_ sends these to _runtime_ over TCP.
-      The _runtime_, in turn enables or disables the robot code built on the _linkage_ library and _carburetor_.
+      The _frontend_ sends enable and disable instructions to the _backend_ over a WebSocket connection, and the _backend_ sends these to linkage library (e.g., _linkage-node_) over TCP.
 
 - **lib**
 
@@ -54,14 +52,6 @@ that for the system. We call the whole project *linkage*.
 
       At this moment, there is one implementation of the _linkage_ library.
       It is written in Node and is also available through npm.
-
-- [**runtime**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime)
-
-  The _runtime_ is a daemonized process running on the Raspberry Pi placed on the robot.
-  It listens for a TCP stream from the _backend_.
-  When a connection to _backend_ has been established, it waits for the signal to start two programs: _carburetor_, and the robot code based on the _linkage_ library.
-  After starting these, it listens for a signal to disable these.
-  As described above, _carburetor_ can handle a termination signal gracefully, and _runtime_ shuts it down through this method.
 
 ## Contribution
 

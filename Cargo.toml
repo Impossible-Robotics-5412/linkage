@@ -1,5 +1,5 @@
 [workspace]
-members = ["carburetor", "cockpit/backend", "runtime", "common", "common/message_derive"]
+members = ["carburetor", "cockpit/backend", "common", "common/message_derive"]
 
 [workspace.package]
 version = "0.1.0"
