@@ -1,15 +1,17 @@
+use bus::{Bus, BusReader};
 use common::messages::{BackendToLinkage, Message};
 
-use std::io::Write;
 use std::mem;
 use std::net::TcpStream;
-use std::sync::mpsc::{Receiver, Sender};
+
+use std::sync::Mutex;
+use std::{io::Write, sync::Arc};
 
 use gilrs::{
     EventType::{AxisChanged, ButtonChanged, Connected, Disconnected},
     GamepadId, Gilrs,
 };
-use log::{debug, error};
+use log::debug;
 
 #[repr(u8)]
 enum EventType {
@@ -19,7 +21,7 @@ enum EventType {
     Disconnected = 3,
 }
 
-pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
+pub(crate) fn start_event_listener(linkage_bus: Arc<Mutex<Bus<BackendToLinkage>>>) {
     let mut gilrs = Gilrs::new().unwrap();
 
     fn gamepad_id_into_u8(gamepad_id: GamepadId) -> u8 {
@@ -36,13 +38,11 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
             value,
         };
 
-        sender.send(message).unwrap_or_else(|error| {
-            error!("Failed to send GamepadInputEvent over channel: {error}")
-        })
+        linkage_bus.lock().unwrap().broadcast(message);
     };
 
     loop {
-        while let Some(gilrs::Event { id, event, time: _ }) = gilrs.next_event() {
+        if let Some(gilrs::Event { id, event, time: _ }) = gilrs.next_event() {
             match event {
                 ButtonChanged(button, value, _code) => send(
                     id,
@@ -60,12 +60,16 @@ pub(crate) fn channel(sender: Sender<BackendToLinkage>) {
                 Disconnected => send(id, EventType::Disconnected, 0, 0),
                 _ => {}
             }
+            continue;
         }
     }
 }
 
-pub(crate) fn handle_input(linkage_stream: &TcpStream, receiver: Receiver<BackendToLinkage>) {
-    while let Ok(message) = receiver.recv() {
+pub(crate) fn handle_input(
+    linkage_stream: &TcpStream,
+    linkage_bus_rx: &mut BusReader<BackendToLinkage>,
+) {
+    while let Ok(message) = linkage_bus_rx.recv() {
         let mut stream = linkage_stream;
         stream
             .write(&message.to_bytes())

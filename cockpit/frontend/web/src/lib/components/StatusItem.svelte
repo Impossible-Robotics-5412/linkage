@@ -13,19 +13,27 @@
 </script>
 
 <div class="status-item" title={info}>
-	<span>{label}</span>
-	<div
-		class:bad={status === Status.BAD}
-		class:semi={status === Status.SEMI}
-		class:good={status === Status.GOOD}
-		class="indicator" />
+	<div class="main">
+		<span>{label}</span>
+		<div
+			class:bad={status === Status.BAD}
+			class:semi={status === Status.SEMI}
+			class:good={status === Status.GOOD}
+			class="indicator" />
+	</div>
+	<span class="info">{info}</span>
 </div>
 
 <style lang="scss">
-	.status-item {
+	.main {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+	}
+
+	.info {
+		color: $c-secondary;
+		font-size: 12px;
 	}
 
 	.indicator {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Container from '$lib/components/Container.svelte';
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
-	import Loggers from '$lib/components/Loggers.svelte';
+	import Loggers from '$lib/components/logging/Loggers.svelte';
 	import Status from '$lib/components/Status.svelte';
 </script>
 

@@ -1,12 +1,15 @@
+use bus::{Bus, BusReader};
 use common::logging::setup_logger;
 use common::messages::{
-    BackendToFrontendMessage, BackendToRuntimeMessage, Bytes, FrontendToBackendMessage, Message,
-    RuntimeToBackendMessage,
+    BackendToFrontendMessage, BackendToLinkage, BackendToRuntimeMessage, Bytes,
+    FrontendToBackendMessage, Message, RuntimeToBackendMessage,
 };
 
 use std::error::Error;
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 use log::{debug, error, info};
 
@@ -18,6 +21,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let config = common::config::config().unwrap();
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
+
+    let linkage_bus = Arc::new(Mutex::new(
+        Bus::new(std::mem::size_of::<BackendToLinkage>()),
+    ));
+
+    let gamepad_event_listener_linkage_bus = linkage_bus.clone();
+    thread::spawn(move || gamepad::start_event_listener(gamepad_event_listener_linkage_bus));
 
     ws::listen(&address, move |frontend| {
         let linkage_lib_address = config.cockpit_backend().linkage_lib_address().to_string();
@@ -31,7 +41,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             runtime_stream.local_addr().unwrap()
         );
 
+        let linkage_bus = linkage_bus.clone();
         move |msg| {
+            let linkage_bus_rx = linkage_bus.lock().unwrap().add_rx();
             let mut runtime_stream = runtime_stream.try_clone().unwrap();
 
             match msg {
@@ -60,11 +72,13 @@ fn main() -> Result<(), Box<dyn Error>> {
                     debug!("Received message: {msg:?} {buffer:?}");
                     match msg {
                         FrontendToBackendMessage::Enable => {
-                            if let Err(error) =
-                                enable_linkage(&mut runtime_stream, linkage_lib_address.clone())
-                            {
+                            if let Err(error) = enable_linkage(
+                                &mut runtime_stream,
+                                linkage_lib_address.clone(),
+                                linkage_bus_rx,
+                            ) {
                                 error!(
-                                    "Connection with runtime broke. ({error})\nTo connect  again, \
+                                    "Connection with runtime broke. ({error})\nTo connect again, \
                                     restart runtime and reconnect cockpit-backend to runtime"
                                 );
                                 return Ok(());
@@ -76,7 +90,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         FrontendToBackendMessage::Disable => {
                             if let Err(error) = disable_linkage(&mut runtime_stream) {
                                 error!(
-                                    "Connection with runtime broke. ({error})\nTo connect  again, \
+                                    "Connection with runtime broke. ({error})\nTo connect again, \
                                     restart runtime and reconnect cockpit-backend to runtime"
                                 );
                                 return Ok(());
@@ -89,6 +103,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
 
+            debug!("Handled frontend message!");
+
             Ok(())
         }
     })
@@ -97,7 +113,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn enable_linkage(runtime_stream: &mut TcpStream, linkage_address: String) -> io::Result<()> {
+fn enable_linkage(
+    runtime_stream: &mut TcpStream,
+    linkage_address: String,
+    mut linkage_bus_rx: BusReader<BackendToLinkage>,
+) -> io::Result<()> {
     runtime_stream.write(&BackendToRuntimeMessage::Enable.to_bytes())?;
 
     let mut buffer = Bytes::default();
@@ -108,7 +128,13 @@ fn enable_linkage(runtime_stream: &mut TcpStream, linkage_address: String) -> io
     match msg {
         RuntimeToBackendMessage::Enabled => {
             info!("Linkage has been enabled");
-            linkage_lib::start_communication(linkage_address);
+            // FIXME: This thread is never killed. Thus, everytime we receive an enabled message,
+            //        we create a new thread that won't be killed automatically. We should watch for
+            //        https://gitlab.com/gilrs-project/gilrs/-/merge_requests/86 to be merged into the gilrs crate.
+            //        This way we can listen for gamepad events with a blocking call, removing the need for all this.
+            thread::spawn(move || {
+                linkage_lib::start_communication(linkage_address, &mut linkage_bus_rx);
+            });
         }
         _ => unreachable!(
             "runtime should only send back ENABLED message after receiving an ENABLE message"
