@@ -37,7 +37,7 @@ fn setup_fern(sender: Sender<String>) {
     fern::Dispatch::new()
         .chain(
             fern::Dispatch::new()
-                .level(log::LevelFilter::Info)
+                .level(log::LevelFilter::Debug)
                 .format(|out, message, record| {
                     out.finish(format_args!("[{}] {}", record.level(), message));
                 })
@@ -45,7 +45,7 @@ fn setup_fern(sender: Sender<String>) {
         )
         .chain(
             fern::Dispatch::new()
-                .level(log::LevelFilter::Info)
+                .level(log::LevelFilter::Debug)
                 .format(|out, message, record| {
                     let log = Log {
                         msg: message.to_string(),
