@@ -1,0 +1,10 @@
+[linkage_lib]
+port = 12362
+carburetor_address = { host = "0.0.0.0", port = 48862 }
+
+[carburetor]
+port = 48862
+
+[cockpit_backend]
+port = 3012
+linkage_lib_address = { host = "0.0.0.0", port = 12362 }

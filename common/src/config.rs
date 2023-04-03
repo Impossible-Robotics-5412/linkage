@@ -21,7 +21,6 @@ impl Display for Address {
 #[derive(Deserialize)]
 pub struct Config {
     linkage_lib: Box<LinkageLib>,
-    runtime: Box<Runtime>,
     carburetor: Box<Carburetor>,
     cockpit_backend: Box<CockpitBackend>,
 }
@@ -29,10 +28,6 @@ pub struct Config {
 impl Config {
     pub fn linkage_lib(&self) -> &LinkageLib {
         &self.linkage_lib
-    }
-
-    pub fn runtime(&self) -> &Runtime {
-        &self.runtime
     }
 
     pub fn carburetor(&self) -> &Carburetor {
@@ -61,32 +56,6 @@ impl LinkageLib {
 }
 
 #[derive(Deserialize)]
-pub struct Runtime {
-    port: AddressPort,
-    linkage_lib_entry_point: String,
-    node_path: String,
-    carburetor_path: String,
-}
-
-impl Runtime {
-    pub fn port(&self) -> &AddressPort {
-        &self.port
-    }
-
-    pub fn linkage_lib_entry_point(&self) -> &String {
-        &self.linkage_lib_entry_point
-    }
-
-    pub fn node_path(&self) -> &String {
-        &self.node_path
-    }
-
-    pub fn carburetor_path(&self) -> &String {
-        &self.carburetor_path
-    }
-}
-
-#[derive(Deserialize)]
 pub struct Carburetor {
     port: AddressPort,
 }
@@ -100,17 +69,12 @@ impl Carburetor {
 #[derive(Deserialize)]
 pub struct CockpitBackend {
     port: AddressPort,
-    runtime_address: Address,
     linkage_lib_address: Address,
 }
 
 impl CockpitBackend {
     pub fn port(&self) -> AddressPort {
         self.port
-    }
-
-    pub fn runtime_address(&self) -> &Address {
-        &self.runtime_address
     }
 
     pub fn linkage_lib_address(&self) -> &Address {

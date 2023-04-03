@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BackendCommunication } from '$lib/client/backend/backend-communication';
 	import Container from '$lib/components/Container.svelte';
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
 	import Loggers from '$lib/components/logging/Loggers.svelte';

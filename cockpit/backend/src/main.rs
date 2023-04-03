@@ -1,165 +1,209 @@
-use bus::{Bus, BusReader};
-use common::logging::setup_logger;
-use common::messages::{
-    BackendToFrontendMessage, BackendToLinkage, BackendToRuntimeMessage, Bytes,
-    FrontendToBackendMessage, Message, RuntimeToBackendMessage,
+mod gamepad;
+
+use common::{
+    logging,
+    messages::{BackendToFrontendMessage, Message},
 };
 
-use std::error::Error;
-use std::io::{self, Read, Write};
-use std::net::TcpStream;
-use std::sync::{Arc, Mutex};
-use std::thread;
+use std::{
+    io::{self, ErrorKind, Read},
+    net::TcpStream,
+    sync::{self, Arc, Mutex},
+    thread,
+    time::Duration,
+};
 
-use log::{debug, error, info};
+use websocket::{
+    sync::{Client, Server},
+    OwnedMessage,
+};
 
-mod gamepad;
-mod linkage_lib;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    logging::setup_logger(7642)?;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    setup_logger(7642)?;
-
-    let config = common::config::config().unwrap();
+    let config = common::config::config()?;
     let address = format!("0.0.0.0:{}", config.cockpit_backend().port());
 
-    let linkage_bus = Arc::new(Mutex::new(
-        Bus::new(std::mem::size_of::<BackendToLinkage>()),
-    ));
+    let server = Server::bind(&address)?;
+    log::info!("Started listening on {address}.");
 
-    let gamepad_event_listener_linkage_bus = linkage_bus.clone();
-    thread::spawn(move || gamepad::start_event_listener(gamepad_event_listener_linkage_bus));
+    for request in server.filter_map(Result::ok) {
+        thread::spawn(move || {
+            // FIXME: Implement use_protocol shown in websocket crate example.
+            let client = request.accept().unwrap();
+            handle_client(client).unwrap();
+        });
+    }
 
-    ws::listen(&address, move |frontend| {
-        let linkage_lib_address = config.cockpit_backend().linkage_lib_address().to_string();
+    log::info!("Stopping.");
 
-        let runtime_stream =
-            TcpStream::connect(config.cockpit_backend().runtime_address().to_string())
-                .expect("should connect to runtime");
+    Ok(())
+}
 
-        info!(
-            "Connected to Runtime on address {}.",
-            runtime_stream.local_addr().unwrap()
-        );
+fn handle_client(client: Client<TcpStream>) -> io::Result<()> {
+    let ip = client.peer_addr()?;
+    log::info!("Connected to Cockpit-frontend at {ip}.");
 
-        let linkage_bus = linkage_bus.clone();
-        move |msg| {
-            let linkage_bus_rx = linkage_bus.lock().unwrap().add_rx();
-            let mut runtime_stream = runtime_stream.try_clone().unwrap();
+    let (mut receiver, mut sender) = client.split().unwrap();
+    let message_bus = Arc::new(Mutex::new(bus::Bus::new(8)));
+    let (client_sender_tx, client_sender_rx) = sync::mpsc::channel::<OwnedMessage>();
 
-            match msg {
-                ws::Message::Text(_) => todo!(),
-                ws::Message::Binary(buffer) => {
-                    if buffer.len() != 8 {
-                        error!(
-                            "Binary data should have 8 bytes, but found {}",
-                            buffer.len()
-                        );
-                        return Ok(());
+    let enable_handle = thread::spawn({
+        let message_bus = message_bus.clone();
+        let client_sender_tx = client_sender_tx.clone();
+        move || {
+            let mut rx = message_bus.lock().unwrap().add_rx();
+            while let Some(message) = rx.recv().unwrap() {
+                let client_sender_tx = client_sender_tx.clone();
+                match message {
+                    OwnedMessage::Close(_) => {
+                        client_sender_tx
+                            .send(OwnedMessage::Close(None))
+                            .unwrap_or_else(|_| log::debug!("Failed to send CLOSED message."));
+                        return;
                     }
+                    OwnedMessage::Binary(buffer) => {
+                        let buffer: [u8; 8] = buffer.try_into().unwrap();
+                        let instruction = buffer.first().unwrap();
 
-                    let buffer: Bytes = buffer
-                        .try_into()
-                        .expect("should be able to convert 8 byte Vec<u8> to Bytes");
-
-                    let msg = match FrontendToBackendMessage::try_from(buffer) {
-                        Ok(m) => m,
-                        Err(e) => {
-                            error!("Unknown message: {e:?}");
-                            return Ok(());
-                        }
-                    };
-
-                    debug!("Received message: {msg:?} {buffer:?}");
-                    match msg {
-                        FrontendToBackendMessage::Enable => {
-                            if let Err(error) = enable_linkage(
-                                &mut runtime_stream,
-                                linkage_lib_address.clone(),
-                                linkage_bus_rx,
-                            ) {
-                                error!(
-                                    "Connection with runtime broke. ({error})\nTo connect again, \
-                                    restart runtime and reconnect cockpit-backend to runtime"
-                                );
-                                return Ok(());
-                            };
-                            frontend.send(ws::Message::Binary(
-                                BackendToFrontendMessage::Enabled.to_bytes().to_vec(),
-                            ))?;
-                        }
-                        FrontendToBackendMessage::Disable => {
-                            if let Err(error) = disable_linkage(&mut runtime_stream) {
-                                error!(
-                                    "Connection with runtime broke. ({error})\nTo connect again, \
-                                    restart runtime and reconnect cockpit-backend to runtime"
-                                );
-                                return Ok(());
-                            };
-                            frontend.send(ws::Message::Binary(
-                                BackendToFrontendMessage::Disabled.to_bytes().to_vec(),
-                            ))?;
+                        match instruction {
+                            0 => enable(&mut rx, client_sender_tx),
+                            _ => {}
                         }
                     }
+                    _ => {}
                 }
             }
-
-            debug!("Handled frontend message!");
-
-            Ok(())
         }
-    })
-    .expect(format!("should start listening on {address}").as_str());
+    });
+
+    let disable_handle = thread::spawn({
+        let message_bus = message_bus.clone();
+        move || {
+            let mut rx = message_bus.lock().unwrap().add_rx();
+            while let Some(message) = rx.recv().unwrap() {
+                let client_sender_tx = client_sender_tx.clone();
+                match message {
+                    OwnedMessage::Close(_) => {
+                        let close_message = OwnedMessage::Close(None);
+                        client_sender_tx
+                            .send(close_message.clone())
+                            .unwrap_or_else(|_| log::debug!("Failed to send CLOSED message."));
+
+                        message_bus.lock().unwrap().broadcast(Some(close_message));
+                        return;
+                    }
+                    OwnedMessage::Binary(buffer) => {
+                        let buffer: [u8; 8] = buffer.try_into().unwrap();
+                        let instruction = buffer.first().unwrap();
+
+                        match instruction {
+                            1 => disable(client_sender_tx),
+                            _ => {}
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+    });
+
+    let sender_handle = thread::spawn(move || {
+        while let Ok(message) = client_sender_rx.recv() {
+            sender.send_message(&message).unwrap();
+            if message.is_close() {
+                return;
+            }
+        }
+    });
+
+    let message_bus_handle = thread::spawn(move || {
+        let message_bus = message_bus.clone();
+        while let Ok(message) = receiver.recv_message() {
+            message_bus.lock().unwrap().broadcast(Some(message.clone()));
+            if message.is_close() {
+                return;
+            }
+        }
+    });
+
+    log::debug!("Waiting to join all thread handles...");
+    disable_handle.join().unwrap();
+    enable_handle.join().unwrap();
+    sender_handle.join().unwrap();
+    message_bus_handle.join().unwrap();
+    log::debug!("Joined all thread handles.");
+
+    log::info!("Disconnected from Cockpit-frontend at {ip}.");
 
     Ok(())
 }
 
-fn enable_linkage(
-    runtime_stream: &mut TcpStream,
-    linkage_address: String,
-    mut linkage_bus_rx: BusReader<BackendToLinkage>,
-) -> io::Result<()> {
-    runtime_stream.write(&BackendToRuntimeMessage::Enable.to_bytes())?;
+fn enable(
+    message_bus_reader: &mut bus::BusReader<Option<OwnedMessage>>,
+    sender: sync::mpsc::Sender<OwnedMessage>,
+) {
+    log::debug!("Starting Linkage-lib socket...");
 
-    let mut buffer = Bytes::default();
-    runtime_stream.read_exact(&mut buffer)?;
+    let mut socket = TcpStream::connect("raspberrypi.local:9999").unwrap();
 
-    let msg = RuntimeToBackendMessage::try_from(buffer).expect("should be a valid message");
+    // Make sure the service has started
+    socket.read(&mut [0]).unwrap();
 
-    match msg {
-        RuntimeToBackendMessage::Enabled => {
-            info!("Linkage has been enabled");
-            // FIXME: This thread is never killed. Thus, everytime we receive an enabled message,
-            //        we create a new thread that won't be killed automatically. We should watch for
-            //        https://gitlab.com/gilrs-project/gilrs/-/merge_requests/86 to be merged into the gilrs crate.
-            //        This way we can listen for gamepad events with a blocking call, removing the need for all this.
-            thread::spawn(move || {
-                linkage_lib::start_communication(linkage_address, &mut linkage_bus_rx);
-            });
+    log::debug!("Started Linkage-lib socket.");
+    let message_bytes = BackendToFrontendMessage::Enabled.to_bytes();
+    let message = OwnedMessage::Binary(message_bytes.to_vec());
+
+    log::debug!(
+        "Sending {:?} message to Cockpit-frontend.",
+        BackendToFrontendMessage::Disabled
+    );
+    sender
+        .send(message)
+        .unwrap_or_else(|_| log::debug!("Failed to send message."));
+
+    // Keep block until the socket closes.
+    socket
+        .set_read_timeout(Some(Duration::from_secs(1)))
+        .unwrap();
+    loop {
+        if let Ok(msg) = message_bus_reader.try_recv() {
+            if let Some(msg) = msg {
+                match msg {
+                    OwnedMessage::Binary(buffer) => {
+                        if buffer.first() == Some(&1u8) {
+                            break;
+                        }
+                    }
+
+                    OwnedMessage::Close(_) => break,
+                    _ => (),
+                }
+            }
         }
-        _ => unreachable!(
-            "runtime should only send back ENABLED message after receiving an ENABLE message"
-        ),
+        match socket.read(&mut [0]) {
+            Ok(0) => break,
+            Err(err) => match err.kind() {
+                ErrorKind::TimedOut | ErrorKind::WouldBlock => {}
+                _ => break,
+            },
+            _ => {}
+        }
     }
 
-    Ok(())
+    log::debug!("Closed Linkage-lib service socket.");
+
+    disable(sender);
 }
 
-fn disable_linkage(runtime_stream: &mut TcpStream) -> io::Result<()> {
-    runtime_stream.write(&BackendToRuntimeMessage::Disable.to_bytes())?;
-
-    let mut buffer = Bytes::default();
-    runtime_stream.read_exact(&mut buffer)?;
-
-    let msg = RuntimeToBackendMessage::try_from(buffer).expect("should be a valid message");
-
-    match msg {
-        RuntimeToBackendMessage::Disabled => {
-            info!("Linkage has been disabled");
-        }
-        _ => unreachable!(
-            "runtime only send back DISABLED message after receiving a DISABLE message"
-        ),
-    }
-
-    Ok(())
+fn disable(sender: sync::mpsc::Sender<OwnedMessage>) {
+    let message_bytes = BackendToFrontendMessage::Disabled.to_bytes();
+    let message = OwnedMessage::Binary(message_bytes.to_vec());
+    log::debug!(
+        "Sending {:?} message to Cockpit-frontend.",
+        BackendToFrontendMessage::Disabled
+    );
+    sender
+        .send(message)
+        .unwrap_or_else(|_| log::debug!("Failed to send message."));
 }

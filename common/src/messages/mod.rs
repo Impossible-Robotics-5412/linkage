@@ -18,18 +18,6 @@ const BACKEND_IS_ENABLED: Bytes = [0x08, 0, 0, 0, 0, 0, 0, 0];
 /// Tells frontend that backend's services have been disabled.
 const BACKEND_IS_DISABLED: Bytes = [0x09, 0, 0, 0, 0, 0, 0, 0];
 
-// Cockpit-Backend > Runtime
-/// Tells runtime that it should be enabled.
-const ENABLE_RUNTIME: Bytes = [0x10, 0, 0, 0, 0, 0, 0, 0];
-/// Tells runtime that it should be disabled.
-const DISABLE_RUNTIME: Bytes = [0x11, 0, 0, 0, 0, 0, 0, 0];
-
-// Cockpit-Backend < Runtime
-/// Tells backend that runtime has been enabled.
-const RUNTIME_IS_ENABLED: Bytes = [0x18, 0, 0, 0, 0, 0, 0, 0];
-/// Tells backend that runtime has been disabled.
-const RUNTIME_IS_DISABLED: Bytes = [0x19, 0, 0, 0, 0, 0, 0, 0];
-
 // TODO: For future implementation of the messages between carburetor and linkage :)
 // // Linkage-Lib > Carburetor
 // // const MOTOR_INSTRUCTION = [0x40, data...] ;
@@ -45,24 +33,6 @@ const RUNTIME_IS_DISABLED: Bytes = [0x19, 0, 0, 0, 0, 0, 0, 0];
 /// The main Message trait, describing conversion from self to [`Bytes`].
 pub trait Message: TryFrom<Bytes> + Into<Bytes> {
     fn to_bytes(&self) -> Bytes;
-}
-
-// Backend ------> Runtime
-#[derive(Debug, Clone, Copy, Message)]
-pub enum BackendToRuntimeMessage {
-    #[message(ENABLE_RUNTIME)]
-    Enable,
-    #[message(DISABLE_RUNTIME)]
-    Disable,
-}
-
-// Runtime ------> Backend
-#[derive(Debug, Clone, Copy, Message)]
-pub enum RuntimeToBackendMessage {
-    #[message(RUNTIME_IS_ENABLED)]
-    Enabled,
-    #[message(RUNTIME_IS_DISABLED)]
-    Disabled,
 }
 
 // Frontend ------> Backend

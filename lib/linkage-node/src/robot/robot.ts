@@ -8,6 +8,7 @@ import { CarburetorConnection } from '../carburetor/carburetor_connection';
 export abstract class Robot {
 	private _isRunning = false;
 	private subsystems: Subsystem[] = [];
+	private internalTickTimer: NodeJS.Timer | undefined;
 
 	/**
 	 * The tick function is called once every 20ms.
@@ -31,14 +32,17 @@ export abstract class Robot {
 		]);
 
 		// FIXME: This shouldn't use setInterval but this is okay for initial testing period.
-		setInterval(() => {
+		this.internalTickTimer = setInterval(() => {
 			this.internalTick();
 		}, 20);
 
-		process.once('SIGINT', this.internalShutdown);
-		process.once('SIGTERM', this.internalShutdown);
+		process.on('SIGINT', this.internalShutdown);
+		process.on('SIGTERM', this.internalShutdown);
 
-		process.kill(process.ppid, 'SIGALRM');
+		// NOTE: This makes sure we close the connection when te systemd socket
+		//       is closed. It will close when the stdin stream is closed.
+		process.stdin.on('readable', () => process.stdin.read());
+		process.stdin.on('end', () => this.internalShutdown());
 
 		this._isRunning = true;
 	}
@@ -62,6 +66,8 @@ export abstract class Robot {
 	private internalShutdown(): void {
 		console.log('Shutting Down');
 
+		clearInterval(this.internalTickTimer);
+
 		for (const subsystem of this.subsystems) {
 			subsystem.shutdown();
 		}
@@ -70,6 +76,8 @@ export abstract class Robot {
 
 		CockpitConnection.shared.close();
 		CarburetorConnection.shared.close();
+
+		process.exit(0);
 	}
 
 	/**

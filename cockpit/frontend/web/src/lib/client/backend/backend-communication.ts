@@ -1,34 +1,28 @@
 import { robotCodeState } from '$lib/client/robot-code/state';
-import type { FrontendResponse } from '../../../types/frontend-response';
 import {
 	BackendToFrontendMessage,
 	FrontendToBackendMessage,
 	type BackendMessage
 } from './message';
-import { backendState, BackendStatus } from './state';
+import { BackendStatus, setBackendStatus } from './state';
 
-export class Backend {
-	static shared = new Backend();
+export class BackendCommunication {
+	static shared = new BackendCommunication();
 
 	private commSocket: WebSocket | undefined;
 
-	constructor() {
-		this.connect();
-	}
-
 	async connect() {
 		this.disconnect();
-		this.setStatus(BackendStatus.CONNECTING);
+		setBackendStatus(BackendStatus.CONNECTING);
 
-		await this.startBackend();
 		await this.startBackendCommunication();
 
-		this.setStatus(BackendStatus.CONNECTED);
+		setBackendStatus(BackendStatus.CONNECTED);
 	}
 
 	disconnect() {
 		this.commSocket?.close();
-		this.setStatus(BackendStatus.DISCONNECTED);
+		setBackendStatus(BackendStatus.DISCONNECTED);
 	}
 
 	enableLinkage() {
@@ -53,26 +47,14 @@ export class Backend {
 		this.commSocket.send(new Uint8Array(message));
 	}
 
-	private async startBackend() {
-		this.setStatus(BackendStatus.PROCESS_STARTING);
-		const response = await fetch('/backend/start', { method: 'post' });
-		const data: FrontendResponse = await response.json();
-		if (data.success) {
-			this.setStatus(BackendStatus.PROCESS_STARTED);
-		} else {
-			console.error(data.error);
-		}
-
-		return data;
-	}
-
 	private async startBackendCommunication() {
 		return new Promise<void>(resolve => {
-			this.setStatus(BackendStatus.COMMUNICATION_STARTING);
+			setBackendStatus(BackendStatus.COMMUNICATION_STARTING);
 			this.commSocket = new WebSocket(`ws://0.0.0.0:3012`);
 
 			this.commSocket.onopen = () => {
-				this.setStatus(BackendStatus.COMMUNICATION_STARTED);
+				setBackendStatus(BackendStatus.COMMUNICATION_STARTED);
+
 				resolve();
 			};
 
@@ -99,12 +81,5 @@ export class Backend {
 				return $state;
 			});
 		}
-	}
-
-	private setStatus(status: BackendStatus) {
-		backendState.update($backendState => {
-			$backendState.status = status;
-			return $backendState;
-		});
 	}
 }

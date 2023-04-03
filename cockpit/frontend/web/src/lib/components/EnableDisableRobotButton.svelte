@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Backend } from '$lib/client/backend/backend';
+	import { BackendCommunication } from '$lib/client/backend/backend-communication';
 	import { robotCodeState } from '$lib/client/robot-code/state';
 	import Button from './ui/Button.svelte';
 </script>
@@ -8,11 +8,13 @@
 	class:enabled={$robotCodeState.enabled}
 	class="enable-disable-robot-button">
 	{#if $robotCodeState.enabled}
-		<Button on:click={() => Backend.shared.disableLinkage()}>
+		<Button on:click={() => BackendCommunication.shared.disableLinkage()}>
 			Disable
 		</Button>
 	{:else}
-		<Button on:click={() => Backend.shared.enableLinkage()}>Enable</Button>
+		<Button on:click={() => BackendCommunication.shared.enableLinkage()}>
+			Enable
+		</Button>
 	{/if}
 </div>
 

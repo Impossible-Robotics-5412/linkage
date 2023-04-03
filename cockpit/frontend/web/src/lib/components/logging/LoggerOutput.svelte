@@ -8,6 +8,7 @@
 
 	export let stream: ReadableStream | undefined = undefined;
 	export let processLogger: ProcessLogger | undefined = undefined;
+	export let maxScrollback = 1000;
 
 	let logs: Log[] = [];
 	let loggerElement: HTMLElement;
@@ -22,6 +23,9 @@
 			}
 
 			logs = [value, ...logs];
+			if (logs.length > maxScrollback) {
+				logs.shift();
+			}
 		}
 	}
 

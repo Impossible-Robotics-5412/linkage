@@ -16,10 +16,7 @@ external peripherals attached to the Pi.
              By Koen & Bauke Westendorp, 2023.
 ```
 
-This program serves as what can be described as a raw backend to
-[_runtime_](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime).
-_runtime_ interacts starts _carburetor_ and the robot code written with the
-_linkage_ library. This library allows people of all skill levels to control
+This program allows people of all skill levels to control
 robots built for educational purposes. It provides an abstraction over the
 control and query of peripherals that can be accessed through TCP. It is
 designed to be run as a daemon.
@@ -121,10 +118,7 @@ absolutely necessary.**
 
 ### Daemon
 
-The program is intended to be run as a child process invoked by [_runtime_](https://github.com/Impossible-Robotics-5412/linkage/tree/main/runtime).
-This is not _necessary_, though.
-In case you want to use _carburetor_ as a standalone layer between your own TCP packets and the motor controllers, you might want to run it as a daemon.
-In that use case, we want it to start on boot, and to restart if anything has gone wrong.
+The program is intended to be run as a standalone layer between your own TCP packets and the motor controllers.
 
 <details>
 <summary>How to run <em>carburetor</em> using systemd</summary>
@@ -171,7 +165,6 @@ suitable location. Go into this directory, and run:
 cargo build --release
 install target/release/carburetor /usr/bin/carburetor
 # Optionally install the service.
-# (not necessary when you run carburetor in conjunction with runtime)
 install -Dm644 carburetor.service /etc/systemd/system/carburetor.service
 sudo systemctl daemon-reload
 ```
@@ -185,20 +178,6 @@ If you wish, the program can now be run by invoking the command `carburetor`.
 During development or for convenience, the `deploy.sh` file allows you to
 locally cross-compile the executable, and deploy the program to the Pi remotely.
 
-Change the parameter values in the `deploy.sh` script if necessary. When
-configured appropriately, run it with `./deploy.sh`.
-
-
-<details>
-<summary>
-<h4>Daemonized</h4>
-</summary>
-
-If necessary, you can run `deploy-systemd.sh` to cross-compile, deploy the
+You can run `deploy-systemd.sh` to cross-compile, deploy the
 binary, _and_ install the systemd service. It also restart the daemon with the
-new binary. However, in the way the project is used at this moment, this is no
-longer necessary, since _carburetor_ is spawned as a child process of _runtime_
-together with the robot code entrypoint. That means that the whole lifetime of
-_carburetor_ is managed from _runtime_, and we have no need for daemonized
-operation.
-</details>
+new binary.
