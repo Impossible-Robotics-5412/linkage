@@ -36,3 +36,10 @@ export function getBackendStatusLabel(status: BackendStatus) {
 			return 'Connected';
 	}
 }
+
+export function setBackendStatus(status: BackendStatus) {
+	backendState.update($backendState => {
+		$backendState.status = status;
+		return $backendState;
+	});
+}

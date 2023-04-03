@@ -12,8 +12,9 @@
 			Disable
 		</Button>
 	{:else}
-		<Button on:click={() => BackendCommunication.shared.enableLinkage()}
-			>Enable</Button>
+		<Button on:click={() => BackendCommunication.shared.enableLinkage()}>
+			Enable
+		</Button>
 	{/if}
 </div>
 
