@@ -1,18 +1,31 @@
 <script lang="ts">
-	import { BackendCommunication } from '$lib/backend/backend-communication';
-	import { robotCodeState } from '$lib/robot-code/state';
 	import Button from './ui/Button.svelte';
+	import { invoke } from '@tauri-apps/api/tauri';
+	
+	let enabled = false;
+
+	async function enable() {
+		enabled = true;
+		invoke('enable');
+		console.log("Enable");
+	}
+
+	function disable() {
+		invoke('disable');
+		enabled = false;
+		console.log("Disable");
+	}
 </script>
 
-<div
-	class:enabled={$robotCodeState.enabled}
+<div 
+	class:enabled
 	class="enable-disable-robot-button">
-	{#if $robotCodeState.enabled}
-		<Button on:click={() => BackendCommunication.shared.disableLinkage()}>
+	{#if enabled}
+		<Button on:click={disable}>
 			Disable
 		</Button>
 	{:else}
-		<Button on:click={() => BackendCommunication.shared.enableLinkage()}>
+		<Button on:click={enable}>
 			Enable
 		</Button>
 	{/if}

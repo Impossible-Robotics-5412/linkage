@@ -364,6 +364,9 @@ dependencies = [
 name = "cockpit"
 version = "0.0.0"
 dependencies = [
+ "bus",
+ "common",
+ "log 0.4.17",
  "serde",
  "serde_json",
  "tauri",
