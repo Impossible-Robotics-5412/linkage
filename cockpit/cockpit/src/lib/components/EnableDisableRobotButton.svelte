@@ -1,19 +1,23 @@
 <script lang="ts">
 	import Button from './ui/Button.svelte';
 	import { invoke } from '@tauri-apps/api/tauri';
-	
+	import { listen } from '@tauri-apps/api/event';
+
 	let enabled = false;
 
-	async function enable() {
-		enabled = true;
-		invoke('enable');
-		console.log("Enable");
-	}
+	listen('linkage-lib-state-change', (event) => {
+		console.log(event);
+		
+		if (event.payload === "Enabled") enabled = true;
+		else if (event.payload === "Disabled") enabled = false;
+	});
 
-	function disable() {
+	async function enable() {
+		invoke('enable');
+	}
+ 
+	async function disable() {
 		invoke('disable');
-		enabled = false;
-		console.log("Disable");
 	}
 </script>
 

@@ -1,79 +1,106 @@
 use std::{
-    io::{ErrorKind, Read},
+    io::{self, ErrorKind, Read},
     net::TcpStream,
-    sync::Mutex,
+    sync::{
+        mpsc::{channel, Receiver, Sender},
+        Arc, Mutex,
+    },
     thread,
     time::Duration,
 };
 
-use bus::{Bus, BusReader};
+use tauri::{Manager, Runtime};
+
+#[derive(serde::Serialize, Clone, Copy)]
+enum LinkageLibStateChange {
+    Enabled,
+    Disabled,
+}
+
+enum ChannelMessage {
+    Disable,
+}
 
 pub struct LinkageLibSocketState {
-    bus: Mutex<Bus<Option<()>>>,
+    sender: Mutex<Sender<ChannelMessage>>,
+    receiver: Arc<Mutex<Receiver<ChannelMessage>>>,
 }
 
 impl Default for LinkageLibSocketState {
     fn default() -> Self {
+        let (sender, receiver) = channel();
         Self {
-            bus: Mutex::new(Bus::new(1)),
+            sender: Mutex::new(sender),
+            receiver: Arc::new(Mutex::new(receiver)),
         }
     }
 }
 
 #[tauri::command]
-pub async fn enable(state: tauri::State<'_, LinkageLibSocketState>) -> Result<(), String> {
-    let mut bus_rx = state.bus.lock().unwrap().add_rx();
+pub async fn enable<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    state: tauri::State<'_, LinkageLibSocketState>,
+) -> Result<(), String> {
+    start_socket(app, state.receiver.clone()).map_err(|err| err.to_string())
+}
 
-    thread::spawn(move || {
-        start_socket(&mut bus_rx);
+#[tauri::command]
+pub async fn disable(state: tauri::State<'_, LinkageLibSocketState>) -> Result<(), String> {
+    stop_socket(state.inner());
+    Ok(())
+}
+
+fn start_socket<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    receiver: Arc<Mutex<Receiver<ChannelMessage>>>,
+) -> io::Result<()> {
+    log::debug!("Starting Linkage-lib socket...");
+
+    let mut socket = TcpStream::connect("raspberrypi.local:9999")?;
+
+    // Make sure the service has started
+    socket.read(&mut [0])?;
+
+    log::debug!("Started Linkage-lib socket.");
+    app.emit_all("linkage-lib-state-change", LinkageLibStateChange::Enabled)
+        .unwrap();
+
+    socket.set_read_timeout(Some(Duration::from_millis(100)))?;
+    thread::spawn({
+        move || {
+            // Keep block until the socket closes.
+            loop {
+                match receiver.lock().unwrap().try_recv() {
+                    // Check if a disable message has been sent from the frontend.
+                    Ok(val) => match val {
+                        ChannelMessage::Disable => break,
+                    },
+                    // Check if the socket has been disconnected.
+                    Err(_) => match socket.read_exact(&mut [0]) {
+                        Err(err) => match err.kind() {
+                            ErrorKind::TimedOut | ErrorKind::WouldBlock => {}
+                            _ => break,
+                        },
+                        _ => {}
+                    },
+                }
+            }
+
+            app.emit_all("linkage-lib-state-change", LinkageLibStateChange::Disabled)
+                .unwrap();
+
+            log::debug!("Closed Linkage-lib service socket.");
+        }
     });
 
     Ok(())
 }
 
-#[tauri::command]
-pub async fn disable(state: tauri::State<'_, LinkageLibSocketState>) -> Result<(), String> {
-    stop_socket(&mut state.bus.lock().unwrap());
-    Ok(())
-}
-
-fn start_socket(bus_rx: &mut BusReader<Option<()>>) {
-    log::debug!("Starting Linkage-lib socket...");
-
-    let mut socket = TcpStream::connect("raspberrypi.local:9999").unwrap();
-
-    // Make sure the service has started
-    socket.read(&mut [0]).unwrap();
-
-    socket
-        .set_read_timeout(Some(Duration::from_secs(1)))
+fn stop_socket(state: &LinkageLibSocketState) {
+    state
+        .sender
+        .lock()
+        .unwrap()
+        .send(ChannelMessage::Disable)
         .unwrap();
-
-    log::debug!("Started Linkage-lib socket.");
-
-    // FIXME: Tell frontend the socket has been started.
-
-    // Keep block until the socket closes.
-    loop {
-        match bus_rx.try_recv() {
-            Ok(val) => match val {
-                None => break,
-                _ => {}
-            },
-            Err(_) => match socket.read(&mut [0]) {
-                Ok(0) => break,
-                Err(err) => match err.kind() {
-                    ErrorKind::TimedOut | ErrorKind::WouldBlock => {}
-                    _ => break,
-                },
-                _ => {}
-            },
-        }
-    }
-
-    log::debug!("Closed Linkage-lib service socket.");
-}
-
-fn stop_socket(bus: &mut Bus<Option<()>>) {
-    bus.broadcast(None);
 }
