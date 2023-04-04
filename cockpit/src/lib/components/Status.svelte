@@ -31,7 +31,7 @@
 
 	<div class="status">
 		<StatusItem
-			info={"TODO Backend Status Label"}
+			info={'TODO Backend Status Label'}
 			label="Cockpit Backend"
 			status={cockpitBackendStatus} />
 
@@ -44,7 +44,7 @@
 
 <style lang="scss">
 	@use '../style/vars' as *;
-	
+
 	.status {
 		display: flex;
 		flex-direction: column;

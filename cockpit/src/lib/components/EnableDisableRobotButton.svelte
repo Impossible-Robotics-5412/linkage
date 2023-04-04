@@ -5,33 +5,27 @@
 
 	let enabled = false;
 
-	listen('linkage-lib-state-change', (event) => {
+	listen('linkage-lib-state-change', event => {
 		console.log(event);
-		
-		if (event.payload === "Enabled") enabled = true;
-		else if (event.payload === "Disabled") enabled = false;
+
+		if (event.payload === 'Enabled') enabled = true;
+		else if (event.payload === 'Disabled') enabled = false;
 	});
 
 	async function enable() {
 		invoke('enable');
 	}
- 
+
 	async function disable() {
 		invoke('disable');
 	}
 </script>
 
-<div 
-	class:enabled
-	class="enable-disable-robot-button">
+<div class:enabled class="enable-disable-robot-button">
 	{#if enabled}
-		<Button on:click={disable}>
-			Disable
-		</Button>
+		<Button on:click={disable}>Disable</Button>
 	{:else}
-		<Button on:click={enable}>
-			Enable
-		</Button>
+		<Button on:click={enable}>Enable</Button>
 	{/if}
 </div>
 

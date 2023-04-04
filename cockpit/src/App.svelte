@@ -6,24 +6,24 @@
 </script>
 
 <main>
-	<Container>  
+	<Container>
 		<div class="window">
 			<Status />
 			<Loggers />
 
 			<EnableDisableRobotButton />
 		</div>
-	</Container> 
+	</Container>
 </main>
 
-<style lang="scss"> 
+<style lang="scss">
 	@use 'lib/style/vars' as *;
 
 	main {
 		display: flex;
 		justify-content: center;
 		align-items: center;
- 
+
 		width: 100vw;
 		height: 100vh;
 	}

@@ -23,17 +23,17 @@
 	</div>
 	<span class="info">{info}</span>
 </div>
- 
-<style lang="scss"> 	 
+
+<style lang="scss">
 	@use '../style/vars' as *;
 
-	.main {  
+	.main {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 	}
 
-	.info { 
+	.info {
 		color: $c-secondary;
 		font-size: 12px;
 	}
