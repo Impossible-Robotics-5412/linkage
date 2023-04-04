@@ -5,5 +5,14 @@
 	"bracketSameLine": true,
 	"quoteProps": "consistent",
 	"singleQuote": true,
-	"trailingComma": "none"
+	"trailingComma": "none",
+	"plugins": ["./cockpit/node_modules/prettier-plugin-svelte"],
+	"overrides": [
+		{
+			"files": ["**/*.svelte"],
+			"options": {
+				"parser": "svelte"
+			}
+		}
+	]
 }
