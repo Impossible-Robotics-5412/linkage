@@ -3,6 +3,7 @@ import { homedir } from 'os';
 import { join } from 'path';
 import { parse as parseToml } from 'toml';
 import { Config } from './config';
+import { Logger } from '../logger/logger';
 
 export class ConfigManager {
 	public static shared = new ConfigManager();
@@ -30,7 +31,7 @@ export class ConfigManager {
 				port: toml['port']
 			};
 		} catch (err) {
-			console.error(err);
+			Logger.error(err);
 		}
 	}
 }

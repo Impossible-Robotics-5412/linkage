@@ -1,6 +1,7 @@
 import { createConnection, Socket } from 'net';
 import { ConfigManager } from '../config/config_manager';
 import { clampMotorValue } from '../util';
+import { Logger } from '../logger/logger';
 
 export class CarburetorConnection {
 	public static readonly shared = new CarburetorConnection();
@@ -25,14 +26,14 @@ export class CarburetorConnection {
 			});
 
 			this.connection.on('connect', () => {
-				console.log(`[CarburetorConnection] Connected.`);
+				Logger.info('[CarburetorConnection] Connected.');
 			});
 
 			this.connection.on('error', error => {
-				console.error(`[CarburetorConnection] ${error}`);
+				Logger.error(`[CarburetorConnection] ${error}`);
 			});
 		} catch (error) {
-			console.log(`[CarburetorConnection] Failed to connect: ${error}.`);
+			Logger.info(`[CarburetorConnection] Failed to connect: ${error}.`);
 		}
 	}
 
@@ -43,12 +44,12 @@ export class CarburetorConnection {
 
 		this.connection.destroy();
 		this.connection = undefined;
-		console.log(`[CarburetorConnection] Disconnected`);
+		Logger.info('[CarburetorConnection] Disconnected.');
 	}
 
 	public sendMotorPacket(port: number, percentage: number) {
 		if (!this.connection) {
-			console.warn(
+			Logger.warn(
 				`[CarburetorConnection] Failed to send motor packet: No connection found.`
 			);
 		}
