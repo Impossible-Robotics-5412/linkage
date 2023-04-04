@@ -51,12 +51,6 @@ def cargo_run(cargo_path=None, package=None, release=False):
 def format():
     styled_print("Formatting entire project...")
     styled_print("Running prettier...")
-    # FIXME: Refactoring svelte files via prettier is not working using the config.
-    #        In VS Code it works fine as long as you add
-    #
-    #        "prettier.documentSelectors": ["**/*.svelte"]
-    #
-    #        to your settings.json
     subprocess.run(
         [
             "npx",
@@ -64,7 +58,7 @@ def format():
             "--write",
             "--config",
             ".prettierrc.json",
-            ".",
+            "{**/*,*}.{js,ts,json,css,scss,sass,html,d.ts,svelte}",
         ]
     )
     styled_print("Running black...")
