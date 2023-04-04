@@ -2,14 +2,13 @@
 	import Button from './ui/Button.svelte';
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { listen } from '@tauri-apps/api/event';
-
-	let enabled = false;
+	import { robotCodeState } from '$lib/state';
 
 	listen('linkage-lib-state-change', event => {
 		console.log(event);
 
-		if (event.payload === 'Enabled') enabled = true;
-		else if (event.payload === 'Disabled') enabled = false;
+		if (event.payload === 'Enabled') $robotCodeState.enabled = true;
+		else if (event.payload === 'Disabled') $robotCodeState.enabled = false;
 	});
 
 	async function enable() {
@@ -21,8 +20,10 @@
 	}
 </script>
 
-<div class:enabled class="enable-disable-robot-button">
-	{#if enabled}
+<div
+	class:enabled={$robotCodeState.enabled}
+	class="enable-disable-robot-button">
+	{#if $robotCodeState.enabled}
 		<Button on:click={disable}>Disable</Button>
 	{:else}
 		<Button on:click={enable}>Enable</Button>

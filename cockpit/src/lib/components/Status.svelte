@@ -1,27 +1,14 @@
 <script lang="ts">
-	// import {
-	// 	backendState,
-	// 	BackendStatus,
-	// 	getBackendStatusLabel
-	// } from '$lib/backend/state';
 	import StatusItem from './StatusItem.svelte';
 	import { Status } from './StatusItem.svelte';
 	import Container from './Container.svelte';
-
-	let cockpitBackendStatus = Status.BAD;
-	// $: {
-	// 	if ($backendState.status >= BackendStatus.CONNECTED)
-	// 		cockpitBackendStatus = Status.GOOD;
-	// 	else if ($backendState.status >= BackendStatus.PROCESS_STARTED)
-	// 		cockpitBackendStatus = Status.SEMI;
-	// 	else cockpitBackendStatus = Status.BAD;
-	// }
+	import { robotCodeState } from '$lib/state';
 
 	let robotCodeStatus = Status.BAD;
-	// $: {
-	// 	if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
-	// 	else robotCodeStatus = Status.BAD;
-	// }
+	$: {
+		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
+		else robotCodeStatus = Status.BAD;
+	}
 </script>
 
 <Container>
@@ -31,13 +18,8 @@
 
 	<div class="status">
 		<StatusItem
-			info={'TODO Backend Status Label'}
-			label="Cockpit Backend"
-			status={cockpitBackendStatus} />
-
-		<StatusItem
 			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
-			label="Robot Code"
+			label="Robot Status"
 			status={robotCodeStatus} />
 	</div>
 </Container>
