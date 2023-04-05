@@ -285,6 +285,8 @@ def run(args: Namespace):
 
 
 if __name__ == "__main__":
+    # FIXME: Implement Tauri Cockpit for Bob.
+
     parser = argparse.ArgumentParser(
         description="Manager script for the many moving parts of Linkage",
         epilog="Koen Westendorp & Bauke Westendorp, 2023",

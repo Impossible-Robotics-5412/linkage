@@ -99,10 +99,6 @@ export class CockpitConnection {
 			const control = message.data6;
 			const value = message.data7;
 
-			Logger.info(
-				`[CockpitConnection] Gamepad Event: ${gamepadId}, ${eventType}, ${control}, ${value}.`
-			);
-
 			GamepadManager.shared.parseGamepadEvent(
 				gamepadId,
 				eventType,
