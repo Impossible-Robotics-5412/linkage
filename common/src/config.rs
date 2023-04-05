@@ -22,7 +22,7 @@ impl Display for Address {
 pub struct Config {
     linkage_lib: Box<LinkageLib>,
     carburetor: Box<Carburetor>,
-    cockpit_backend: Box<CockpitBackend>,
+    cockpit: Box<Cockpit>,
 }
 
 impl Config {
@@ -34,8 +34,8 @@ impl Config {
         &self.carburetor
     }
 
-    pub fn cockpit_backend(&self) -> &CockpitBackend {
-        &self.cockpit_backend
+    pub fn cockpit(&self) -> &Cockpit {
+        &self.cockpit
     }
 }
 
@@ -67,16 +67,11 @@ impl Carburetor {
 }
 
 #[derive(Deserialize)]
-pub struct CockpitBackend {
-    port: AddressPort,
+pub struct Cockpit {
     linkage_lib_address: Address,
 }
 
-impl CockpitBackend {
-    pub fn port(&self) -> AddressPort {
-        self.port
-    }
-
+impl Cockpit {
     pub fn linkage_lib_address(&self) -> &Address {
         &self.linkage_lib_address
     }

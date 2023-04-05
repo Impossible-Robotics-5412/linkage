@@ -50,7 +50,6 @@ pub fn enable<R: Runtime>(
 
             let mut socket = TcpStream::connect("raspberrypi.local:9999").unwrap();
 
-            // FIXME: This makes the whole app hang.
             // Make sure the service has started
             socket.read(&mut [0]).unwrap();
 

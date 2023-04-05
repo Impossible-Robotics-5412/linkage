@@ -151,7 +151,7 @@ def create_config_file():
     config_folder_path = f"{home_dir()}/.config/linkage"
     config_file_path = f"{config_folder_path}/config.toml"
 
-    example_config_file_path = f"{linkage_dir()}/examples/config/config.pi.default.toml"
+    example_config_file_path = f"{linkage_dir()}/examples/config/config.default.toml"
 
     # FIXME: It's kind of weird that we get the config from the examples folder.
     styled_print(f"Creating default config file at {config_file_path}")
