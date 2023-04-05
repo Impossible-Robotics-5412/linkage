@@ -71,8 +71,8 @@ def format():
 
 def build_cockpit():
     styled_print("Building frontend...")
-    subprocess.run(["npm", "install"], cwd="cockpit")
-    subprocess.run(["npm", "run", "tauri", "build"], cwd="cockpit")
+    subprocess.run(["pnpm", "install"], cwd="cockpit")
+    subprocess.run(["pnpm", "run", "tauri", "build"], cwd="cockpit")
 
 
 def build_carburetor(cargo_path=None, release=False):
@@ -82,19 +82,19 @@ def build_carburetor(cargo_path=None, release=False):
 
 def build_lib():
     styled_print("Building Linkage-lib...")
-    subprocess.run(["npm", "install"], cwd="lib/linkage-node")
-    subprocess.run(["npm", "run", "build"], cwd="lib/linkage-node")
+    subprocess.run(["pnpm", "install"], cwd="lib/linkage-node")
+    subprocess.run(["pnpm", "run", "build"], cwd="lib/linkage-node")
 
 
 def build_lib_example():
     styled_print("Building Linkage-lib example...")
     # FIXME: We need to use sudo here because of permission issues, but we should try to find a workaround for this...
-    subprocess.run(["sudo", "npm", "link"], cwd="lib/linkage-node")
+    subprocess.run(["pnpm", "link"], cwd="lib/linkage-node")
     subprocess.run(
-        ["sudo", "npm", "link", "@impossiblerobotics/linkage", "--save"],
+        ["pnpm", "link", "@impossiblerobotics/linkage", "--save"],
         cwd="examples/lib/linkage-node",
     )
-    subprocess.run(["npm", "run", "build"], cwd="examples/lib/linkage-node")
+    subprocess.run(["pnpm", "run", "build"], cwd="examples/lib/linkage-node")
 
 
 def build(args: Namespace):
@@ -247,8 +247,8 @@ def run_cockpit(release=False):
         build_cockpit()
     else:
         styled_print("Running Cockpit")
-        subprocess.run(["npm", "install"], cwd="cockpit")
-        subprocess.run(["npm", "run", "tauri", "dev"], cwd="cockpit")
+        subprocess.run(["pnpm", "install"], cwd="cockpit")
+        subprocess.run(["pnpm", "run", "tauri", "dev"], cwd="cockpit")
 
 
 def run(args: Namespace):

@@ -1,0 +1,32 @@
+{
+	"name": "linkage",
+	"version": "0.0.0",
+	"description": "An opensource alternative for controlling and programming FRC robots!",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"frc",
+		"robot"
+	],
+	"repository": {
+		"url": "https://github.com/Impossible-Robotics-5412/linkage"
+	},
+	"bugs": {
+		"url": "https://github.com/Impossible-Robotics-5412/linkage/issues"
+	},
+	"homepage": "https://github.com/Impossible-Robotics-5412/linkage",
+	"contributors": [
+		{
+			"name": "Koen Westendorp",
+			"email": "koensswestendorp@gmail.com",
+			"url": "https://github.com/koenwestendorp"
+		},
+		{
+			"name": "Bauke Westendorp",
+			"email": "baukewestendorp@gmail.com",
+			"url": "https://github.com/baukewestendorp"
+		}
+	],
+	"license": "MIT"
+}

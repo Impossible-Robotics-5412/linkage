@@ -3,8 +3,8 @@
 ## Developing
 
 Once you've downloaded the project and installed dependencies with
-`npm install`, build and run your code:
+`pnpm install`, build and run your code:
 
 ```bash
-npm run start
+pnpm run start
 ```
