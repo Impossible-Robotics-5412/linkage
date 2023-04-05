@@ -18,9 +18,9 @@
 				break;
 			}
 
-			logs = [value, ...logs];
+			logs = [...logs, value];
 			if (logs.length > maxScrollback) {
-				logs.pop();
+				logs.shift();
 				logs = logs;
 			}
 		}
