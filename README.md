@@ -1,10 +1,28 @@
 # Linkage
 
 <!--- figlet -f Cyberlarge linkage --->
-
+```
             _____ __   _ _     _ _______  ______ _______
      |        |   | \  | |____/  |_____| |  ____ |______
      |_____ __|__ |  \_| |    \_ |     | |_____| |______
+
+```
+
+## Getting started
+
+### Prerequisites
+- [[nodejs](https://nodejs.org/en)] Node is a Javascript runtime.
+- [[pnpm](https://pnpm.io)] This project uses pnpm as a node package manager. It is strongly recommended to use this aswel for compatibility!
+- [[cargo](https://doc.rust-lang.org/cargo/)] Cargo is the package manager used by Rust. Because this project uses quite some Rust code, this is needed to run most code.
+- [[python3](https://www.python.org/downloads/)] Python is used for our build script _bob.py_.
+
+After cloning the repo (`git clone https://github.com/Impossible-Robotics-5412/linkage.git`) run `pnpm install`. This will add a config file to ~/.config/linkage/config.toml which is used for general configuration of the project, and install dependencies needed.
+
+You should be able to run `./bob.py run cockpit` from the root of the project. to start Cockpit.
+
+### Windows support
+Currently windows is not supported, but we are looking into this to make sure everyone can enjoy Linkage!
+
 
 ## Project structure
 
