@@ -48,6 +48,10 @@ def cargo_run(cargo_path=None, package=None, release=False):
     subprocess.run(args, cwd=linkage_dir())
 
 
+def init():
+    subprocess.run(["pnpm", "install"])
+
+
 def format():
     styled_print("Formatting entire project...")
     styled_print("Running prettier...")
@@ -82,7 +86,6 @@ def build_carburetor(cargo_path=None, release=False):
 
 def build_lib():
     styled_print("Building Linkage-lib...")
-    subprocess.run(["pnpm", "install"], cwd="lib/linkage-node")
     subprocess.run(["pnpm", "run", "build"], cwd="lib/linkage-node")
 
 
@@ -247,7 +250,6 @@ def run_cockpit(release=False):
         build_cockpit()
     else:
         styled_print("Running Cockpit")
-        subprocess.run(["pnpm", "install"], cwd="cockpit")
         subprocess.run(["pnpm", "run", "tauri", "dev"], cwd="cockpit")
 
 
@@ -272,6 +274,9 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(
         title="subarguments", dest="subcommand", required=True
     )
+
+    # Init subcommand
+    init_subcommand = subparsers.add_parser("init", help="initializes the project")
 
     # Format subcommand
     format_subcommand = subparsers.add_parser("format", help="format all files")
@@ -350,7 +355,9 @@ if __name__ == "__main__":
     # Parsing
     args = parser.parse_args()
 
-    if args.subcommand == "format":
+    if args.subcommand == "init":
+        init()
+    elif args.subcommand == "format":
         format()
     elif args.subcommand == "build":
         build(args)
