@@ -42,66 +42,69 @@ pub fn enable<R: Runtime>(
     app: tauri::AppHandle<R>,
     state: tauri::State<'_, LinkageLibState>,
 ) -> Result<(), String> {
-    log::debug!("Starting Linkage-lib socket...");
-
-    let mut socket = TcpStream::connect("raspberrypi.local:9999").unwrap();
-
-    // Make sure the service has started
-    socket.read(&mut [0]).unwrap();
-
-    log::debug!("Started Linkage-lib socket.");
-    app.emit_all(
-        EVENT_LINKAGE_LIB_STATE_CHANGE,
-        LinkageLibStateChange::Enabled,
-    )
-    .unwrap();
-
-    socket
-        .set_read_timeout(Some(Duration::from_millis(100)))
-        .unwrap();
-
     thread::spawn({
         let receiver = state.disabled_message_receiver.clone();
+        let mut gamepad_event_bus_rx = state.gamepad_event_bus.lock().unwrap().add_rx();
         move || {
-            // Keep block until the socket closes.
-            loop {
-                match receiver.lock().unwrap().try_recv() {
-                    // Check if a disable message has been sent from the frontend.
-                    Ok(()) => break,
-                    // Check if the socket has been disconnected.
-                    Err(_) => match socket.read_exact(&mut [0]) {
-                        Err(err) => match err.kind() {
-                            ErrorKind::TimedOut | ErrorKind::WouldBlock => {}
-                            _ => break,
-                        },
-                        _ => {}
-                    },
-                }
-            }
+            log::debug!("Starting Linkage-lib socket...");
 
+            let mut socket = TcpStream::connect("raspberrypi.local:9999").unwrap();
+
+            // FIXME: This makes the whole app hang.
+            // Make sure the service has started
+            socket.read(&mut [0]).unwrap();
+
+            log::debug!("Started Linkage-lib socket.");
             app.emit_all(
                 EVENT_LINKAGE_LIB_STATE_CHANGE,
-                LinkageLibStateChange::Disabled,
+                LinkageLibStateChange::Enabled,
             )
             .unwrap();
 
-            log::debug!("Closed Linkage-lib service socket.");
-        }
-    });
+            socket
+                .set_read_timeout(Some(Duration::from_millis(100)))
+                .unwrap();
 
-    thread::spawn({
-        thread::sleep(Duration::from_secs(3));
+            thread::spawn({
+                move || {
+                    // Keep block until the socket closes.
+                    loop {
+                        match receiver.lock().unwrap().try_recv() {
+                            // Check if a disable message has been sent from the frontend.
+                            Ok(()) => break,
+                            // Check if the socket has been disconnected.
+                            Err(_) => match socket.read_exact(&mut [0]) {
+                                Err(err) => match err.kind() {
+                                    ErrorKind::TimedOut | ErrorKind::WouldBlock => {}
+                                    _ => break,
+                                },
+                                _ => {}
+                            },
+                        }
+                    }
 
-        let mut gamepad_event_bus_rx = state.gamepad_event_bus.lock().unwrap().add_rx();
-        move || {
-            let mut linkage_communication_stream =
-                TcpStream::connect("raspberrypi.local:12362").unwrap();
-
-            while let Ok(Some(message)) = gamepad_event_bus_rx.recv() {
-                linkage_communication_stream
-                    .write(&message.to_bytes())
+                    app.emit_all(
+                        EVENT_LINKAGE_LIB_STATE_CHANGE,
+                        LinkageLibStateChange::Disabled,
+                    )
                     .unwrap();
-            }
+
+                    log::debug!("Closed Linkage-lib service socket.");
+                }
+            });
+
+            thread::spawn({
+                move || {
+                    let mut linkage_communication_stream =
+                        TcpStream::connect("raspberrypi.local:12362").unwrap();
+
+                    while let Ok(Some(message)) = gamepad_event_bus_rx.recv() {
+                        linkage_communication_stream
+                            .write(&message.to_bytes())
+                            .unwrap();
+                    }
+                }
+            });
         }
     });
 
