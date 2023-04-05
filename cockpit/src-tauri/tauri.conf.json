@@ -7,7 +7,7 @@
 		"withGlobalTauri": false
 	},
 	"package": {
-		"productName": "cockpit",
+		"productName": "Cockpit",
 		"version": "0.0.0"
 	},
 	"tauri": {
@@ -40,9 +40,9 @@
 			{
 				"fullscreen": false,
 				"resizable": true,
-				"title": "cockpit",
-				"width": 800,
-				"height": 600
+				"title": "Cockpit",
+				"width": 1200,
+				"height": 900
 			}
 		]
 	}
