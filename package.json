@@ -2,6 +2,9 @@
 	"name": "linkage",
 	"version": "0.0.0",
 	"description": "An opensource alternative for controlling and programming FRC robots!",
+	"scripts": {
+		"install": "./bob.py init --no-npm-install"
+	},
 	"keywords": [
 		"frc",
 		"robot"

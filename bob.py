@@ -48,8 +48,9 @@ def cargo_run(cargo_path=None, package=None, release=False):
     subprocess.run(args, cwd=linkage_dir())
 
 
-def init():
-    subprocess.run(["pnpm", "install"])
+def init(no_npm_install: False):
+    if not no_npm_install:
+        subprocess.run(["pnpm", "install"])
     create_config_file()
 
 
@@ -280,6 +281,12 @@ if __name__ == "__main__":
     # Init subcommand
     init_subcommand = subparsers.add_parser("init", help="initializes the project")
 
+    init_subcommand.add_argument(
+        "--no-npm-install",
+        help="initialize the project without running npm install",
+        action="store_true",
+    )
+
     # Format subcommand
     format_subcommand = subparsers.add_parser("format", help="format all files")
 
@@ -358,7 +365,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.subcommand == "init":
-        init()
+        init(no_npm_install=args.no_npm_install)
     elif args.subcommand == "format":
         format()
     elif args.subcommand == "build":
