@@ -1,12 +1,12 @@
 use std::error::Error;
 use std::fmt::Display;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub type AddressHost = String;
 pub type AddressPort = usize;
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Address {
     pub host: AddressHost,
     pub port: AddressPort,
@@ -18,7 +18,7 @@ impl Display for Address {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Config {
     linkage_lib: Box<LinkageLib>,
     carburetor: Box<Carburetor>,
@@ -39,7 +39,7 @@ impl Config {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct LinkageLib {
     port: AddressPort,
     carburetor_address: Address,
@@ -55,7 +55,7 @@ impl LinkageLib {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Carburetor {
     port: AddressPort,
 }
@@ -66,14 +66,24 @@ impl Carburetor {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Cockpit {
     linkage_lib_address: Address,
+    linkage_socket_address: Address,
+    linkage_lib_logger_address: Address,
 }
 
 impl Cockpit {
     pub fn linkage_lib_address(&self) -> &Address {
         &self.linkage_lib_address
+    }
+
+    pub fn linkage_socket_address(&self) -> &Address {
+        &self.linkage_socket_address
+    }
+
+    pub fn linkage_lib_logger_address(&self) -> &Address {
+        &self.linkage_lib_logger_address
     }
 }
 

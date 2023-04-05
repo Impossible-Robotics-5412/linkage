@@ -1,9 +1,11 @@
 [linkage_lib]
 port = 12362
-carburetor_address = { host = "0.0.0.0", port = 48862 }
+carburetor_address = { host = "raspberrypi.local", port = 48862 }
 
 [carburetor]
 port = 48862
 
 [cockpit]
-linkage_lib_address = { host = "0.0.0.0", port = 12362 }
+linkage_socket_address = { host = "raspberrypi.local", port = 9999 }
+linkage_lib_address = { host = "raspberrypi.local", port = 12362 }
+linkage_lib_logger_address = { host = "raspberrypi.local", port = 7640 }

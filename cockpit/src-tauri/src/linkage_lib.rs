@@ -42,13 +42,15 @@ pub fn enable<R: Runtime>(
     app: tauri::AppHandle<R>,
     state: tauri::State<'_, LinkageLibState>,
 ) -> Result<(), String> {
+    let config = common::config::config().unwrap();
+
     thread::spawn({
         let receiver = state.disabled_message_receiver.clone();
         let mut gamepad_event_bus_rx = state.gamepad_event_bus.lock().unwrap().add_rx();
         move || {
-            log::debug!("Starting Linkage-lib socket...");
-
-            let mut socket = TcpStream::connect("raspberrypi.local:9999").unwrap();
+            let socket_address = config.cockpit().linkage_socket_address();
+            log::debug!("Starting Linkage-lib socket on '{socket_address}'...");
+            let mut socket = TcpStream::connect(socket_address.to_string()).unwrap();
 
             // Make sure the service has started
             socket.read(&mut [0]).unwrap();
@@ -94,8 +96,10 @@ pub fn enable<R: Runtime>(
 
             thread::spawn({
                 move || {
+                    let linkage_lib_address = config.cockpit().linkage_lib_address();
+                    log::debug!("Starting Linkage-lib communication on '{linkage_lib_address}'.");
                     let mut linkage_communication_stream =
-                        TcpStream::connect("raspberrypi.local:12362").unwrap();
+                        TcpStream::connect(linkage_lib_address.to_string()).unwrap();
 
                     while let Ok(Some(message)) = gamepad_event_bus_rx.recv() {
                         linkage_communication_stream
