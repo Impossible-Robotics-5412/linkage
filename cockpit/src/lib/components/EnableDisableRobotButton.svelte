@@ -5,8 +5,6 @@
 	import { robotCodeState } from '$lib/state';
 
 	listen('linkage-lib-state-change', event => {
-		console.log(event);
-
 		if (event.payload === 'Enabled') $robotCodeState.enabled = true;
 		else if (event.payload === 'Disabled') $robotCodeState.enabled = false;
 	});

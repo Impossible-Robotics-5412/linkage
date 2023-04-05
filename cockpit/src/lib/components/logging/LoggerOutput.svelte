@@ -21,6 +21,7 @@
 			logs = [value, ...logs];
 			if (logs.length > maxScrollback) {
 				logs.pop();
+				logs = logs;
 			}
 		}
 		reader.cancel();
