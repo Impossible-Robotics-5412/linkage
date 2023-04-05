@@ -1,40 +1,36 @@
 <script lang="ts">
-	import Container from '$lib/components/Container.svelte';
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
 	import Loggers from '$lib/components/logging/Loggers.svelte';
 	import Status from '$lib/components/Status.svelte';
 </script>
 
 <main>
-	<Container>
-		<div class="window">
-			<Status />
-			<Loggers />
+	<div class="main-window">
+		<Status />
+		<Loggers />
 
-			<EnableDisableRobotButton />
-		</div>
-	</Container>
+		<EnableDisableRobotButton />
+	</div>
 </main>
 
-<style lang="scss">
-	@use 'lib/style/vars' as *;
-
+<style>
 	main {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
 		width: 100vw;
 		height: 100vh;
 	}
 
-	.window {
+	.main-window {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		padding: 1.5rem;
+
+		width: 100%;
+		height: 100%;
+
 		display: grid;
-		grid-template-columns: 25% auto;
+		grid-template-columns: 16rem auto;
 		grid-template-rows: auto min-content;
 		gap: 1.5rem;
-
-		width: 840px;
-		height: 320px;
 	}
 </style>
