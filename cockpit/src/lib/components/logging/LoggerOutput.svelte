@@ -6,16 +6,16 @@
 		type ProcessLogger
 	} from '$lib/process-logger';
 
-	export let stream: ReadableStream | undefined = undefined;
-	export let processLogger: ProcessLogger | undefined = undefined;
+	export let processLogger: ProcessLogger;
 	export let maxScrollback = 1000;
 
 	let logs: Log[] = [];
 	let loggerElement: HTMLElement;
+	let isOpen = false;
 
 	async function startReadingStream(stream: ReadableStream) {
 		const reader = stream.getReader();
-		while (true) {
+		while (isOpen) {
 			const { done, value } = await reader.read();
 			if (done) {
 				console.log('End of stream');
@@ -29,10 +29,17 @@
 		}
 	}
 
-	async function startReadingProcessLogger(processLogger: ProcessLogger) {
+	async function connect() {
+		isOpen = true;
 		processLogger.start().then(async stream => {
 			await startReadingStream(stream);
 		});
+	}
+
+	function disconnect() {
+		isOpen = false;
+		logs = [];
+		processLogger.stop();
 	}
 
 	function scrollToBottom() {
@@ -54,24 +61,26 @@
 	}
 
 	$: if (logs) scrollToBottom();
-	$: {
-		if (stream) startReadingStream(stream);
-		else if (processLogger) startReadingProcessLogger(processLogger);
-	}
 </script>
 
 <div class="logger-output" bind:this={loggerElement}>
-	{#each logs as log}
-		<div
-			class="line"
-			class:level-error={log.level === LogLevel.ERROR}
-			class:level-warn={log.level === LogLevel.WARN}
-			class:level-info={log.level === LogLevel.INFO}
-			class:level-debug={log.level === LogLevel.DEBUG}
-			class:level-trace={log.level === LogLevel.TRACE}>
-			<span>[{logLevelLabel(log.level)}] {log.msg}</span>
-		</div>
-	{/each}
+	{#if isOpen}
+		<button on:click={disconnect}>Disconnect</button>
+		{#each logs as log}
+			<div
+				class="line"
+				class:level-error={log.level === LogLevel.ERROR}
+				class:level-warn={log.level === LogLevel.WARN}
+				class:level-info={log.level === LogLevel.INFO}
+				class:level-debug={log.level === LogLevel.DEBUG}
+				class:level-trace={log.level === LogLevel.TRACE}>
+				<span>[{logLevelLabel(log.level)}] {log.msg}</span>
+			</div>
+		{/each}
+	{:else}
+		<h2>Logger connection closed.</h2>
+		<button on:click={connect}>Connect</button>
+	{/if}
 </div>
 
 <style lang="scss">

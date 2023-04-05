@@ -9,10 +9,15 @@
 	}
 
 	const tabs: Record<string, Tab> = {
+		linkage: {
+			name: 'Linkage',
+			processLogger: new ProcessLogger('ws://raspberrypi.local:7640')
+		},
 		backend: {
 			name: 'Cockpit Backend',
 			processLogger: new ProcessLogger('ws://0.0.0.0:7642')
 		}
+
 		// carburetor: {
 		// 	name: 'Carburetor',
 		// 	processLogger: new ProcessLogger('ws://0.0.0.0:7644')

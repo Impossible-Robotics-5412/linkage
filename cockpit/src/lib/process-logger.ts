@@ -49,25 +49,42 @@ export function logLevelLabel(level: LogLevel) {
 }
 
 export class ProcessLogger {
+	private processLogSocket: WebSocket | undefined;
+
 	constructor(public readonly address: string) {}
 
-	public start() {
+	start() {
 		return new Promise<ReadableStream<Log>>((resolve, reject) => {
-			const processLogSocket = new WebSocket(this.address);
+			if (this.processLogSocket) return;
 
-			processLogSocket.addEventListener('error', reject);
+			this.processLogSocket = new WebSocket(this.address);
 
-			processLogSocket.onopen = () => {
+			this.processLogSocket.addEventListener('error', reject);
+
+			this.processLogSocket.onopen = () => {
 				const stream = new ReadableStream<Log>({
 					start: controller => {
-						processLogSocket.addEventListener('message', msg => {
-							controller.enqueue(JSON.parse(msg.data));
-						});
+						this.processLogSocket.addEventListener(
+							'message',
+							msg => {
+								controller.enqueue(JSON.parse(msg.data));
+							}
+						);
 					}
 				});
 
 				resolve(stream);
 			};
 		});
+	}
+
+	stop() {
+		this.processLogSocket?.close();
+		this.processLogSocket = undefined;
+	}
+
+	async restart() {
+		this.stop();
+		await this.start();
 	}
 }
