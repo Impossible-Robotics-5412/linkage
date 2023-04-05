@@ -42,7 +42,9 @@
 				"resizable": true,
 				"title": "Cockpit",
 				"width": 1200,
-				"height": 900
+				"height": 900,
+				"minWidth": 600,
+				"minHeight": 300
 			}
 		]
 	}
