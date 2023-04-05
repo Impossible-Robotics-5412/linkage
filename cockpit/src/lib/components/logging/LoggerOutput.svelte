@@ -1,21 +1,17 @@
 <script lang="ts">
-	import {
-		LogLevel,
-		logLevelLabel,
-		type Log,
-		type ProcessLogger
-	} from '$lib/process-logger';
+	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
 
-	export let processLogger: ProcessLogger;
+	export let stream: ReadableStream;
 	export let maxScrollback = 1000;
+	export let closedStreamMessage = 'Logger stream is closed';
 
 	let logs: Log[] = [];
 	let loggerElement: HTMLElement;
-	let isOpen = false;
 
-	async function startReadingStream(stream: ReadableStream) {
+	async function startReadingStream() {
 		const reader = stream.getReader();
-		while (isOpen) {
+
+		while (stream) {
 			const { done, value } = await reader.read();
 			if (done) {
 				console.log('End of stream');
@@ -24,22 +20,12 @@
 
 			logs = [value, ...logs];
 			if (logs.length > maxScrollback) {
-				logs.shift();
+				logs.pop();
+				logs = logs;
 			}
 		}
-	}
-
-	async function connect() {
-		isOpen = true;
-		processLogger.start().then(async stream => {
-			await startReadingStream(stream);
-		});
-	}
-
-	function disconnect() {
-		isOpen = false;
-		logs = [];
-		processLogger.stop();
+		reader.cancel();
+		stream?.cancel();
 	}
 
 	function scrollToBottom() {
@@ -61,11 +47,11 @@
 	}
 
 	$: if (logs) scrollToBottom();
+	$: if (stream) startReadingStream();
 </script>
 
 <div class="logger-output" bind:this={loggerElement}>
-	{#if isOpen}
-		<button on:click={disconnect}>Disconnect</button>
+	{#if stream}
 		{#each logs as log}
 			<div
 				class="line"
@@ -78,13 +64,23 @@
 			</div>
 		{/each}
 	{:else}
-		<h2>Logger connection closed.</h2>
-		<button on:click={connect}>Connect</button>
+		<div class="logger-closed-message">
+			<h2>{closedStreamMessage}</h2>
+		</div>
 	{/if}
 </div>
 
 <style lang="scss">
 	@use '../../style/vars' as *;
+
+	.logger-closed-message {
+		width: 100%;
+		height: 100%;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
 
 	.logger-output {
 		font-size: 14px;

@@ -38,6 +38,7 @@ export abstract class Robot {
 		// FIXME: This shouldn't use setInterval but this is okay for initial testing period.
 		this.internalTickTimer = setInterval(() => {
 			this.internalTick();
+			Logger.info(Date.now().toFixed());
 		}, 20);
 
 		process.on('SIGINT', this.internalShutdown);

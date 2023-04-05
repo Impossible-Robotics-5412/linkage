@@ -1,27 +1,24 @@
 <script lang="ts">
-	import { ProcessLogger } from '$lib/process-logger';
 	import Container from '$lib/components/Container.svelte';
-	import LoggerOutput from './LoggerOutput.svelte';
+	import type { ComponentType } from 'svelte';
+
+	import LinkageLoggerOutput from './LinkageLoggerOutput.svelte';
+	import CockpitBackendLoggerOutput from './CockpitBackendLoggerOutput.svelte';
 
 	interface Tab {
 		name: string;
-		processLogger: ProcessLogger;
+		loggerOutputComponent: ComponentType;
 	}
 
 	const tabs: Record<string, Tab> = {
 		linkage: {
 			name: 'Linkage',
-			processLogger: new ProcessLogger('ws://raspberrypi.local:7640')
+			loggerOutputComponent: LinkageLoggerOutput
 		},
 		backend: {
 			name: 'Cockpit Backend',
-			processLogger: new ProcessLogger('ws://0.0.0.0:7642')
+			loggerOutputComponent: CockpitBackendLoggerOutput
 		}
-
-		// carburetor: {
-		// 	name: 'Carburetor',
-		// 	processLogger: new ProcessLogger('ws://0.0.0.0:7644')
-		// }
 	};
 
 	let currentTabId = Object.keys(tabs)[0];
@@ -41,7 +38,8 @@
 	<div class="output">
 		{#each Object.keys(tabs) as tabId}
 			<div class="tab" class:visible={currentTabId === tabId}>
-				<LoggerOutput processLogger={tabs[tabId].processLogger} />
+				<svelte:component
+					this={tabs[currentTabId].loggerOutputComponent} />
 			</div>
 		{/each}
 	</div>
