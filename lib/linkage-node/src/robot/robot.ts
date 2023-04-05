@@ -1,6 +1,7 @@
 import { Subsystem } from '../subsystem';
 import { CockpitConnection } from '../cockpit/cockpit_connection';
 import { CarburetorConnection } from '../carburetor/carburetor_connection';
+import { Logger } from '../logger/logger';
 
 /**
  * The robot class is the main entry point for the entire robot program. All logic starts here.
@@ -26,6 +27,9 @@ export abstract class Robot {
 	 * Starts the robot code. This should only be called once per program.
 	 */
 	public async run(): Promise<void> {
+		Logger.init();
+		Logger.info('Starting.');
+
 		await Promise.all([
 			await CockpitConnection.shared.listen(),
 			await CarburetorConnection.shared.connect()
@@ -64,7 +68,7 @@ export abstract class Robot {
 	}
 
 	private internalShutdown(): void {
-		console.log('Shutting Down');
+		Logger.info('Shutting Down.');
 
 		clearInterval(this.internalTickTimer);
 

@@ -1,6 +1,7 @@
 import { GamepadManager } from '../gamepad';
 import { createServer, Server } from 'net';
 import { ConfigManager } from '../config/config_manager';
+import { Logger } from '../logger/logger';
 
 enum CockpitInstruction {
 	GAMEPAD_EVENT = 0x20
@@ -45,7 +46,7 @@ export class CockpitConnection {
 		}
 
 		this.server = createServer(socket => {
-			console.log(
+			Logger.info(
 				`[CockpitConnection] New connection: ${socket.remoteAddress}.`
 			);
 
@@ -57,25 +58,25 @@ export class CockpitConnection {
 			});
 
 			socket.on('close', () => {
-				console.error(
+				Logger.error(
 					`[CockpitConnection] Socket closed ${socket.remoteAddress}`
 				);
 			});
 
 			socket.on('error', error => {
-				console.error(
+				Logger.error(
 					`[CockpitConnection] Socket error on socket ${socket.remoteAddress} ${error}`
 				);
 			});
 		});
 
 		this.server.on('error', error => {
-			console.log(`[CockpitConnection] Failed to connect: ${error}.`);
+			Logger.info(`[CockpitConnection] Failed to connect: ${error}.`);
 		});
 
 		const port = ConfigManager.shared.config?.port;
 		this.server.listen(port, () => {
-			console.log(
+			Logger.info(
 				`[CockpitConnection] Started listening on port ${port}.`
 			);
 		});
@@ -88,7 +89,7 @@ export class CockpitConnection {
 
 		this.server.close();
 		this.server = undefined;
-		console.log(`[CockpitConnection] Disconnected.`);
+		Logger.info('[CockpitConnection] Disconnected.');
 	}
 
 	private onMessage(message: CockpitMessage): void {
@@ -105,7 +106,7 @@ export class CockpitConnection {
 				value
 			);
 		} else {
-			console.log(
+			Logger.info(
 				`[CockpitConnection] Invalid instruction: ${message.instruction}.`
 			);
 		}

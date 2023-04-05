@@ -1,22 +1,9 @@
 mod error;
 
 use error::MessageError;
-use message_derive::Message;
 
 /// An 8-byte array that serves as the common message sent between linkage programs.
 pub type Bytes = [u8; 8];
-
-// Cockpit-Frontend > Cockpit-Backend
-/// Tells backend that its services should be enabled.
-const ENABLE_BACKEND: Bytes = [0x00, 0, 0, 0, 0, 0, 0, 0];
-/// Tells backend that its services should be disabled.
-const DISABLE_BACKEND: Bytes = [0x01, 0, 0, 0, 0, 0, 0, 0];
-
-// Cockpit-Frontend < Cockpit-Backend
-/// Tells frontend that backend's services have been enabled.
-const BACKEND_IS_ENABLED: Bytes = [0x08, 0, 0, 0, 0, 0, 0, 0];
-/// Tells frontend that backend's services have been disabled.
-const BACKEND_IS_DISABLED: Bytes = [0x09, 0, 0, 0, 0, 0, 0, 0];
 
 // TODO: For future implementation of the messages between carburetor and linkage :)
 // // Linkage-Lib > Carburetor
@@ -35,27 +22,9 @@ pub trait Message: TryFrom<Bytes> + Into<Bytes> {
     fn to_bytes(&self) -> Bytes;
 }
 
-// Frontend ------> Backend
-#[derive(Debug, Clone, Copy, Message)]
-pub enum FrontendToBackendMessage {
-    #[message(ENABLE_BACKEND)]
-    Enable,
-    #[message(DISABLE_BACKEND)]
-    Disable,
-}
-
-// Backend ------> Frontend
-#[derive(Debug, Clone, Copy, Message)]
-pub enum BackendToFrontendMessage {
-    #[message(BACKEND_IS_ENABLED)]
-    Enabled,
-    #[message(BACKEND_IS_DISABLED)]
-    Disabled,
-}
-
 // Backend ------> Linkage Lib
 #[derive(Debug, Clone, Copy)]
-pub enum BackendToLinkage {
+pub enum CockpitToLinkage {
     GamepadInputEvent {
         gamepad_id: u8,
         event_type: u8,
@@ -64,13 +33,13 @@ pub enum BackendToLinkage {
     },
 }
 
-impl Message for BackendToLinkage {
+impl Message for CockpitToLinkage {
     fn to_bytes(&self) -> Bytes {
         Bytes::from(*self)
     }
 }
 
-impl TryFrom<Bytes> for BackendToLinkage {
+impl TryFrom<Bytes> for CockpitToLinkage {
     type Error = MessageError;
 
     fn try_from(value: Bytes) -> Result<Self, Self::Error> {
@@ -88,11 +57,11 @@ impl TryFrom<Bytes> for BackendToLinkage {
     }
 }
 
-impl From<BackendToLinkage> for Bytes {
-    fn from(value: BackendToLinkage) -> Self {
+impl From<CockpitToLinkage> for Bytes {
+    fn from(value: CockpitToLinkage) -> Self {
         #[allow(unused_parens)]
         match value {
-            BackendToLinkage::GamepadInputEvent {
+            CockpitToLinkage::GamepadInputEvent {
                 gamepad_id,
                 event_type,
                 control,

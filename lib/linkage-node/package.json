@@ -12,9 +12,11 @@
 	},
 	"devDependencies": {
 		"@types/node": "^18.15.3",
+		"@types/ws": "^8.5.4",
 		"typescript": "^4.9.5"
 	},
 	"dependencies": {
-		"toml": "^3.0.0"
+		"toml": "^3.0.0",
+		"ws": "^8.13.0"
 	}
 }

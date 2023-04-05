@@ -51,12 +51,6 @@ def cargo_run(cargo_path=None, package=None, release=False):
 def format():
     styled_print("Formatting entire project...")
     styled_print("Running prettier...")
-    # FIXME: Refactoring svelte files via prettier is not working using the config.
-    #        In VS Code it works fine as long as you add
-    #
-    #        "prettier.documentSelectors": ["**/*.svelte"]
-    #
-    #        to your settings.json
     subprocess.run(
         [
             "npx",
@@ -64,7 +58,7 @@ def format():
             "--write",
             "--config",
             ".prettierrc.json",
-            ".",
+            "{**/*,*}.{js,ts,json,css,scss,sass,html,d.ts,svelte}",
         ]
     )
     styled_print("Running black...")
@@ -75,15 +69,10 @@ def format():
     exit(0)
 
 
-def build_cockpit_frontend():
+def build_cockpit():
     styled_print("Building frontend...")
-    subprocess.run(["npm", "install"], cwd="cockpit/frontend/web")
-    subprocess.run(["npm", "run", "build"], cwd="cockpit/frontend/web")
-
-
-def build_cockpit_backend(cargo_path=None, release=False):
-    styled_print("Building backend...")
-    cargo_build(cargo_path, "cockpit-backend", release=release)
+    subprocess.run(["npm", "install"], cwd="cockpit")
+    subprocess.run(["npm", "run", "tauri", "build"], cwd="cockpit")
 
 
 def build_carburetor(cargo_path=None, release=False):
@@ -114,15 +103,10 @@ def build(args: Namespace):
         cargo_build(release=args.release)
         build_lib()
         build_lib_example()
-        build_cockpit_frontend()
+        build_cockpit()
     elif args.part == "cockpit":
         styled_print("Building cockpit frontend and backend...")
-        build_cockpit_frontend()
-        build_cockpit_backend(release=args.release)
-    elif args.part == "cockpit-frontend":
-        build_cockpit_frontend()
-    elif args.part == "cockpit-backend":
-        build_cockpit_backend(release=args.release)
+        build_cockpit()
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
     elif args.part == "lib-example":
@@ -258,31 +242,19 @@ def run_carburetor(release=False, no_build=False):
     cargo_run(package="carburetor", release=release)
 
 
-def run_cockpit_frontend(release=False, no_build=False):
+def run_cockpit(release=False):
     if release:
-        if not no_build:
-            build_cockpit_frontend()
-        styled_print("Running Cockpit-frontend...")
-        subprocess.run(["npm", "run", "preview"], cwd="cockpit/frontend/web")
+        build_cockpit()
     else:
-        styled_print("Running Cockpit-frontend...")
-        subprocess.run(["npm", "run", "dev"], cwd="cockpit/frontend/web")
-
-
-def run_cockpit_backend(release=False, no_build=False):
-    if not no_build:
-        build_cockpit_backend(release=release)
-    styled_print("Running Cockpit-backend...")
-    cargo_run(package="cockpit-backend", release=release)
+        styled_print("Running Cockpit")
+        subprocess.run(["npm", "run", "tauri", "dev"], cwd="cockpit")
 
 
 def run(args: Namespace):
     if args.part == "carburetor":
         run_carburetor(release=args.release, no_build=args.no_build)
-    elif args.part == "cockpit-frontend":
-        run_cockpit_frontend(release=args.release, no_build=args.no_build)
-    elif args.part == "cockpit-backend":
-        run_cockpit_backend(release=args.release, no_build=args.no_build)
+    elif args.part == "cockpit":
+        run_cockpit(release=args.release)
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
@@ -314,8 +286,6 @@ if __name__ == "__main__":
         choices=[
             "all",
             "cockpit",
-            "cockpit-frontend",
-            "cockpit-backend",
             "carburetor",
             "lib",
             "lib-example",
@@ -358,8 +328,7 @@ if __name__ == "__main__":
         "part",
         help="the part of linkage to run",
         choices=[
-            "cockpit-frontend",
-            "cockpit-backend",
+            "cockpit",
             "carburetor",
         ],
     )
