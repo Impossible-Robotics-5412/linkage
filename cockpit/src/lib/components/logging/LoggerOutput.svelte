@@ -83,20 +83,25 @@
 	}
 
 	.logger-output {
-		font-size: 14px;
 		height: 100%;
+
+		font-size: 14px;
+
 		overflow: scroll;
 		display: flex;
 		flex-direction: column;
-		margin-top: -1px;
 	}
 
 	.line {
 		padding: 2px 1.5rem;
-		width: 100%;
 		box-sizing: border-box;
 
 		border-top: 1px solid $c-gray-2;
+
+		& pre {
+			word-wrap: break-word;
+			white-space: normal;
+		}
 	}
 
 	@mixin log-level($selector, $text-color, $color, $border-color: $c-gray-2) {

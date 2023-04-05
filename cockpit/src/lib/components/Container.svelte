@@ -29,6 +29,7 @@
 		background-color: $c-background;
 
 		display: grid;
+		grid-template-columns: 100%;
 		grid-template-rows: auto calc(100% - 3rem);
 	}
 
