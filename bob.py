@@ -17,7 +17,7 @@ def linkage_dir():
 
 
 def home_dir():
-    return path.expanduser("~pi")
+    return path.expanduser("~")
 
 
 def is_raspberry_pi():
@@ -50,6 +50,7 @@ def cargo_run(cargo_path=None, package=None, release=False):
 
 def init():
     subprocess.run(["pnpm", "install"])
+    create_config_file()
 
 
 def format():
@@ -155,14 +156,15 @@ def create_config_file():
     config_file_path = f"{config_folder_path}/config.toml"
 
     example_config_file_path = f"{linkage_dir()}/examples/config/config.default.toml"
-
-    # FIXME: It's kind of weird that we get the config from the examples folder.
-    styled_print(f"Creating default config file at {config_file_path}")
-    makedirs(config_folder_path, exist_ok=True)
-    shutil.copy(
-        src=example_config_file_path,
-        dst=config_file_path,
-    )
+    if path.isfile(config_file_path):
+        styled_print(f"Config file already exists at '{config_file_path}'.")
+    else:
+        styled_print(f"Creating default config file at '{config_file_path}'.")
+        makedirs(config_folder_path, exist_ok=True)
+        shutil.copy(
+            src=example_config_file_path,
+            dst=config_file_path,
+        )
 
 
 def install_node_js():
