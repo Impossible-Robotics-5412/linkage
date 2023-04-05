@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
 
-	export let stream: ReadableStream;
-	export let maxScrollback = 1000;
+	export let stream: ReadableStream<Log>;
+	export let maxScrollback = 500;
 	export let closedStreamMessage = 'Logger stream is closed';
 
 	let logs: Log[] = [];
@@ -96,23 +96,41 @@
 		padding: 2px 1.5rem;
 		box-sizing: border-box;
 
-		border-top: 1px solid $c-gray-2;
-
 		& pre {
 			word-wrap: break-word;
 			white-space: normal;
 		}
 	}
 
-	@mixin log-level($selector, $text-color, $color, $border-color: $c-gray-2) {
+	@mixin log-level(
+		$selector,
+		$text-color,
+		$color,
+		$border-color,
+		$priority: false
+	) {
 		.line#{$selector} {
 			background: $color;
-			border-top-color: $border-color;
+			border-top: 1px solid $border-color;
 
 			color: $text-color;
 
-			&:not(#{$selector}):has(+ .line#{$selector}) {
-				border-top-color: $border-color;
+			@if $priority {
+				border-bottom: 1px solid $border-color;
+
+				& + .line {
+					border-top: none;
+				}
+			}
+
+			@if not $priority {
+				&:first-child {
+					border-top: none;
+				}
+			}
+
+			&:last-child {
+				border-bottom: 1px solid $border-color;
 			}
 		}
 	}
@@ -121,15 +139,17 @@
 		'.level-error',
 		$c-primary,
 		scale-color($c-red, $alpha: -85%),
-		$c-red
+		$c-red,
+		true
 	);
 	@include log-level(
 		'.level-warn',
 		$c-primary,
 		scale-color($c-orange, $alpha: -85%),
-		$c-orange
+		$c-orange,
+		true
 	);
-	@include log-level('.level-info', $c-primary, $c-background);
-	@include log-level('.level-debug', $c-secondary, $c-background);
-	@include log-level('.level-trace', $c-secondary, $c-background);
+	@include log-level('.level-info', $c-primary, $c-background, $c-gray-2);
+	@include log-level('.level-debug', $c-secondary, $c-background, $c-gray-2);
+	@include log-level('.level-trace', $c-secondary, $c-background, $c-gray-2);
 </style>
