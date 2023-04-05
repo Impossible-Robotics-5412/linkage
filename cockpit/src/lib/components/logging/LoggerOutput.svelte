@@ -59,7 +59,7 @@
 				class:level-info={log.level === LogLevel.INFO}
 				class:level-debug={log.level === LogLevel.DEBUG}
 				class:level-trace={log.level === LogLevel.TRACE}>
-				<span>[{logLevelLabel(log.level)}] {log.msg}</span>
+				<pre>[{logLevelLabel(log.level)}] {log.msg}</pre>
 			</div>
 		{/each}
 	{:else}

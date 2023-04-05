@@ -67,7 +67,9 @@ export class ProcessLogger {
 						this.processLogSocket.addEventListener(
 							'message',
 							msg => {
-								controller.enqueue(JSON.parse(msg.data));
+								const log: Log = JSON.parse(msg.data);
+								log.msg = log.msg.trimEnd();
+								controller.enqueue(log);
 							}
 						);
 					}
