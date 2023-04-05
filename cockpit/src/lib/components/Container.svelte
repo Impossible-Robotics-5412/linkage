@@ -40,6 +40,8 @@
 		padding: 0 1.5rem;
 		height: 3rem;
 
+		background: $c-gray-1;
+
 		border-bottom: 1px solid $c-gray-2;
 	}
 
