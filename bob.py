@@ -247,6 +247,7 @@ def run_cockpit(release=False):
         build_cockpit()
     else:
         styled_print("Running Cockpit")
+        subprocess.run(["npm", "install"], cwd="cockpit")
         subprocess.run(["npm", "run", "tauri", "dev"], cwd="cockpit")
 
 
