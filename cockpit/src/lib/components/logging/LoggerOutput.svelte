@@ -21,7 +21,6 @@
 			logs = [value, ...logs];
 			if (logs.length > maxScrollback) {
 				logs.pop();
-				logs = logs;
 			}
 		}
 		reader.cancel();
@@ -87,7 +86,7 @@
 		height: 100%;
 		overflow: scroll;
 		display: flex;
-		flex-direction: column-reverse;
+		flex-direction: column;
 		margin-top: -1px;
 	}
 
