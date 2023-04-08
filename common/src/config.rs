@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub type AddressHost = String;
 pub type AddressPort = usize;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Address {
     pub host: AddressHost,
     pub port: AddressPort,
@@ -18,7 +18,7 @@ impl Display for Address {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Config {
     linkage_lib: Box<LinkageLib>,
     carburetor: Box<Carburetor>,
@@ -39,7 +39,7 @@ impl Config {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct LinkageLib {
     port: AddressPort,
     carburetor_address: Address,
@@ -55,7 +55,7 @@ impl LinkageLib {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Carburetor {
     port: AddressPort,
 }
@@ -66,7 +66,7 @@ impl Carburetor {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Cockpit {
     linkage_lib_address: Address,
     linkage_socket_address: Address,
