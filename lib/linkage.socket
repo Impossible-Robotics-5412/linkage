@@ -1,0 +1,10 @@
+[Unit]
+Description=Linkage Socket
+
+[Socket]
+ListenStream=0.0.0.0:9999
+Accept=yes
+MaxConnections=1
+
+[Install]
+WantedBy=sockets.target

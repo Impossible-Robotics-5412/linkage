@@ -10,19 +10,37 @@
 
 ## Getting started
 
+### Installing Linkage on a Pi
+1. Clone the repo to the Pi using `git clone https://github.com/Impossible-Robotics-5412/linkage.git`.
+2. Navigate into the downloaded repo using `cd linkage`.
+3. Run `./install-rpi.sh`. (Please note this might take quite a few minutes as it will install and compile all necessary dependencies!)
+4. [Deploy your robot code](#deploy-robot-code).
+
+### Running Cockpit
+Currently we don't create prebuilt versions of Cockpit, which means you will have to build it from source.
+In the near future this shouldn't be needed anymore for general use.
+Please see [Preparing the project](#preparing-the-project) for more information about building and running Cockpit.
+
+## Building Cockpit
 ### Prerequisites
-- [[nodejs](https://nodejs.org/en)] Node is a Javascript runtime.
+- [[node](https://nodejs.org/en)] Node is a Javascript runtime.
 - [[pnpm](https://pnpm.io)] This project uses pnpm as a node package manager. It is strongly recommended to use this aswel for compatibility!
 - [[cargo](https://doc.rust-lang.org/cargo/)] Cargo is the package manager used by Rust. Because this project uses quite some Rust code, this is needed to run most code.
 - [[python3](https://www.python.org/downloads/)] Python is used for our build script _bob.py_.
 
-After cloning the repo (`git clone https://github.com/Impossible-Robotics-5412/linkage.git`) run `pnpm install`. This will add a config file to ~/.config/linkage/config.toml which is used for general configuration of the project, and install dependencies needed.
+### Preparing the project
+After cloning the repo run `pnpm install`. This will add a config file to `~/.config/linkage/config.toml` which is used for general configuration of the project, and will install the necessary dependencies.
 
-You should be able to run `./bob.py run cockpit` from the root of the project. to start Cockpit.
+### Running Cockpit
+Now you should be able to run `./bob.py run cockpit` from the root of the project to start Cockpit.
 
-### Windows support
+## Deploying robot code
+To get started, you can deploy the example robot code:
+1. Navigate into the example folder using `cd examples/lib/linkage-node`.
+2. Run `./deploy.sh`
+
+## Windows support
 Currently windows is not supported, but we are looking into this to make sure everyone can enjoy Linkage!
-
 
 ## Project structure
 
@@ -104,7 +122,7 @@ This code of conduct is subject to elaboration.
     - [ ] What?
     - [ ] Why?
     - [ ] How?
-- [ ] Installation and Usage section (see [#3](https://github.com/Impossible-Robotics-5412/linkage/issues/3))
+- [x] Installation and Usage section (see [#3](https://github.com/Impossible-Robotics-5412/linkage/issues/3))
 - [ ] Add examples (see [#2](https://github.com/Impossible-Robotics-5412/linkage/issues/2))
 - [X] Unified configuration file (see [#4](https://github.com/Impossible-Robotics-5412/linkage/issues/4))
 

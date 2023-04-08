@@ -3,6 +3,8 @@ Description=Carburetor
 After=multi-user.target
 
 [Service]
+# FIXME: Create custom user for running linkage processes
+User=pi
 ExecStart=/usr/bin/carburetor
 Restart=always
 RestartSec=3s
