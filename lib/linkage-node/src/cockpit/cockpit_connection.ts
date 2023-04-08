@@ -47,7 +47,7 @@ export class CockpitConnection {
 
 		this.server = createServer(socket => {
 			Logger.info(
-				`[CockpitConnection] New connection: ${socket.remoteAddress}.`
+				`[CockpitConnection] New connection: '${socket.remoteAddress}'.`
 			);
 
 			socket.on('readable', () => {
@@ -58,20 +58,20 @@ export class CockpitConnection {
 			});
 
 			socket.on('close', () => {
-				Logger.error(
-					`[CockpitConnection] Socket closed ${socket.remoteAddress}`
+				Logger.info(
+					`[CockpitConnection] Socket closed: '${socket.remoteAddress}'`
 				);
 			});
 
 			socket.on('error', error => {
 				Logger.error(
-					`[CockpitConnection] Socket error on socket ${socket.remoteAddress} ${error}`
+					`[CockpitConnection] Error on socket '${socket.remoteAddress}': ${error}`
 				);
 			});
 		});
 
 		this.server.on('error', error => {
-			Logger.info(`[CockpitConnection] Failed to connect: ${error}.`);
+			Logger.info(`[CockpitConnection] Failed to connect: ${error}`);
 		});
 
 		const port = ConfigManager.shared.config?.port;
