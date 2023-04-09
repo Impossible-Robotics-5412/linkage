@@ -57,7 +57,10 @@
 				class:level-info={log.level === LogLevel.INFO}
 				class:level-debug={log.level === LogLevel.DEBUG}
 				class:level-trace={log.level === LogLevel.TRACE}>
-				<pre>[{logLevelLabel(log.level)}] {log.msg}</pre>
+				<span title={`${log.file}:${log.line}`}>
+					[{new Date().toLocaleTimeString()}
+					{logLevelLabel(log.level)}] {log.msg}
+				</span>
 			</div>
 		{/each}
 	{:else}
@@ -93,7 +96,7 @@
 		padding: 2px 1.5rem;
 		box-sizing: border-box;
 
-		& pre {
+		& span {
 			word-wrap: break-word;
 			white-space: pre-line;
 		}
