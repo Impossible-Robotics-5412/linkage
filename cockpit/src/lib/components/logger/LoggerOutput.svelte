@@ -9,7 +9,12 @@
 	let logs: Log[] = [];
 	let loggerElement: HTMLElement;
 
+	function clearLogger() {
+		logs = [];
+	}
+
 	async function startReadingStream() {
+		clearLogger();
 		const reader = stream.getReader();
 
 		while (stream) {
