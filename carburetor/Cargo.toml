@@ -6,7 +6,6 @@ authors.workspace = true
 
 [dependencies]
 simple-signal = "1.1.1"
-sys-info = "0.9.1"
 common = { path = "../common" }
 log = "0.4.17"
 
