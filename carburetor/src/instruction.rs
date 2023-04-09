@@ -98,10 +98,6 @@ impl std::fmt::Display for Speed {
 
 pub(crate) enum Instruction {
     Motor(MotorInstruction),
-    Query, // This is a test query bound to 69
-    Battery,
-    Memory,
-    Cpu,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -150,26 +146,7 @@ pub(crate) fn decode(buf: MessageBytes) -> Option<Instruction> {
             let speed = (speed * 10_000.0).round() / 10_000.0;
             Some(Instruction::Motor(MotorInstruction::new(channel, speed)?))
         }
-        100 => Some(Instruction::Battery),
-        101 => Some(Instruction::Memory),
-        102 => Some(Instruction::Cpu),
-        69 => Some(Instruction::Query),
         // Not yet implemented.
         _ => None,
     }
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-//     fn test_decode() {
-//         assert_eq!(decode([0, 0, 0, 0, 0]), Instruction::new(0, -1.0));
-//         assert_eq!(
-//             decode([[100, 0, 0, 0], (0.5_f32).to_be_bytes()].concat()),
-//             Instruction::new(100, 0.0)
-//         );
-//         assert_eq!(decode([200, 0, 0, 0, u8::MAX]), Instruction::new(200, 1.0));
-//     }
-// }

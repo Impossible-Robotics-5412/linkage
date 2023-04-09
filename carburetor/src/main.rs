@@ -121,23 +121,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                     sender.send(instr.speed())?;
                 }
-                // Instruction::Query => stream.write_all(&69_f32.to_be_bytes())?,
-                Instruction::Query => writeln!(stream, "Nice!")?,
-                Instruction::Battery => writeln!(stream, "Battery: 42%")?,
-                Instruction::Memory => {
-                    let info = sys_info::mem_info()?;
-                    let total = info.total;
-                    let free = info.free;
-                    let used = total - free;
-                    let percentage = (used as f32 / total as f32) * 100.0;
-                    debug!("Reported memory status to {peer}.");
-                    writeln!(stream, "Memory: {percentage:.0}% ({used} / {total})")?
-                }
-                Instruction::Cpu => {
-                    let load = sys_info::loadavg()?.one;
-                    debug!("Reported cpu status to {peer}.");
-                    writeln!(stream, "Cpu: {load}")?
-                }
             }
         }
 
