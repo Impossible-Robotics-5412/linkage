@@ -6,6 +6,7 @@
 	import { loggerState } from '$lib/state/logger';
 
 	listen('linkage-lib-state-change', event => {
+		$robotCodeState.changing = false;
 		if (event.payload === 'Enabled') {
 			$robotCodeState.enabled = true;
 			$loggerState.selectedTabId = 'linkage';
@@ -16,10 +17,12 @@
 	});
 
 	async function enable() {
+		$robotCodeState.changing = true;
 		invoke('enable');
 	}
 
 	async function disable() {
+		$robotCodeState.changing = true;
 		invoke('disable');
 	}
 </script>
@@ -28,9 +31,13 @@
 	class:enabled={$robotCodeState.enabled}
 	class="enable-disable-robot-button">
 	{#if $robotCodeState.enabled}
-		<Button on:click={disable}>Disable</Button>
+		<Button disabled={$robotCodeState.changing} on:click={disable}>
+			Disable
+		</Button>
 	{:else}
-		<Button on:click={enable}>Enable</Button>
+		<Button disabled={$robotCodeState.changing} on:click={enable}>
+			Enable
+		</Button>
 	{/if}
 </div>
 

@@ -1,7 +1,8 @@
 <script lang="ts">
+	export let disabled = false;
 </script>
 
-<button on:click>
+<button {disabled} on:click>
 	<slot />
 </button>
 
@@ -25,6 +26,11 @@
 
 		&:hover {
 			opacity: 0.9;
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: wait;
 		}
 	}
 </style>
