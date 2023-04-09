@@ -968,6 +968,7 @@ dependencies = [
 name = "gauge"
 version = "0.1.0"
 dependencies = [
+ "common",
  "crossbeam",
  "serde",
  "serde_json",

@@ -13,21 +13,27 @@ extern crate systemstat;
 mod system;
 
 fn main() {
+    let config = common::config::config().unwrap();
+
     let system = systemstat::System::new();
 
     let (tx, rx) = crossbeam::channel::unbounded();
 
-    //Continuously the updated system information over the channel.
+    // Continuously the updated system information over the channel.
     thread::spawn(move || loop {
         let system_info = system::SystemInfo::new(&system);
 
+        // FIXME: we should only send if we have listeners.
+        // Otherwise thousands of pending messages will stack up because they won't be read.
         tx.send(system_info).unwrap();
     });
 
     // Start listening for clients (Cockpit).
-    let listener = TcpListener::bind("0.0.0.0:4226").unwrap();
+    let port = config.gauge().port();
+    let listener = TcpListener::bind(format!("0.0.0.0:{port}")).unwrap();
     for stream in listener.incoming() {
         let rx = rx.clone();
+
         // for each client start a new thread that will handle sending the updated system information over the stream.
         thread::spawn(move || {
             handle_client(rx, stream.unwrap());
