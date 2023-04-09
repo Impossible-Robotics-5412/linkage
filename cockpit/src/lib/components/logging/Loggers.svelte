@@ -11,13 +11,13 @@
 	}
 
 	const tabs: Record<string, Tab> = {
-		linkage: {
-			name: 'Linkage',
-			loggerOutputComponent: LinkageLoggerOutput
-		},
 		backend: {
 			name: 'Cockpit Backend',
 			loggerOutputComponent: CockpitBackendLoggerOutput
+		},
+		linkage: {
+			name: 'Linkage',
+			loggerOutputComponent: LinkageLoggerOutput
 		}
 	};
 
