@@ -1,7 +1,7 @@
 import type { ComponentType } from 'svelte';
 
-import LinkageLoggerOutput from '$lib/components/logging/LinkageLoggerOutput.svelte';
-import CockpitBackendLoggerOutput from '$lib/components/logging/CockpitBackendLoggerOutput.svelte';
+import LinkageLoggerOutput from '$lib/components/logger/LinkageLoggerOutput.svelte';
+import CockpitBackendLoggerOutput from '$lib/components/logger/CockpitBackendLoggerOutput.svelte';
 import { writable } from 'svelte/store';
 
 export interface Tab {
