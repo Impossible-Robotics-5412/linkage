@@ -1,7 +1,6 @@
 Operate motor controllers using PWM pins from a Raspberry Pi. This program
 receives messages on a TCP stream and applies the requested instructions to
-motor controllers and can query the status of the system and in the future
-external peripherals attached to the Pi.
+motor controllers and in the future external peripherals attached to the Pi.
 
 <!--- figlet -f rounded carburetor --->
 
@@ -18,7 +17,7 @@ external peripherals attached to the Pi.
 
 This program allows people of all skill levels to control
 robots built for educational purposes. It provides an abstraction over the
-control and query of peripherals that can be accessed through TCP. It is
+control peripherals that can be accessed through TCP. It is
 designed to be run as a daemon.
 
 _WARNING: This project is in a highly unstable and experimental stage. It cannot
@@ -52,11 +51,7 @@ Request messages are 8 bytes (64 bits) long, and are layed out as follows:
 | :--: | :----------------------------------------- |
 |  0   | Instruction                                |
 |      | - 0: control motor                         |
-|      | - ...: additional control instructions     |
-|      | - 100: query battery                       |
-|      | - 101: query memory                        |
-|      | - 102: query cpu                           |
-|      | - ...: additional query instructions       |
+|      | - ...: future control instructions     |
 |  1   | Channel (in case of control instructions)  |
 |      | - 0: Pwm0                                  |
 |      | - 1: Pwm1                                  |
@@ -67,18 +62,6 @@ Request messages are 8 bytes (64 bits) long, and are layed out as follows:
 | ...  | lowing 4 bytes represent a big-endian f32. |
 |  7   | Otherwise Empty like 2-3.                  |
 
-##### Control
-
-When a message with a query is received, the appropriate response will be sent
-back over the TCP stream.
-
-##### Query
-
-When a message with a query is received, the appropriate response will be sent
-back over the TCP stream. Currently, these responses take the shape of utf-8
-text describing the status of the battery (mock), memory, or cpu. In the future,
-these responses might take the shape of messages similar to the requests.
-
 ##### Examples
 
 ###### Set PWM pin 1 to 50% forward speed
@@ -87,20 +70,6 @@ these responses might take the shape of messages similar to the requests.
 [0x00, 0x01, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00]
   |     |    ----------  ----------------------
  instr chan    empty       f32 with value 0.5
-```
-
-###### Query memory usage of the Pi
-
-```
-[0x65, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-  |    ----------------------------------------
- instr                  empty
-```
-
-This will (currently) return something like:
-
-```
-Memory: 26% (242376 / 944268)
 ```
 
 ### Behavior
