@@ -1,31 +1,34 @@
-use std::{
-    io::Write,
-    net::{TcpListener, TcpStream},
-    thread,
-};
+use std::io::{ErrorKind, Read, Write};
+use std::net::{TcpListener, TcpStream};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
+use std::thread;
 
 use crossbeam::channel::Receiver;
-use system::SystemInfo;
 use systemstat::Platform;
 
-extern crate systemstat;
+use system::SystemInfo;
 
 mod system;
 
 fn main() {
     let config = common::config::config().unwrap();
-
     let system = systemstat::System::new();
-
     let (tx, rx) = crossbeam::channel::unbounded();
+    let client_count = Arc::new(AtomicUsize::new(0));
 
     // Continuously the updated system information over the channel.
-    thread::spawn(move || loop {
-        let system_info = system::SystemInfo::new(&system);
+    thread::spawn({
+        let client_count = client_count.clone();
 
-        // FIXME: we should only send if we have listeners.
-        // Otherwise thousands of pending messages will stack up because they won't be read.
-        tx.send(system_info).unwrap();
+        move || loop {
+            let system_info = system::SystemInfo::new(&system);
+
+            if client_count.load(std::sync::atomic::Ordering::Relaxed) == 0 {
+                continue;
+            }
+            tx.send(system_info).unwrap();
+        }
     });
 
     // Start listening for clients (Cockpit).
@@ -33,10 +36,16 @@ fn main() {
     let listener = TcpListener::bind(format!("0.0.0.0:{port}")).unwrap();
     for stream in listener.incoming() {
         let rx = rx.clone();
+        let stream = stream.unwrap();
+        let client_count = client_count.clone();
 
-        // for each client start a new thread that will handle sending the updated system information over the stream.
+        stream.set_nonblocking(true).unwrap();
+        client_count.fetch_add(1, Ordering::Relaxed);
+
+        // For each client start a new thread that will handle sending the updated system information over the stream.
         thread::spawn(move || {
-            handle_client(rx, stream.unwrap());
+            handle_client(rx, stream);
+            client_count.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
         });
     }
 }
@@ -48,6 +57,13 @@ fn handle_client(receiver: Receiver<SystemInfo>, mut stream: TcpStream) {
         let json_string = serde_json::to_string(&system_info).unwrap();
 
         // Send the system info over the stream to the client (Cockpit).
-        stream.write(json_string.as_bytes()).unwrap();
+        _ = stream.write(json_string.as_bytes());
+
+        // If the stream is closed, stop this while loop.
+        if let Err(error) = stream.read_exact(&mut [0]) {
+            if error.kind() == ErrorKind::UnexpectedEof {
+                break;
+            }
+        }
     }
 }
