@@ -38,8 +38,7 @@
 	<div class="output">
 		{#each Object.keys(tabs) as tabId}
 			<div class="tab" class:visible={currentTabId === tabId}>
-				<svelte:component
-					this={tabs[currentTabId].loggerOutputComponent} />
+				<svelte:component this={tabs[tabId].loggerOutputComponent} />
 			</div>
 		{/each}
 	</div>
