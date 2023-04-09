@@ -1,7 +1,7 @@
 <script lang="ts">
 	import StatusItem from './StatusItem.svelte';
 	import { Status } from './StatusItem.svelte';
-	import Container from './Container.svelte';
+	import Container from '../Container.svelte';
 	import { robotCodeState } from '$lib/state/robot-code';
 	import { listen } from '@tauri-apps/api/event';
 	import { invoke } from '@tauri-apps/api/tauri';
@@ -54,20 +54,16 @@
 		{#if systemInfo?.cpu}
 			<StatusItem
 				info={`${systemInfo.cpu.idle.toFixed(0)}%`}
-				label="Robot CPU Idle"
-				status={Status.SEMI} />
+				label="Robot CPU Idle" />
 			<StatusItem
 				info={`${systemInfo.cpu.system.toFixed(0)}%`}
-				label="Robot CPU System"
-				status={Status.SEMI} />
+				label="Robot CPU System" />
 			<StatusItem
 				info={`${systemInfo.cpu.user.toFixed(0)}%`}
-				label="Robot CPU User"
-				status={Status.SEMI} />
+				label="Robot CPU User" />
 			<StatusItem
 				info={`${systemInfo.cpu.temp.toFixed(0)}℃`}
-				label="Robot CPU Temperature"
-				status={Status.SEMI} />
+				label="Robot CPU Temperature" />
 		{/if}
 
 		{#if systemInfo?.memory?.swap}
@@ -77,8 +73,7 @@
 						systemInfo.memory.swap.total) *
 					100
 				).toFixed(0)}%`}
-				label="Robot Swap Memory"
-				status={Status.SEMI} />
+				label="Robot Swap Memory" />
 		{/if}
 
 		{#if systemInfo?.memory?.swap}
@@ -87,14 +82,13 @@
 					(systemInfo.memory.mem.used / systemInfo.memory.mem.total) *
 					100
 				).toFixed(0)}%`}
-				label="Robot Memory"
-				status={Status.SEMI} />
+				label="Robot Memory" />
 		{/if}
 	</div>
 </Container>
 
 <style lang="scss">
-	@use '../style/vars' as *;
+	@use '../../style/vars' as *;
 
 	.status {
 		display: flex;

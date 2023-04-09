@@ -9,23 +9,24 @@
 <script lang="ts">
 	export let info: string;
 	export let label: string;
-	export let status: Status;
+	export let status: Status | undefined = undefined;
 </script>
 
 <div class="status-item" title={info}>
 	<div class="main">
 		<span>{label}</span>
-		<div
+		<span
+			class="info"
 			class:bad={status === Status.BAD}
 			class:semi={status === Status.SEMI}
-			class:good={status === Status.GOOD}
-			class="indicator" />
+			class:good={status === Status.GOOD}>
+			{info}
+		</span>
 	</div>
-	<span class="info">{info}</span>
 </div>
 
 <style lang="scss">
-	@use '../style/vars' as *;
+	@use '../../style/vars' as *;
 
 	.main {
 		display: flex;
@@ -36,21 +37,20 @@
 	.info {
 		color: $c-secondary;
 		font-size: 12px;
-	}
 
-	.indicator {
-		width: 12px;
-		height: 12px;
-		border-radius: 100%;
+		&.bad {
+			color: $c-error;
+			font-weight: bold;
+		}
 
-		background: $c-error;
-	}
+		&.semi {
+			color: $c-warning;
+			font-weight: bold;
+		}
 
-	.indicator.semi {
-		background: $c-warning;
-	}
-
-	.indicator.good {
-		background: $c-success;
+		&.good {
+			color: $c-success;
+			font-weight: bold;
+		}
 	}
 </style>
