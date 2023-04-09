@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
+	import { onMount, tick } from 'svelte';
 
 	export let stream: ReadableStream<Log> | undefined;
 	export let maxScrollback = 500;
@@ -28,22 +29,18 @@
 		stream?.cancel();
 	}
 
-	function scrollToBottom() {
-		if (loggerElement) {
-			const isScrolledToBottom =
-				loggerElement.scrollHeight - loggerElement.clientHeight <=
-				loggerElement.scrollTop + 32;
+	async function scrollToBottom() {
+		if (!loggerElement) return;
 
-			if (!isScrolledToBottom) return;
+		const isScrolledToBottom =
+			loggerElement.scrollHeight - loggerElement.clientHeight <=
+			loggerElement.scrollTop + 32;
 
-			// FIXME: This setTimeout is needed because otherwise it
-			//        will scroll to the second to last element.
-			//        Not sure why but it is't all that clean...
-			setTimeout(() => {
-				loggerElement.scrollTop =
-					loggerElement.scrollHeight - loggerElement.clientHeight;
-			});
-		}
+		if (!isScrolledToBottom) return;
+
+		await tick();
+		loggerElement.scrollTop =
+			loggerElement.scrollHeight - loggerElement.clientHeight;
 	}
 
 	$: if (logs) scrollToBottom();
