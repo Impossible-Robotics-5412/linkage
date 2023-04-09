@@ -42,12 +42,12 @@ pub struct SystemInfo {
 impl SystemInfo {
     pub fn new(system: &systemstat::System) -> Self {
         Self {
-            cpu: get_cpu(&system),
+            cpu: get_cpu(system),
             memory: Memory {
-                swap: get_swap(&system),
-                mem: get_mem(&system),
+                swap: get_swap(system),
+                mem: get_mem(system),
             },
-            uptime: get_uptime(&system),
+            uptime: get_uptime(system),
         }
     }
 }
@@ -71,7 +71,7 @@ fn get_cpu(system: &System) -> Option<Cpu> {
                     user: cpu_load.user * 100.0,
                     system: cpu_load.system * 100.0,
                     idle: cpu_load.idle * 100.0,
-                    temp: get_cpu_temp(&system),
+                    temp: get_cpu_temp(system),
                 }),
                 Err(error) => {
                     println!("Failed finish getting CPU info: {}", error);
