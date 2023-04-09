@@ -4,12 +4,9 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread;
 
+use common::system_info::SystemInfo;
 use crossbeam::channel::Receiver;
 use systemstat::Platform;
-
-use system::SystemInfo;
-
-mod system;
 
 fn main() {
     let config = common::config::config().unwrap();
@@ -22,7 +19,7 @@ fn main() {
         let client_count = client_count.clone();
 
         move || loop {
-            let system_info = system::SystemInfo::new(&system);
+            let system_info = SystemInfo::new(&system);
 
             if client_count.load(std::sync::atomic::Ordering::Relaxed) == 0 {
                 continue;
@@ -55,9 +52,12 @@ fn handle_client(receiver: Receiver<SystemInfo>, mut stream: TcpStream) {
     while let Ok(system_info) = receiver.recv() {
         // Jsonify the system info.
         let json_string = serde_json::to_string(&system_info).unwrap();
+        let mut data = Vec::from(json_string);
+        // Add a newline to the byte array. This indicates the end of the message.
+        data.push('\n' as u8);
 
         // Send the system info over the stream to the client (Cockpit).
-        _ = stream.write(json_string.as_bytes());
+        _ = stream.write(&mut data);
 
         // If the stream is closed, stop this while loop.
         if let Err(error) = stream.read_exact(&mut [0]) {

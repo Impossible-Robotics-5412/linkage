@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use std::thread;
 use std::time::Duration;
@@ -6,7 +6,7 @@ use systemstat::{saturating_sub_bytes, Platform, System};
 
 const UPDATE_INTERVAL_MILLIS: u64 = 500;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Cpu {
     pub user: f32,
     pub system: f32,
@@ -14,25 +14,25 @@ pub struct Cpu {
     pub temp: Option<f32>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Swap {
     pub used: u64,
     pub total: u64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Mem {
     pub used: u64,
     pub total: u64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Memory {
     pub swap: Option<Swap>,
     pub mem: Option<Mem>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemInfo {
     pub cpu: Option<Cpu>,
     pub memory: Memory,
