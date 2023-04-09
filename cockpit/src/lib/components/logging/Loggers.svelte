@@ -1,34 +1,13 @@
 <script lang="ts">
 	import Container from '$lib/components/Container.svelte';
-	import type { ComponentType } from 'svelte';
-
-	import LinkageLoggerOutput from './LinkageLoggerOutput.svelte';
-	import CockpitBackendLoggerOutput from './CockpitBackendLoggerOutput.svelte';
-
-	interface Tab {
-		name: string;
-		loggerOutputComponent: ComponentType;
-	}
-
-	const tabs: Record<string, Tab> = {
-		backend: {
-			name: 'Cockpit Backend',
-			loggerOutputComponent: CockpitBackendLoggerOutput
-		},
-		linkage: {
-			name: 'Linkage',
-			loggerOutputComponent: LinkageLoggerOutput
-		}
-	};
-
-	let currentTabId = Object.keys(tabs)[0];
+	import { loggerState, tabs } from '$lib/state/logger';
 </script>
 
 <Container noPadding>
 	<div class="header" slot="header">
-		<h3>{tabs[currentTabId].name}</h3>
+		<h3>{tabs[$loggerState.selectedTabId].name}</h3>
 
-		<select bind:value={currentTabId}>
+		<select bind:value={$loggerState.selectedTabId}>
 			{#each Object.keys(tabs) as tabId}
 				<option value={tabId}>{tabs[tabId].name}</option>
 			{/each}
@@ -37,7 +16,9 @@
 
 	<div class="output">
 		{#each Object.keys(tabs) as tabId}
-			<div class="tab" class:visible={currentTabId === tabId}>
+			<div
+				class="tab"
+				class:visible={$loggerState.selectedTabId === tabId}>
 				<svelte:component this={tabs[tabId].loggerOutputComponent} />
 			</div>
 		{/each}

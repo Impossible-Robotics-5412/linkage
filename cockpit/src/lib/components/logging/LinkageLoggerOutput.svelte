@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getConfig } from '$lib/config';
 	import { ProcessLogger } from '$lib/process-logger';
-	import { robotCodeState } from '$lib/state';
+	import { robotCodeState } from '$lib/state/robot-code';
 	import LoggerOutput from './LoggerOutput.svelte';
 
 	let processLogger: ProcessLogger;

@@ -2,7 +2,7 @@
 	import StatusItem from './StatusItem.svelte';
 	import { Status } from './StatusItem.svelte';
 	import Container from './Container.svelte';
-	import { robotCodeState } from '$lib/state';
+	import { robotCodeState } from '$lib/state/robot-code';
 
 	let robotCodeStatus = Status.BAD;
 	$: {
