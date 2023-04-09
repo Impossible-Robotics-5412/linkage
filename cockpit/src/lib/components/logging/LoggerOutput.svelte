@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
 
-	export let stream: ReadableStream<Log>;
+	export let stream: ReadableStream<Log> | undefined;
 	export let maxScrollback = 500;
 	export let closedStreamMessage = 'Logger stream is closed';
 
@@ -98,7 +98,7 @@
 
 		& pre {
 			word-wrap: break-word;
-			white-space: normal;
+			white-space: pre-line;
 		}
 	}
 
