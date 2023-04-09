@@ -2,11 +2,17 @@
 	import Button from './ui/Button.svelte';
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { listen } from '@tauri-apps/api/event';
-	import { robotCodeState } from '$lib/state';
+	import { robotCodeState } from '$lib/state/robot-code';
+	import { loggerState } from '$lib/state/logger';
 
 	listen('linkage-lib-state-change', event => {
-		if (event.payload === 'Enabled') $robotCodeState.enabled = true;
-		else if (event.payload === 'Disabled') $robotCodeState.enabled = false;
+		if (event.payload === 'Enabled') {
+			$robotCodeState.enabled = true;
+			$loggerState.selectedTabId = 'linkage';
+		} else if (event.payload === 'Disabled') {
+			$robotCodeState.enabled = false;
+			$loggerState.selectedTabId = 'cockpit-backend';
+		}
 	});
 
 	async function enable() {

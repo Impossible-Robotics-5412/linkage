@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
+	import { onMount, tick } from 'svelte';
 
-	export let stream: ReadableStream<Log>;
+	export let stream: ReadableStream<Log> | undefined;
 	export let maxScrollback = 500;
 	export let closedStreamMessage = 'Logger stream is closed';
 
@@ -28,22 +29,18 @@
 		stream?.cancel();
 	}
 
-	function scrollToBottom() {
-		if (loggerElement) {
-			const isScrolledToBottom =
-				loggerElement.scrollHeight - loggerElement.clientHeight <=
-				loggerElement.scrollTop + 32;
+	async function scrollToBottom() {
+		if (!loggerElement) return;
 
-			if (!isScrolledToBottom) return;
+		const isScrolledToBottom =
+			loggerElement.scrollHeight - loggerElement.clientHeight <=
+			loggerElement.scrollTop + 32;
 
-			// FIXME: This setTimeout is needed because otherwise it
-			//        will scroll to the second to last element.
-			//        Not sure why but it is't all that clean...
-			setTimeout(() => {
-				loggerElement.scrollTop =
-					loggerElement.scrollHeight - loggerElement.clientHeight;
-			});
-		}
+		if (!isScrolledToBottom) return;
+
+		await tick();
+		loggerElement.scrollTop =
+			loggerElement.scrollHeight - loggerElement.clientHeight;
 	}
 
 	$: if (logs) scrollToBottom();
@@ -60,7 +57,10 @@
 				class:level-info={log.level === LogLevel.INFO}
 				class:level-debug={log.level === LogLevel.DEBUG}
 				class:level-trace={log.level === LogLevel.TRACE}>
-				<pre>[{logLevelLabel(log.level)}] {log.msg}</pre>
+				<span title={`${log.file}:${log.line}`}>
+					[{new Date().toLocaleTimeString()}
+					{logLevelLabel(log.level)}] {log.msg}
+				</span>
 			</div>
 		{/each}
 	{:else}
@@ -96,9 +96,9 @@
 		padding: 2px 1.5rem;
 		box-sizing: border-box;
 
-		& pre {
+		& span {
 			word-wrap: break-word;
-			white-space: normal;
+			white-space: pre-line;
 		}
 	}
 

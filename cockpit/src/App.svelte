@@ -1,6 +1,6 @@
 <script lang="ts">
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
-	import Loggers from '$lib/components/logging/Loggers.svelte';
+	import Loggers from '$lib/components/logger/Loggers.svelte';
 	import Status from '$lib/components/Status.svelte';
 </script>
 
