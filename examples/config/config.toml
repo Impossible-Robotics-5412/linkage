@@ -1,14 +1,21 @@
 [linkage_lib]
+# The port on which Linkage-lib will listen
 port = 12362
+# The address Carburetor is listening on
 carburetor_address = { host = "raspberrypi.local", port = 48862 }
 
 [carburetor]
+# The port on which Carburetor will listen
 port = 48862
 
 [gauge]
+# The port on which Gauge will listen
 port = 4226
 
 [cockpit]
+# The address the Linkage-lib socket service that starts Linkage-lib is listening on
 linkage_socket_address = { host = "raspberrypi.local", port = 9999 }
+# The address Linkage-lib is listening on
 linkage_lib_address = { host = "raspberrypi.local", port = 12362 }
+# The address the Linkage-lib logger is listening on
 linkage_lib_logger_address = { host = "raspberrypi.local", port = 7640 }
