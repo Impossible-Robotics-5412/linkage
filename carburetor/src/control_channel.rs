@@ -1,15 +1,8 @@
-#[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
-use crate::{PERIOD_MS, PULSE_NEUTRAL_US};
-#[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
-use rppal::{
-    pwm::{Channel, Polarity, Pwm},
-    system::DeviceInfo,
-};
-#[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
-use std::time::Duration;
-
 use std::error::Error;
 use std::sync::mpsc::Receiver;
+
+#[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
+use rppal::pwm::{Channel, Polarity, Pwm};
 
 use crate::Speed;
 
@@ -18,6 +11,7 @@ pub(crate) enum Channel {
     Pwm0,
     Pwm1,
 }
+
 #[cfg(not(all(target_arch = "arm", target_os = "linux", target_env = "gnu")))]
 impl std::fmt::Display for Channel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -35,8 +29,8 @@ pub(crate) fn control_channel(
     #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
     let pwm = Pwm::with_period(
         pwm_channel,
-        Duration::from_millis(PERIOD_MS),
-        Duration::from_micros(PULSE_NEUTRAL_US),
+        std::time::Duration::from_millis(crate::PERIOD_MS),
+        std::time::Duration::from_micros(crate::PULSE_NEUTRAL_US),
         Polarity::Normal,
         true,
     )?;
