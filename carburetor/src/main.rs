@@ -8,8 +8,7 @@ use std::time::Duration;
 
 use common::logging::setup_logger;
 
-use log::{debug, error, info};
-#[cfg(target_arch = "armv7")]
+#[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
 use rppal::pwm::Channel;
 use simple_signal::{self, Signal};
 
@@ -19,7 +18,7 @@ use crate::instruction::{decode, Instruction, MessageBytes, Speed};
 mod control_channel;
 mod instruction;
 
-#[cfg(not(target_arch = "armv7"))]
+#[cfg(not(all(target_arch = "arm", target_os = "linux", target_env = "gnu")))]
 use control_channel::Channel;
 
 const WELCOME_MESSAGE: &str = r#"
@@ -43,12 +42,15 @@ const PULSE_NEUTRAL_US: u64 = 1500;
 fn main() -> Result<(), Box<dyn Error>> {
     setup_logger(7644)?;
 
-    info!("{WELCOME_MESSAGE}");
+    log::info!("{WELCOME_MESSAGE}");
+
+    #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
+    log::info!("Carburetor detected you are running on a Raspberry Pi!");
 
     let config = common::config::config()?;
     let address = format!("0.0.0.0:{}", config.carburetor().port());
 
-    info!("Setting up...");
+    log::info!("Setting up...");
     let (tx0, rx0) = channel();
     let (tx1, rx1) = channel();
 
@@ -56,10 +58,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let tx0 = tx0.clone();
         let tx1 = tx1.clone();
         move |signals| {
-            info!("Caught: {signals:?}");
+            log::info!("Caught: {signals:?}");
 
             // Clean up by putting both at neutral.
-            info!("Cleaning up...");
+            log::info!("Cleaning up...");
             tx0.send(Speed::neutral()).unwrap();
             tx1.send(Speed::neutral()).unwrap();
 
@@ -68,22 +70,22 @@ fn main() -> Result<(), Box<dyn Error>> {
             // been carried out.
             thread::sleep(Duration::from_millis(10));
 
-            info!("Bye!");
+            log::info!("Bye!");
             exit(0)
         }
     });
 
-    info!("Spawning device control threads...");
+    log::info!("Spawning device control threads...");
     thread::spawn(|| control_channel(Channel::Pwm0, rx0));
     thread::spawn(|| control_channel(Channel::Pwm1, rx1));
 
-    info!("Setup completed. Listening on {}...", address);
+    log::info!("Setup completed. Listening on {}...", address);
     let server = TcpListener::bind(address).expect("address should be valid");
     for (n, stream) in server.incoming().enumerate() {
         let mut stream = stream?;
         let peer = stream.peer_addr()?;
         let local = stream.local_addr()?;
-        info!("({n}) Received stream from {peer} on {local}.",);
+        log::info!("({n}) Received stream from {peer} on {local}.",);
 
         let mut buf = MessageBytes::default();
         loop {
@@ -96,13 +98,13 @@ fn main() -> Result<(), Box<dyn Error>> {
                 Err(e) => return Err(e)?,
             }
 
-            debug!("Received message: {buf:?}");
+            log::trace!("Received message: {buf:?}");
 
             // Decode the received json into a Vec of instructions.
             let instruction = match decode(buf) {
                 Some(instr) => instr,
                 None => {
-                    error!("|\tInvalid message: {buf:?}");
+                    log::error!("|\tInvalid message: {buf:?}");
                     writeln!(stream, "Invalid message: {buf:?}")?;
                     continue;
                 }
@@ -114,7 +116,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         0 => tx0.clone(),
                         1 => tx1.clone(),
                         channel => {
-                            error!("|\tInstruction channel {channel} does not exist.");
+                            log::error!("|\tInstruction channel {channel} does not exist.");
                             continue;
                         }
                     };
@@ -125,10 +127,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         // Clean up by putting both at neutral.
-        info!("({n}) Connection closed. Resetting motors to neutral.");
+        log::info!("({n}) Connection closed. Resetting motors to neutral.");
         tx0.send(Speed::neutral()).unwrap();
         tx1.send(Speed::neutral()).unwrap();
-        info!("Still listening...");
+        log::info!("Still listening...");
     }
 
     unreachable!("server.incoming() cannot return None")

@@ -34,6 +34,9 @@ rm ./install-rust.sh
 ${CARGO_PATH} build -p carburetor --release
 sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
 
+# Make sure we can use PWM channels.
+echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
+
 # Install Gauge
 ${CARGO_PATH} build -p gauge --release
 sudo install ${GAUGE_BUILD_PATH} /usr/bin/gauge
@@ -55,3 +58,9 @@ sudo systemctl enable carburetor.service
 sudo systemctl restart carburetor.service
 sudo systemctl enable gauge.service
 sudo systemctl restart gauge.service
+
+echo \n
+echo "--------------------------------"
+echo "Please restart the Raspberry Pi!"
+echo "--------------------------------"
+echo \n
