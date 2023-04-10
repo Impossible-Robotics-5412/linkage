@@ -34,6 +34,9 @@ rm ./install-rust.sh
 ${CARGO_PATH} build -p carburetor --release
 sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
 
+# Make sure we can use PWM channels.
+echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
+
 # Install Gauge
 ${CARGO_PATH} build -p gauge --release
 sudo install ${GAUGE_BUILD_PATH} /usr/bin/gauge
