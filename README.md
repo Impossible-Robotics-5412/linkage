@@ -28,6 +28,8 @@ Please see [Preparing the project](#preparing-the-project) for more information 
 - [[cargo](https://doc.rust-lang.org/cargo/)] Cargo is the package manager used by Rust. Because this project uses quite some Rust code, this is needed to run most code.
 - [[python3](https://www.python.org/downloads/)] Python is used for our build script _bob.py_.
 
+- Follow https://tauri.app/v1/guides/getting-started/prerequisites to install the right dependencies for Tauri.
+
 ### Preparing the project
 After cloning the repo run `pnpm install`. This will add a config file to `~/.config/linkage/config.toml` which is used for general configuration of the project, and will install the necessary dependencies.
 
