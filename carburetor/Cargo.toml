@@ -9,5 +9,5 @@ simple-signal = "1.1.1"
 common = { path = "../common" }
 log = "0.4.17"
 
-[target.'cfg(target_arch = "armv7")'.dependencies]
+[target.'cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))'.dependencies]
 rppal = "0.14.1"
