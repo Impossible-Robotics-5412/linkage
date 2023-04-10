@@ -7,6 +7,7 @@
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { listen } from '@tauri-apps/api/event';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
+	import type { SystemInfo } from '$lib/types/system-info';
 
 	let systemInfo: SystemInfo | undefined;
 	invoke('start_gauge_connection')
