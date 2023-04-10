@@ -58,3 +58,9 @@ sudo systemctl enable carburetor.service
 sudo systemctl restart carburetor.service
 sudo systemctl enable gauge.service
 sudo systemctl restart gauge.service
+
+echo \n
+echo "--------------------------------"
+echo "Please restart the Raspberry Pi!"
+echo "--------------------------------"
+echo \n
