@@ -58,21 +58,8 @@ that for the system. We call the whole project *linkage*.
 
 - **cockpit**
 
-  Cockpit is the user interface for linkage.
+  Cockpit is the user interface for Linkage.
   It is separated in a _backend_ and a _frontend_.
-  These can be located on the same host computer or on different devices.
-  In case of the web-based _frontend_, the same computer can serve the _frontend_ and _backend_ while the _frontend_ web interface is accessed over the local network.
-  The _backend_ and (perhaps multiple different intstances of) _frontend_ communicate over the WebSocket protocol.
-
-    - [**backend**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/cockpit/backend)
-
-      The _cockpit-backend_ is responsible for the communication between the user-facing _cockpit-frontend_ and the linkage library (e.g., _linkage-node_).
-      It runs on a computer in the same local network as the robot pilot computer, and the Raspberry Pi embedded in the robot.
-
-    - [**frontend**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/cockpit/web/frontend)/web
-
-      The web _cockpit-frontend_ serves a webpage over the local network through which the robot pilot can control the robot.
-      The _frontend_ sends enable and disable instructions to the _backend_ over a WebSocket connection, and the _backend_ sends these to linkage library (e.g., _linkage-node_) over TCP.
 
 - **lib**
 
