@@ -8,18 +8,25 @@
 	import { listen } from '@tauri-apps/api/event';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
 
-	let robotCodeStatus = Status.BAD;
-	$: {
-		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
-		else robotCodeStatus = Status.BAD;
-	}
-
 	let systemInfo: SystemInfo | undefined;
 	invoke('start_gauge_connection').then(() => {
 		listen('received-system-info', event => {
 			systemInfo = event.payload as SystemInfo;
 		});
 	});
+
+	let robotCodeStatus = Status.BAD;
+	$: {
+		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
+		else robotCodeStatus = Status.BAD;
+	}
+
+	$: robotCodeFoundInfo = systemInfo?.robot_code_exists
+		? 'Found'
+		: 'Not Found';
+	$: robotCodeFoundStatus = systemInfo?.robot_code_exists
+		? Status.GOOD
+		: Status.BAD;
 </script>
 
 <Container>
@@ -28,11 +35,15 @@
 	</div>
 
 	<div class="status">
-		<h3>Robot Processes</h3>
+		<h3>Robot Code</h3>
 		<StatusItem
 			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
-			label="Robot Code"
+			label="State"
 			status={robotCodeStatus} />
+		<StatusItem
+			info={robotCodeFoundInfo}
+			label="Entrypoint"
+			status={robotCodeFoundStatus} />
 
 		<h3>Robot System</h3>
 		<RobotSystemStatus {systemInfo} />

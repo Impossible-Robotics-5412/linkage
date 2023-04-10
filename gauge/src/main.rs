@@ -4,7 +4,6 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread;
 
-use common::service_info::{service_is_active, ServiceInfo};
 use common::system_info::SystemInfo;
 use crossbeam::channel::Receiver;
 use systemstat::Platform;
@@ -20,13 +19,7 @@ fn main() {
         let client_count = client_count.clone();
 
         move || loop {
-            let service_info = ServiceInfo {
-                carburetor_status: service_is_active("carburetor.service"),
-                gauge_status: service_is_active("gauge.service"),
-                linkage_socket_status: service_is_active("linkage.socket"),
-            };
-
-            let system_info = SystemInfo::new(&system, service_info);
+            let system_info = SystemInfo::new(&system);
 
             if client_count.load(std::sync::atomic::Ordering::Relaxed) == 0 {
                 continue;

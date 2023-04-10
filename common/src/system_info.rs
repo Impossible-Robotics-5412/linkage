@@ -1,12 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-use std::thread;
 use std::time::Duration;
+use std::{process::Command, thread};
 use systemstat::{saturating_sub_bytes, Platform, System};
 
-use crate::service_info::ServiceInfo;
-
 const UPDATE_INTERVAL_MILLIS: u64 = 500;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServiceInfo {
+    pub carburetor_status: bool,
+    pub gauge_status: bool,
+    pub linkage_socket_status: bool,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Cpu {
@@ -40,10 +45,17 @@ pub struct SystemInfo {
     pub memory: Memory,
     pub uptime: Option<u64>,
     pub service_info: ServiceInfo,
+    pub robot_code_exists: bool,
 }
 
 impl SystemInfo {
-    pub fn new(system: &systemstat::System, service_info: ServiceInfo) -> Self {
+    pub fn new(system: &systemstat::System) -> Self {
+        let service_info = ServiceInfo {
+            carburetor_status: service_is_active("carburetor.service"),
+            gauge_status: service_is_active("gauge.service"),
+            linkage_socket_status: service_is_active("linkage.socket"),
+        };
+
         Self {
             cpu: get_cpu(system),
             memory: Memory {
@@ -52,8 +64,25 @@ impl SystemInfo {
             },
             uptime: get_uptime(system),
             service_info,
+            robot_code_exists: robot_code_exists(),
         }
     }
+}
+
+fn robot_code_exists() -> bool {
+    match home::home_dir() {
+        Some(home) => home.join("robot_code/build/main.js").is_file(),
+        None => false,
+    }
+}
+
+fn service_is_active(service_name: &str) -> bool {
+    let exit_status = Command::new("systemctl")
+        .args(["is-active", "--quiet", service_name])
+        .status()
+        .expect("failed to check service status");
+
+    exit_status.success()
 }
 
 fn get_cpu_temp(system: &System) -> Option<f32> {

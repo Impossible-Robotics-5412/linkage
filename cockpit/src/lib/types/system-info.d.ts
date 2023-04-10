@@ -21,4 +21,5 @@ interface SystemInfo {
 		gauge_status: boolean;
 		linkage_socket_status: boolean;
 	};
+	robot_code_exists: boolean;
 }
