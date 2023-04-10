@@ -8,7 +8,7 @@ set -o xtrace
 readonly CARGO_PATH=$HOME/.cargo/bin/cargo
 
 readonly CARBURETOR_BUILD_PATH=./target/release/carburetor
-readonly GAUGE_EXECUTABLE_PATH=./gauge/target/pi/gauge
+readonly GAUGE_BUILD_PATH=./target/release/gauge
 
 readonly CONFIG_SOURCE_FILE=./examples/config/config.toml
 readonly CONFIG_TARGET_FOLDER=$HOME/.config/linkage/
@@ -19,24 +19,24 @@ readonly CARBURETOR_SERVICE=./carburetor/carburetor.service
 readonly GAUGE_SERVICE=./gauge/gauge.service
 
 # Install NodeJS
-curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
-sudo apt install nodejs
+# curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
+# sudo apt install nodejs
 
 # Install Rust
 # Yes, this is ugly but not sure how to set the -y flag in the script 
 # when running `curl https://sh.rustup.rs -sSf | sh` any other way.
-curl https://sh.rustup.rs -sSf -o install-rust.sh
-chmod +x ./install-rust.sh
-./install-rust.sh -y
-rm ./install-rust.sh
+# curl https://sh.rustup.rs -sSf -o install-rust.sh
+# chmod +x ./install-rust.sh
+# ./install-rust.sh -y
+# rm ./install-rust.sh
 
 # Install Carburetor
-${CARGO_PATH} build -p carburetor --release
-sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
+# ${CARGO_PATH} build -p carburetor --release
+# sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
 
-# FIXME Prebuild carburator the same way we do it here. 
 # Install Gauge
-sudo install ${GAUGE_EXECUTABLE_PATH} /usr/bin/gauge 
+${CARGO_PATH} build -p gauge --release
+sudo install ${GAUGE_BUILD_PATH} /usr/bin/gauge
 
 # Copy config file
 mkdir -p ${CONFIG_TARGET_FOLDER}
