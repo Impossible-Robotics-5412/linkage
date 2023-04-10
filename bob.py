@@ -152,7 +152,7 @@ def create_config_file():
     config_folder_path = f"{home_dir()}/.config/linkage"
     config_file_path = f"{config_folder_path}/config.toml"
 
-    example_config_file_path = f"{linkage_dir()}/examples/config/config.default.toml"
+    example_config_file_path = f"{linkage_dir()}/examples/config/config.toml"
     if path.isfile(config_file_path):
         styled_print(f"Config file already exists at '{config_file_path}'.")
     else:
