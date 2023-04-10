@@ -3,9 +3,8 @@
 import argparse
 from argparse import Namespace
 import subprocess
-import platform
 import shutil
-from os import makedirs, path, environ
+from os import makedirs, path
 
 
 def styled_print(message):
@@ -131,6 +130,11 @@ def deploy_carburetor():
     subprocess.run(["./deploy.sh"], cwd="carburetor")
 
 
+def deploy_gauge():
+    styled_print("Deploying Gauge...")
+    subprocess.run(["./deploy.sh"], cwd="gauge")
+
+
 def deploy_example():
     styled_print("Deploying Linkage-lib example...")
     subprocess.run(["./deploy.sh"], cwd="examples/lib/linkage-node")
@@ -140,10 +144,14 @@ def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
         deploy_carburetor()
+        deploy_example()
+        deploy_gauge()
     elif args.part == "carburetor":
         deploy_carburetor()
     elif args.part == "lib-example":
         deploy_example()
+    elif args.part == "gauge":
+        deploy_gauge()
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
@@ -224,6 +232,7 @@ if __name__ == "__main__":
         choices=[
             "all",
             "cockpit",
+            "gauge",
             "carburetor",
             "lib",
             "lib-example",
@@ -247,7 +256,7 @@ if __name__ == "__main__":
     deploy_subcommand.add_argument(
         "part",
         help="the part of linkage to deploy",
-        choices=["all", "carburetor", "lib-example"],
+        choices=["all", "carburetor", "lib-example", "gauge"],
     )
 
     # Run subcommand
@@ -262,6 +271,7 @@ if __name__ == "__main__":
         choices=[
             "cockpit",
             "carburetor",
+            "gauge",
         ],
     )
 

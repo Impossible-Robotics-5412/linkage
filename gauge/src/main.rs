@@ -21,7 +21,7 @@ fn main() {
         move || loop {
             let system_info = SystemInfo::new(&system);
 
-            if client_count.load(std::sync::atomic::Ordering::Relaxed) == 0 {
+            if client_count.load(Ordering::Relaxed) == 0 {
                 continue;
             }
 
@@ -43,7 +43,7 @@ fn main() {
         // For each client start a new thread that will handle sending the updated system information over the stream.
         thread::spawn(move || {
             handle_client(rx, stream);
-            client_count.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
+            client_count.fetch_sub(1, Ordering::Relaxed);
         });
     }
 }
