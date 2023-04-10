@@ -19,20 +19,20 @@ readonly CARBURETOR_SERVICE=./carburetor/carburetor.service
 readonly GAUGE_SERVICE=./gauge/gauge.service
 
 # Install NodeJS
-# curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
-# sudo apt install nodejs
+curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
+sudo apt install nodejs
 
 # Install Rust
 # Yes, this is ugly but not sure how to set the -y flag in the script 
-# when running `curl https://sh.rustup.rs -sSf | sh` any other way.
-# curl https://sh.rustup.rs -sSf -o install-rust.sh
-# chmod +x ./install-rust.sh
-# ./install-rust.sh -y
-# rm ./install-rust.sh
+when running `curl https://sh.rustup.rs -sSf | sh` any other way.
+curl https://sh.rustup.rs -sSf -o install-rust.sh
+chmod +x ./install-rust.sh
+./install-rust.sh -y
+rm ./install-rust.sh
 
 # Install Carburetor
-# ${CARGO_PATH} build -p carburetor --release
-# sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
+${CARGO_PATH} build -p carburetor --release
+sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
 
 # Install Gauge
 ${CARGO_PATH} build -p gauge --release
