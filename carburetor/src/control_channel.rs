@@ -42,7 +42,7 @@ pub(crate) fn control_channel(
         let after = std::time::Instant::now();
         let delta = after - before;
         let direction = speed.direction();
-        eprintln!("{pwm_channel}: received {speed} ({direction}). Executed in {delta:?}.");
+        log::trace!("{pwm_channel}: received {speed} ({direction}). Executed in {delta:?}.");
     }
 
     Ok(())

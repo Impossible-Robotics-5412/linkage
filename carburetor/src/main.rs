@@ -42,7 +42,10 @@ const PULSE_NEUTRAL_US: u64 = 1500;
 fn main() -> Result<(), Box<dyn Error>> {
     setup_logger(7644)?;
 
-    info!("{WELCOME_MESSAGE}");
+    log::info!("{WELCOME_MESSAGE}");
+
+    #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
+    log::info!("Carburetor detected you are running on a Raspberry Pi!");
 
     let config = common::config::config()?;
     let address = format!("0.0.0.0:{}", config.carburetor().port());
@@ -95,7 +98,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 Err(e) => return Err(e)?,
             }
 
-            log::debug!("Received message: {buf:?}");
+            log::trace!("Received message: {buf:?}");
 
             // Decode the received json into a Vec of instructions.
             let instruction = match decode(buf) {
