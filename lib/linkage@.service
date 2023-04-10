@@ -13,6 +13,3 @@ TimeoutStopSec=5
 
 [Install]
 WantedBy=multi-user.target
-
-
-# FIXME: WE STILL CRASH WHEN SENDING GAMEPAD EVENTS FROM COCKPIT
