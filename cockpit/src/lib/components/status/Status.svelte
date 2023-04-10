@@ -3,41 +3,13 @@
 	import { Status } from './StatusItem.svelte';
 	import Container from '../Container.svelte';
 	import { robotCodeState } from '$lib/state/robot-code';
-	import { listen } from '@tauri-apps/api/event';
-	import { invoke } from '@tauri-apps/api/tauri';
+	import RobotSystemStatus from './RobotSystemStatus.svelte';
 
 	let robotCodeStatus = Status.BAD;
 	$: {
 		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
 		else robotCodeStatus = Status.BAD;
 	}
-
-	interface SystemInfo {
-		cpu?: {
-			user: number;
-			system: number;
-			idle: number;
-			temp?: number;
-		};
-		memory?: {
-			swap?: {
-				used: number;
-				total: number;
-			};
-			mem?: {
-				used: number;
-				total: number;
-			};
-		};
-		uptime?: number;
-	}
-
-	let systemInfo: SystemInfo | undefined;
-	invoke('start_gauge_connection').then(() => {
-		listen('received-system-info', event => {
-			systemInfo = event.payload;
-		});
-	});
 </script>
 
 <Container>
@@ -46,44 +18,14 @@
 	</div>
 
 	<div class="status">
+		<h3>Robot Processes</h3>
 		<StatusItem
 			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
-			label="Robot Status"
+			label="Robot Code"
 			status={robotCodeStatus} />
 
-		{#if systemInfo?.cpu}
-			<StatusItem
-				info={`${systemInfo.cpu.idle.toFixed(0)}%`}
-				label="Robot CPU Idle" />
-			<StatusItem
-				info={`${systemInfo.cpu.system.toFixed(0)}%`}
-				label="Robot CPU System" />
-			<StatusItem
-				info={`${systemInfo.cpu.user.toFixed(0)}%`}
-				label="Robot CPU User" />
-			<StatusItem
-				info={`${systemInfo.cpu.temp.toFixed(0)}℃`}
-				label="Robot CPU Temperature" />
-		{/if}
-
-		{#if systemInfo?.memory?.swap}
-			<StatusItem
-				info={`${(
-					(systemInfo.memory.swap.used /
-						systemInfo.memory.swap.total) *
-					100
-				).toFixed(0)}%`}
-				label="Robot Swap Memory" />
-		{/if}
-
-		{#if systemInfo?.memory?.swap}
-			<StatusItem
-				info={`${(
-					(systemInfo.memory.mem.used / systemInfo.memory.mem.total) *
-					100
-				).toFixed(0)}%`}
-				label="Robot Memory" />
-		{/if}
+		<h3>Robot System Status</h3>
+		<RobotSystemStatus />
 	</div>
 </Container>
 
@@ -103,6 +45,10 @@
 				border-bottom: none;
 				padding-bottom: 0;
 			}
+		}
+
+		h3:not(:first-child) {
+			padding-top: 1.5rem;
 		}
 	}
 </style>
