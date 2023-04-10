@@ -3,9 +3,11 @@
 
 mod config;
 mod gamepad;
+mod gauge;
 mod linkage_lib;
 
 use config::config;
+use gauge::start_gauge_connection;
 use linkage_lib::{disable, enable, LinkageLibState};
 
 fn main() {
@@ -15,7 +17,12 @@ fn main() {
 
     tauri::Builder::default()
         .manage(LinkageLibState::new(gamepad_event_bus))
-        .invoke_handler(tauri::generate_handler![enable, disable, config])
+        .invoke_handler(tauri::generate_handler![
+            enable,
+            disable,
+            config,
+            start_gauge_connection
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

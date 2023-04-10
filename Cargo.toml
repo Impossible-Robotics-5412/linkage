@@ -1,5 +1,5 @@
 [workspace]
-members = ["carburetor", "cockpit/src-tauri", "common", "common/message_derive"]
+members = ["carburetor", "gauge", "cockpit/src-tauri", "common", "common/message_derive"]
 
 [workspace.package]
 version = "0.1.0"

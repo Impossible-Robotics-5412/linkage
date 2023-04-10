@@ -73,8 +73,5 @@ export class CarburetorConnection {
 }
 
 enum CarburetorInstruction {
-	CONTROL_MOTOR = 0,
-	QUERY_BATTERY = 100,
-	QUERY_MEMORY = 101,
-	QUERY_CPU = 102
+	CONTROL_MOTOR = 0
 }

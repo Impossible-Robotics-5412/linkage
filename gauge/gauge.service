@@ -1,0 +1,13 @@
+[Unit]
+Description=Gauge
+After=multi-user.target
+
+[Service]
+# FIXME: Create custom user for running linkage processes
+User=pi
+ExecStart=/usr/bin/gauge
+Restart=always
+RestartSec=3s
+
+[Install]
+WantedBy=multi-user.target

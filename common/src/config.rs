@@ -23,6 +23,7 @@ pub struct Config {
     linkage_lib: Box<LinkageLib>,
     carburetor: Box<Carburetor>,
     cockpit: Box<Cockpit>,
+    gauge: Box<Gauge>,
 }
 
 impl Config {
@@ -36,6 +37,10 @@ impl Config {
 
     pub fn cockpit(&self) -> &Cockpit {
         &self.cockpit
+    }
+
+    pub fn gauge(&self) -> &Gauge {
+        &self.gauge
     }
 }
 
@@ -84,6 +89,17 @@ impl Cockpit {
 
     pub fn linkage_lib_logger_address(&self) -> &Address {
         &self.linkage_lib_logger_address
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Gauge {
+    port: AddressPort,
+}
+
+impl Gauge {
+    pub fn port(&self) -> AddressPort {
+        self.port
     }
 }
 
