@@ -44,7 +44,7 @@ def cargo_run(cargo_path=None, package=None, release=False):
     subprocess.run(args, cwd=linkage_dir())
 
 
-def init(no_npm_install: False):
+def init(no_npm_install):
     if not no_npm_install:
         subprocess.run(["pnpm", "install"])
     create_config_file()
