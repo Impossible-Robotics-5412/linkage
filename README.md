@@ -61,6 +61,11 @@ that for the system. We call the whole project *linkage*.
   Cockpit is the user interface for Linkage.
   It is separated in a _backend_ and a _frontend_.
 
+- [**gauge**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/gauge)
+
+  Gauge is a process that runs on the Pi, that sends system information to Cockpit.
+  This includes CPU load, memory usage, running services, etc.
+
 - **lib**
 
   The _linkage_ library provides a programming interface, which allows people to create programs that control the robot.
