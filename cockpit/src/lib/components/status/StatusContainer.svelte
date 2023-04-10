@@ -9,11 +9,15 @@
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
 
 	let systemInfo: SystemInfo | undefined;
-	invoke('start_gauge_connection').then(() => {
-		listen('received-system-info', event => {
-			systemInfo = event.payload as SystemInfo;
+	invoke('start_gauge_connection')
+		.then(() => {
+			listen('received-system-info', event => {
+				systemInfo = event.payload as SystemInfo;
+			});
+		})
+		.catch(error => {
+			console.error('Could connect to Gauge: ' + error);
 		});
-	});
 
 	let robotCodeStatus = Status.BAD;
 	$: {
