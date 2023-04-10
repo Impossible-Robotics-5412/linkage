@@ -44,7 +44,7 @@ def cargo_run(cargo_path=None, package=None, release=False):
     subprocess.run(args, cwd=linkage_dir())
 
 
-def init(no_npm_install: False):
+def init(no_npm_install):
     if not no_npm_install:
         subprocess.run(["pnpm", "install"])
     create_config_file()
@@ -152,7 +152,7 @@ def create_config_file():
     config_folder_path = f"{home_dir()}/.config/linkage"
     config_file_path = f"{config_folder_path}/config.toml"
 
-    example_config_file_path = f"{linkage_dir()}/examples/config/config.default.toml"
+    example_config_file_path = f"{linkage_dir()}/examples/config/config.toml"
     if path.isfile(config_file_path):
         styled_print(f"Config file already exists at '{config_file_path}'.")
     else:
