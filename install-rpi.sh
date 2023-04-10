@@ -24,7 +24,7 @@ sudo apt install nodejs
 
 # Install Rust
 # Yes, this is ugly but not sure how to set the -y flag in the script 
-when running `curl https://sh.rustup.rs -sSf | sh` any other way.
+# when running `curl https://sh.rustup.rs -sSf | sh` any other way.
 curl https://sh.rustup.rs -sSf -o install-rust.sh
 chmod +x ./install-rust.sh
 ./install-rust.sh -y
