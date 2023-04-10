@@ -38,6 +38,8 @@
 		<h3>Status</h3>
 	</div>
 
+	<!-- FIXME: Add indicator telling if the robot is enabled -->
+
 	<div class="status">
 		<h3>Robot Code</h3>
 		<StatusItem
@@ -49,10 +51,17 @@
 			label="Entrypoint"
 			status={robotCodeFoundStatus} />
 
-		<h3>Robot System</h3>
-		<RobotSystemStatus {systemInfo} />
-		<h3>Robot Services</h3>
-		<RobotServicesStatus {systemInfo} />
+		{#if systemInfo?.cpu && systemInfo?.memory}
+			<h3>Robot System</h3>
+			<RobotSystemStatus
+				memory={systemInfo.memory}
+				cpu={systemInfo.cpu} />
+		{/if}
+
+		{#if systemInfo?.service_info}
+			<h3>Robot Services</h3>
+			<RobotServicesStatus serviceInfo={systemInfo?.service_info} />
+		{/if}
 	</div>
 </Container>
 

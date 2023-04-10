@@ -1,38 +1,31 @@
 <script lang="ts">
+	import type { SystemServiceInfo } from '$lib/types/system-info';
 	import StatusItem from './StatusItem.svelte';
 	import { Status } from './StatusItem.svelte';
 
-	export let systemInfo: SystemInfo | undefined;
+	export let serviceInfo: SystemServiceInfo;
 
-	$: carburetorStatus = systemInfo?.service_info.carburetor_status
+	$: carburetorStatus = serviceInfo.carburetor_status
 		? Status.GOOD
 		: Status.BAD;
-	$: gaugeStatus = systemInfo?.service_info.gauge_status
-		? Status.GOOD
-		: Status.BAD;
-	$: linkageSocketStatus = systemInfo?.service_info.linkage_socket_status
+	$: gaugeStatus = serviceInfo.gauge_status ? Status.GOOD : Status.BAD;
+	$: linkageSocketStatus = serviceInfo.linkage_socket_status
 		? Status.GOOD
 		: Status.BAD;
 
-	$: carburetorInfo = systemInfo?.service_info.carburetor_status
-		? 'Active'
-		: 'Inactive';
-	$: gaugeInfo = systemInfo?.service_info.gauge_status
-		? 'Active'
-		: 'Inactive';
-	$: linkageSocketInfo = systemInfo?.service_info.linkage_socket_status
+	$: carburetorInfo = serviceInfo.carburetor_status ? 'Active' : 'Inactive';
+	$: gaugeInfo = serviceInfo.gauge_status ? 'Active' : 'Inactive';
+	$: linkageSocketInfo = serviceInfo.linkage_socket_status
 		? 'Active'
 		: 'Inactive';
 </script>
 
-{#if systemInfo?.service_info}
-	<StatusItem
-		info={linkageSocketInfo}
-		status={linkageSocketStatus}
-		label="Linkage Socket" />
-	<StatusItem
-		info={carburetorInfo}
-		status={carburetorStatus}
-		label="Carburetor" />
-	<StatusItem info={gaugeInfo} status={gaugeStatus} label="Gauge" />
-{/if}
+<StatusItem
+	info={linkageSocketInfo}
+	status={linkageSocketStatus}
+	label="Linkage Socket" />
+<StatusItem
+	info={carburetorInfo}
+	status={carburetorStatus}
+	label="Carburetor" />
+<StatusItem info={gaugeInfo} status={gaugeStatus} label="Gauge" />
