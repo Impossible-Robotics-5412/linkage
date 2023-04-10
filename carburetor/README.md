@@ -82,7 +82,7 @@ the program is restarted.
 
 **Thus, terminate the program using SIGINT or SIGTERM, and _never_ SIGKILL.**
 
-**Use SIGKILL iff the operating environment is absolutely safe and it is
+**Use SIGKILL if the operating environment is absolutely safe and it is
 absolutely necessary.**
 
 ### Daemon
