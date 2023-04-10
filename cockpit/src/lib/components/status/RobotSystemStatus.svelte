@@ -1,34 +1,7 @@
 <script lang="ts">
-	import { listen } from '@tauri-apps/api/event';
-	import { invoke } from '@tauri-apps/api/tauri';
 	import StatusItem from './StatusItem.svelte';
 
-	interface SystemInfo {
-		cpu?: {
-			user: number;
-			system: number;
-			idle: number;
-			temp?: number;
-		};
-		memory?: {
-			swap?: {
-				used: number;
-				total: number;
-			};
-			mem?: {
-				used: number;
-				total: number;
-			};
-		};
-		uptime?: number;
-	}
-
-	let systemInfo: SystemInfo | undefined;
-	invoke('start_gauge_connection').then(() => {
-		listen('received-system-info', event => {
-			systemInfo = event.payload;
-		});
-	});
+	export let systemInfo: SystemInfo | undefined;
 
 	$: cpuSystemLoad = `${systemInfo?.cpu?.system.toFixed(0)}%`;
 	$: cpuUserLoad = `${systemInfo?.cpu?.user.toFixed(0)}%`;

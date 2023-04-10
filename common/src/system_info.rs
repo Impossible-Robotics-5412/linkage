@@ -4,6 +4,8 @@ use std::thread;
 use std::time::Duration;
 use systemstat::{saturating_sub_bytes, Platform, System};
 
+use crate::service_info::ServiceInfo;
+
 const UPDATE_INTERVAL_MILLIS: u64 = 500;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -37,10 +39,11 @@ pub struct SystemInfo {
     pub cpu: Option<Cpu>,
     pub memory: Memory,
     pub uptime: Option<u64>,
+    pub service_info: ServiceInfo,
 }
 
 impl SystemInfo {
-    pub fn new(system: &systemstat::System) -> Self {
+    pub fn new(system: &systemstat::System, service_info: ServiceInfo) -> Self {
         Self {
             cpu: get_cpu(system),
             memory: Memory {
@@ -48,6 +51,7 @@ impl SystemInfo {
                 mem: get_mem(system),
             },
             uptime: get_uptime(system),
+            service_info,
         }
     }
 }

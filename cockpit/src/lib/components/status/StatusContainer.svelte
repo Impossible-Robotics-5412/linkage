@@ -4,12 +4,22 @@
 	import Container from '../Container.svelte';
 	import { robotCodeState } from '$lib/state/robot-code';
 	import RobotSystemStatus from './RobotSystemStatus.svelte';
+	import { invoke } from '@tauri-apps/api/tauri';
+	import { listen } from '@tauri-apps/api/event';
+	import RobotServicesStatus from './RobotServicesStatus.svelte';
 
 	let robotCodeStatus = Status.BAD;
 	$: {
 		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
 		else robotCodeStatus = Status.BAD;
 	}
+
+	let systemInfo: SystemInfo | undefined;
+	invoke('start_gauge_connection').then(() => {
+		listen('received-system-info', event => {
+			systemInfo = event.payload as SystemInfo;
+		});
+	});
 </script>
 
 <Container>
@@ -24,8 +34,10 @@
 			label="Robot Code"
 			status={robotCodeStatus} />
 
-		<h3>Robot System Status</h3>
-		<RobotSystemStatus />
+		<h3>Robot System</h3>
+		<RobotSystemStatus {systemInfo} />
+		<h3>Robot Services</h3>
+		<RobotServicesStatus {systemInfo} />
 	</div>
 </Container>
 

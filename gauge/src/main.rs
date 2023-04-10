@@ -4,6 +4,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread;
 
+use common::service_info::{service_is_active, ServiceInfo};
 use common::system_info::SystemInfo;
 use crossbeam::channel::Receiver;
 use systemstat::Platform;
@@ -19,11 +20,18 @@ fn main() {
         let client_count = client_count.clone();
 
         move || loop {
-            let system_info = SystemInfo::new(&system);
+            let service_info = ServiceInfo {
+                carburetor_status: service_is_active("carburetor.service"),
+                gauge_status: service_is_active("gauge.service"),
+                linkage_socket_status: service_is_active("linkage.socket"),
+            };
+
+            let system_info = SystemInfo::new(&system, service_info);
 
             if client_count.load(std::sync::atomic::Ordering::Relaxed) == 0 {
                 continue;
             }
+
             tx.send(system_info).unwrap();
         }
     });
@@ -54,10 +62,10 @@ fn handle_client(receiver: Receiver<SystemInfo>, mut stream: TcpStream) {
         let json_string = serde_json::to_string(&system_info).unwrap();
         let mut data = Vec::from(json_string);
         // Add a newline to the byte array. This indicates the end of the message.
-        data.push('\n' as u8);
+        data.push(b'\n');
 
         // Send the system info over the stream to the client (Cockpit).
-        _ = stream.write(&mut data);
+        _ = stream.write(&data);
 
         // If the stream is closed, stop this while loop.
         if let Err(error) = stream.read_exact(&mut [0]) {
