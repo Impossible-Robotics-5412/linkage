@@ -146,7 +146,3 @@ If you wish, the program can now be run by invoking the command `carburetor`.
 
 During development or for convenience, the `deploy.sh` file allows you to
 locally cross-compile the executable, and deploy the program to the Pi remotely.
-
-You can run `deploy-systemd.sh` to cross-compile, deploy the
-binary, _and_ install the systemd service. It also restart the daemon with the
-new binary.
