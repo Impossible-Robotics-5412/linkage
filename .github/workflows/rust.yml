@@ -2,19 +2,19 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  lint:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Lint
-      run: cargo clippy --verbose
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install libgtk-3-dev
+      - uses: actions/checkout@v3
+      - name: Lint
+        run: cargo clippy --verbose
