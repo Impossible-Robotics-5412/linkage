@@ -115,7 +115,7 @@ pub fn config() -> Result<Config, Box<dyn Error>> {
     let config_file = config::File::try_from(config_path)?;
 
     let config = config::Config::builder()
-        .add_source(config::File::from(config_file))
+        .add_source(config_file)
         .add_source(config::Environment::with_prefix("LINKAGE"))
         .build()
         .unwrap()

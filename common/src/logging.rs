@@ -75,10 +75,9 @@ fn start_websocket_server(port: AddressPort, log_bus: Arc<Mutex<Bus<String>>>) {
                 let mut log_bus_rx = log_bus.lock().unwrap().add_rx();
 
                 move || loop {
-                    match log_bus_rx.recv() {
-                        Ok(json_log) => frontend.send(ws::Message::Text(json_log)).unwrap(),
-                        Err(_) => {}
-                    };
+                    if let Ok(json_log) = log_bus_rx.recv() {
+                        frontend.send(ws::Message::Text(json_log)).unwrap()
+                    }
                 }
             });
 

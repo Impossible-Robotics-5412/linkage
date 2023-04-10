@@ -57,7 +57,7 @@ pub fn enable<R: Runtime>(
             let mut socket = TcpStream::connect(socket_address.to_string()).unwrap();
 
             // Make sure the service has started
-            socket.read(&mut [0]).unwrap();
+            socket.read_exact(&mut [0]).unwrap();
 
             log::debug!("Started Linkage-lib socket.");
             app.emit_all(
@@ -158,7 +158,7 @@ fn block_until_disable(socket: &mut TcpStream, disable_message_receiver: &Mutex<
             // Didn't receive a disable message from the frontend,
             // so let's see if the connection has been closed.
             Err(_) => {
-                match socket.read_exact(&mut vec![0]) {
+                match socket.read_exact(&mut [0]) {
                     Err(err) if err.kind() == ErrorKind::UnexpectedEof => {
                         // The socket has been closed.
                         log::debug!(
