@@ -109,16 +109,5 @@ In case the offence does not end after this, we will take further action, among 
 
 This code of conduct is subject to elaboration.
 
-## Todo
-
-- [x] Describe project structure in README
-- [ ] Introduction section with the following outline to describe the project as a whole (see [#1](https://github.com/Impossible-Robotics-5412/linkage/issues/1))
-    - [ ] What?
-    - [ ] Why?
-    - [ ] How?
-- [x] Installation and Usage section (see [#3](https://github.com/Impossible-Robotics-5412/linkage/issues/3))
-- [ ] Add examples (see [#2](https://github.com/Impossible-Robotics-5412/linkage/issues/2))
-- [X] Unified configuration file (see [#4](https://github.com/Impossible-Robotics-5412/linkage/issues/4))
-
 Thank you for reading about our project and take the time to look at the sky today.
 You deserve that.
