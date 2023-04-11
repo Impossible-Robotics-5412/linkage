@@ -41,9 +41,10 @@ impl Robot {
     pub fn run(mut self) {
         setup_logger(7640).expect("logger should be able to start");
 
-        start_cockpit_listener().expect("failed to start listening for Cockpit connections.");
-
         let state: RobotStateHandle = Default::default();
+
+        start_cockpit_listener(state.clone())
+            .expect("failed to start listening for Cockpit connections.");
 
         self.is_running = true;
         let (term_tx, term_rx) = std::sync::mpsc::channel();

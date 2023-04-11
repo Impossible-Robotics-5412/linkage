@@ -3,15 +3,11 @@ use linkage_rs::state::RobotStateHandle;
 use linkage_rs::subsystem::Subsystem;
 
 #[derive(Default)]
-struct TankDrivetrainSubsystem {
-    count: usize,
-}
+struct TankDrivetrainSubsystem {}
 
 impl Subsystem for TankDrivetrainSubsystem {
     fn tick(&mut self, robot_state: RobotStateHandle) {
-        log::info!("TankDrivetrainSubsystem Tick {}", self.count);
         log::info!("{:?}", robot_state.lock().unwrap());
-        self.count += 1;
     }
 }
 
