@@ -1,4 +1,5 @@
 use linkage_rs::robot::Robot;
+use linkage_rs::state::RobotStateHandle;
 use linkage_rs::subsystem::Subsystem;
 
 #[derive(Default)]
@@ -7,17 +8,10 @@ struct TankDrivetrainSubsystem {
 }
 
 impl Subsystem for TankDrivetrainSubsystem {
-    fn setup(&mut self) {
-        log::info!("TankDrivetrainSubsystem Setup")
-    }
-
-    fn tick(&mut self) {
+    fn tick(&mut self, robot_state: RobotStateHandle) {
         log::info!("TankDrivetrainSubsystem Tick {}", self.count);
+        log::info!("{:?}", robot_state.lock().unwrap());
         self.count += 1;
-    }
-
-    fn shutdown(&mut self) {
-        log::info!("TankDrivetrainSubsystem Shutdown")
     }
 }
 

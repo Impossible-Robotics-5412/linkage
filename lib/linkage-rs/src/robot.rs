@@ -1,6 +1,7 @@
 use common::logging::setup_logger;
 
 use crate::cockpit::start_cockpit_listener;
+use crate::state::RobotStateHandle;
 use crate::subsystem::Subsystem;
 
 #[derive(Default)]
@@ -42,8 +43,9 @@ impl Robot {
 
         start_cockpit_listener().expect("failed to start listening for Cockpit connections.");
 
-        self.is_running = true;
+        let state: RobotStateHandle = Default::default();
 
+        self.is_running = true;
         let (term_tx, term_rx) = std::sync::mpsc::channel();
 
         ctrlc::set_handler(move || {
@@ -58,14 +60,14 @@ impl Robot {
         };
 
         for subsystem in self.subsystems.iter_mut() {
-            subsystem.setup();
+            subsystem.setup(state.clone());
         }
 
         while self.is_running {
             if let Some(tick) = &self.tick_handler {
                 tick();
                 for subsystem in self.subsystems.iter_mut() {
-                    subsystem.tick();
+                    subsystem.tick(state.clone());
                 }
             }
 
@@ -77,7 +79,7 @@ impl Robot {
         }
 
         for subsystem in self.subsystems.iter_mut() {
-            subsystem.shutdown();
+            subsystem.shutdown(state.clone());
         }
         if let Some(shutdown) = &self.shutdown_handler {
             shutdown();
