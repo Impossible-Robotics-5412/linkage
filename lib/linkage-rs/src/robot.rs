@@ -6,9 +6,9 @@ use crate::subsystem::Subsystem;
 #[derive(Default)]
 pub struct Robot {
     subsystems: Vec<Box<dyn Subsystem>>,
-    setup: Option<Box<dyn Fn()>>,
-    tick: Option<Box<dyn Fn()>>,
-    shutdown: Option<Box<dyn Fn()>>,
+    setup_handler: Option<Box<dyn Fn()>>,
+    tick_handler: Option<Box<dyn Fn()>>,
+    shutdown_handler: Option<Box<dyn Fn()>>,
     is_running: bool,
 }
 
@@ -23,22 +23,23 @@ impl Robot {
     }
 
     pub fn on_setup<F: Fn() + 'static>(mut self, on_setup: F) -> Self {
-        self.setup = Some(Box::new(on_setup));
+        self.setup_handler = Some(Box::new(on_setup));
         self
     }
 
     pub fn on_tick<F: Fn() + 'static>(mut self, on_tick: F) -> Self {
-        self.tick = Some(Box::new(on_tick));
+        self.tick_handler = Some(Box::new(on_tick));
         self
     }
 
     pub fn on_shutdown<F: Fn() + 'static>(mut self, on_shutdown: F) -> Self {
-        self.shutdown = Some(Box::new(on_shutdown));
+        self.shutdown_handler = Some(Box::new(on_shutdown));
         self
     }
 
     pub fn run(mut self) {
         setup_logger(7640).expect("logger should be able to start");
+
         start_cockpit_listener().expect("failed to start listening for Cockpit connections.");
 
         self.is_running = true;
@@ -52,7 +53,7 @@ impl Robot {
         })
         .expect("failed to set termination handler");
 
-        if let Some(setup) = &self.setup {
+        if let Some(setup) = &self.setup_handler {
             setup();
         };
 
@@ -61,7 +62,7 @@ impl Robot {
         }
 
         while self.is_running {
-            if let Some(tick) = &self.tick {
+            if let Some(tick) = &self.tick_handler {
                 tick();
                 for subsystem in self.subsystems.iter_mut() {
                     subsystem.tick();
@@ -78,7 +79,7 @@ impl Robot {
         for subsystem in self.subsystems.iter_mut() {
             subsystem.shutdown();
         }
-        if let Some(shutdown) = &self.shutdown {
+        if let Some(shutdown) = &self.shutdown_handler {
             shutdown();
         }
     }
