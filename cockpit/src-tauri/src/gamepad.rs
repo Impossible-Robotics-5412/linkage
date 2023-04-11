@@ -44,7 +44,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
                                 gamepad_id: gamepad_id_into_u8(event.id),
                                 event_type: EventType::AxisChanged as u8,
                                 control: axis as u8,
-                                value: (value.clamp(0.0, 1.0) * 255.0) as u8,
+                                value: (127.0 + (value.clamp(-1.0, 1.0)) * 255.0) as u8,
                             };
 
                             bus.lock().unwrap().broadcast(Some(message));
