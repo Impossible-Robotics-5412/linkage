@@ -1,4 +1,5 @@
-use linkage_rs::gamepad::{GamepadId, PsController};
+use linkage_rs::gamepads::gamepad::Gamepad;
+use linkage_rs::gamepads::ps_controller::PsController;
 use linkage_rs::robot::Robot;
 use linkage_rs::state::RobotStateHandle;
 use linkage_rs::subsystem::Subsystem;

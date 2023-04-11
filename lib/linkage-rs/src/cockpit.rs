@@ -3,7 +3,7 @@ use std::net::{TcpListener, TcpStream};
 
 use common::messages::{Bytes, CockpitToLinkage};
 
-use crate::gamepad::GamepadData;
+use crate::gamepads::gamepad::GamepadData;
 use crate::state::RobotStateHandle;
 
 pub fn start_cockpit_listener(state: RobotStateHandle) -> io::Result<()> {

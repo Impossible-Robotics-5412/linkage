@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use crate::gamepad::{GamepadData, GamepadId};
+use crate::gamepads::gamepad::{GamepadData, GamepadId};
 
 pub type RobotStateHandle = Arc<Mutex<RobotState>>;
 
