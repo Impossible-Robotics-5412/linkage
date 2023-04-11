@@ -3,7 +3,7 @@ use std::net::{TcpListener, TcpStream};
 
 use common::messages::{Bytes, CockpitToLinkage};
 
-use crate::gamepad::Gamepad;
+use crate::gamepad::GamepadData;
 use crate::state::RobotStateHandle;
 
 pub fn start_cockpit_listener(state: RobotStateHandle) -> io::Result<()> {
@@ -44,7 +44,7 @@ fn handle_cockpit_message(message: CockpitToLinkage, state: RobotStateHandle) {
             let gamepad = state
                 .gamepads
                 .entry(gamepad_id)
-                .or_insert(Gamepad::default());
+                .or_insert(GamepadData::default());
 
             // FIXME: Handle Connect and Disconnect EventType
 
