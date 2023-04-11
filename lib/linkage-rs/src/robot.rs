@@ -1,3 +1,5 @@
+use common::logging::setup_logger;
+
 use crate::subsystem::Subsystem;
 
 #[derive(Default)]
@@ -35,6 +37,8 @@ impl Robot {
     }
 
     pub fn run(mut self) {
+        setup_logger(7682).expect("logger should be able to start");
+
         self.is_running = true;
 
         let (term_tx, term_rx) = std::sync::mpsc::channel();

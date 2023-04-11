@@ -1654,7 +1654,9 @@ dependencies = [
 name = "linkage-rs"
 version = "0.1.0"
 dependencies = [
+ "common",
  "ctrlc",
+ "log",
 ]
 
 [[package]]

@@ -8,24 +8,24 @@ struct TankDrivetrainSubsystem {
 
 impl Subsystem for TankDrivetrainSubsystem {
     fn setup(&mut self) {
-        eprintln!("TankDrivetrainSubsystem Setup")
+        log::info!("TankDrivetrainSubsystem Setup")
     }
 
     fn tick(&mut self) {
-        eprintln!("TankDrivetrainSubsystem Tick {}", self.count);
+        log::info!("TankDrivetrainSubsystem Tick {}", self.count);
         self.count += 1;
     }
 
     fn shutdown(&mut self) {
-        eprintln!("TankDrivetrainSubsystem Shutdown")
+        log::info!("TankDrivetrainSubsystem Shutdown")
     }
 }
 
 fn main() {
     Robot::new()
         .add_subsystem(TankDrivetrainSubsystem::default())
-        .on_setup(|| eprintln!("Robot Setup"))
-        .on_tick(|| eprintln!("Robot Tick"))
-        .on_shutdown(|| eprintln!("Robot Shutdown"))
+        .on_setup(|| log::info!("Robot Setup"))
+        .on_tick(|| log::info!("Robot Tick"))
+        .on_shutdown(|| log::info!("Robot Shutdown"))
         .run();
 }
