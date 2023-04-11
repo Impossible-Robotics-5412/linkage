@@ -66,9 +66,9 @@ impl Robot {
         while self.is_running {
             if let Some(tick) = &self.tick_handler {
                 tick();
-                for subsystem in self.subsystems.iter_mut() {
-                    subsystem.tick(state.clone());
-                }
+            }
+            for subsystem in self.subsystems.iter_mut() {
+                subsystem.tick(state.clone());
             }
 
             std::thread::sleep(std::time::Duration::from_millis(20));

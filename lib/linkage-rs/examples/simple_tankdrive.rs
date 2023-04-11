@@ -18,8 +18,5 @@ impl Subsystem for TankDrivetrainSubsystem {
 fn main() {
     Robot::new()
         .add_subsystem(TankDrivetrainSubsystem::default())
-        .on_setup(|| log::info!("Robot Setup"))
-        .on_tick(|| log::info!("Robot Tick"))
-        .on_shutdown(|| log::info!("Robot Shutdown"))
         .run();
 }
