@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-common = { path = "../../common", features = ["logging"]}
+common = { path = "../../common", features = ["logging", "messages"]}
 ctrlc = { version = "3.2.5", features = ["termination"] }
 log = "0.4.17"

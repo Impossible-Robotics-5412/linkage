@@ -1,5 +1,6 @@
 use common::logging::setup_logger;
 
+use crate::cockpit::start_cockpit_listener;
 use crate::subsystem::Subsystem;
 
 #[derive(Default)]
@@ -37,7 +38,8 @@ impl Robot {
     }
 
     pub fn run(mut self) {
-        setup_logger(7682).expect("logger should be able to start");
+        setup_logger(7640).expect("logger should be able to start");
+        start_cockpit_listener().expect("failed to start listening for Cockpit connections.");
 
         self.is_running = true;
 
