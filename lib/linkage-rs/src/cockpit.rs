@@ -3,7 +3,7 @@ use std::net::{TcpListener, TcpStream};
 
 use common::messages::{Bytes, CockpitToLinkage};
 
-use crate::gamepads::gamepad::GamepadData;
+use crate::gamepads::gamepad::{EventType, GamepadData};
 use crate::state::RobotStateHandle;
 
 pub(crate) fn start_listener(state: RobotStateHandle, port: &usize) -> io::Result<()> {
@@ -37,18 +37,19 @@ fn handle_cockpit_message(message: CockpitToLinkage, state: RobotStateHandle) {
             control,
             value,
         } => {
-            let mut state = state.lock().unwrap();
+            if event_type == EventType::Disconnected as u8 {
+                state.lock().unwrap().gamepads.remove_entry(&gamepad_id);
+            } else {
+                let mut state = state.lock().unwrap();
+                let gamepad = state
+                    .gamepads
+                    .entry(gamepad_id)
+                    .or_insert(GamepadData::default());
 
-            let gamepad = state
-                .gamepads
-                .entry(gamepad_id)
-                .or_insert(GamepadData::default());
-
-            // TODO: Handle Connect and Disconnect EventType
-
-            gamepad
-                .handle_cockpit_message(event_type, control, value)
-                .unwrap();
+                gamepad
+                    .handle_cockpit_message(event_type, control, value)
+                    .unwrap();
+            }
         }
     }
 }
