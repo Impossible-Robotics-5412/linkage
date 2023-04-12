@@ -1,7 +1,7 @@
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::{
     io::{ErrorKind, Read, Write},
     net::TcpStream,
-    sync::mpsc::{channel, Receiver, Sender},
     sync::{Arc, Mutex},
     thread,
     time::Duration,
@@ -24,17 +24,14 @@ enum LinkageLibStateChange {
 
 pub struct LinkageLibState {
     gamepad_event_bus: Arc<Mutex<Bus<Option<CockpitToLinkage>>>>,
-    disabled_message_sender: Mutex<Sender<()>>,
-    disabled_message_receiver: Arc<Mutex<Receiver<()>>>,
+    disabled: Arc<AtomicBool>,
 }
 
 impl LinkageLibState {
     pub fn new(gamepad_event_bus: Arc<Mutex<Bus<Option<CockpitToLinkage>>>>) -> Self {
-        let (sender, receiver) = channel();
         Self {
             gamepad_event_bus,
-            disabled_message_sender: Mutex::new(sender),
-            disabled_message_receiver: Arc::new(Mutex::new(receiver)),
+            disabled: Arc::new(AtomicBool::new(false)),
         }
     }
 }
@@ -47,8 +44,10 @@ pub fn enable<R: Runtime>(
     let config = common::config::config().map_err(|err| format!("Failed to load config: {err}"))?;
     log::debug!("Received enable command");
 
+    state.disabled.store(false, Ordering::Relaxed);
+
     thread::spawn({
-        let disable_message_receiver = state.disabled_message_receiver.clone();
+        let disabled = state.disabled.clone();
         let gamepad_event_bus_rx = state.gamepad_event_bus.lock().unwrap().add_rx();
 
         move || {
@@ -66,9 +65,15 @@ pub fn enable<R: Runtime>(
             )
             .unwrap();
 
-            thread::spawn(move || start_linkage_lib_communication(config, gamepad_event_bus_rx));
+            thread::spawn({
+                let disabled = disabled.clone();
+                move || {
+                    start_linkage_lib_communication(config, gamepad_event_bus_rx, disabled.clone());
+                    log::warn!("END");
+                }
+            });
 
-            block_until_disable(&mut socket, &disable_message_receiver);
+            block_until_disable(&mut socket, disabled.clone());
 
             app.emit_all(
                 EVENT_LINKAGE_LIB_STATE_CHANGE,
@@ -86,33 +91,36 @@ pub fn enable<R: Runtime>(
 }
 
 #[tauri::command]
-pub fn disable(state: tauri::State<'_, LinkageLibState>) -> Result<(), String> {
+pub fn disable(state: tauri::State<'_, LinkageLibState>) {
     log::debug!("Received disable command");
 
-    state
-        .disabled_message_sender
-        .lock()
-        .unwrap()
-        .send(())
-        .map_err(|err| format!("Failed to send disable message: {err}"))
+    state.disabled.store(true, Ordering::Relaxed);
 }
 
 fn start_linkage_lib_communication(
     config: Config,
     mut gamepad_event_bus_rx: BusReader<Option<CockpitToLinkage>>,
+    disabled: Arc<AtomicBool>,
 ) {
     let linkage_lib_address = config.cockpit().linkage_lib_address();
     log::debug!("Starting Linkage-lib communication on '{linkage_lib_address}'.");
 
-    let mut handle_gamepad_events = |linkage_communication_stream: &mut TcpStream| {
-        loop {
-            match gamepad_event_bus_rx.recv() {
-                Ok(Some(message)) => {
+    match TcpStream::connect(linkage_lib_address.to_string()) {
+        Ok(mut linkage_communication_stream) => {
+            // We are connected to the Linkage communication socket.
+            loop {
+                if disabled.load(Ordering::Relaxed) {
+                    log::debug!("Received disable message. Breaking out of loop.");
+                    break;
+                }
+
+                if let Ok(Some(message)) = gamepad_event_bus_rx.try_recv() {
                     if let Err(err) = linkage_communication_stream.write(&message.to_bytes()) {
                         match err.kind() {
                             ErrorKind::BrokenPipe => {
                                 // If the pipe is broken, we can't use this connection anymore
                                 // so let's just break out of the loop, so we can disconnect this stream and close this thread.
+                                log::debug!("Linkage communication stream pipe is broken. Breaking out of loop.");
                                 break;
                             }
                             _ => log::error!(
@@ -123,17 +131,9 @@ fn start_linkage_lib_communication(
                         }
                     }
                 }
-                err => {
-                    log::error!("Invalid message from gamepad event bus: {:?}", err);
-                }
             }
-        }
-    };
 
-    match TcpStream::connect(linkage_lib_address.to_string()) {
-        Ok(mut linkage_communication_stream) => {
-            // We are connected to the Linkage communication socket.
-            handle_gamepad_events(&mut linkage_communication_stream);
+            _ = linkage_communication_stream.shutdown(std::net::Shutdown::Both)
         }
         Err(err) => log::error!(
             "Failed to connect to linkage on address '{}': {}",
@@ -143,7 +143,7 @@ fn start_linkage_lib_communication(
     }
 }
 
-fn block_until_disable(socket: &mut TcpStream, disable_message_receiver: &Mutex<Receiver<()>>) {
+fn block_until_disable(socket: &mut TcpStream, disabled: Arc<AtomicBool>) {
     socket
         .set_read_timeout(Some(Duration::from_millis(100)))
         .unwrap();
@@ -151,26 +151,20 @@ fn block_until_disable(socket: &mut TcpStream, disable_message_receiver: &Mutex<
     // Keep blocking until the socket closes.
     loop {
         // Check if a disable message has been sent from the frontend.
-        match disable_message_receiver.lock().unwrap().try_recv() {
-            // Received disabled message from frontend.
-            Ok(()) => {
-                log::debug!("Closing Linakge socket: Disable message received");
+        if disabled.load(Ordering::Relaxed) {
+            log::debug!("Closing Linakge socket: Disable message received");
+            break;
+        }
+
+        // Didn't receive a disable message from the frontend,
+        // so let's see if the connection has been closed.
+        match socket.read_exact(&mut [0]) {
+            Err(err) if err.kind() == ErrorKind::UnexpectedEof => {
+                // The socket has been closed.
+                log::debug!("Closing Linkage socket: Linkage socket received UnexpectedEof");
                 break;
             }
-            // Didn't receive a disable message from the frontend,
-            // so let's see if the connection has been closed.
-            Err(_) => {
-                match socket.read_exact(&mut [0]) {
-                    Err(err) if err.kind() == ErrorKind::UnexpectedEof => {
-                        // The socket has been closed.
-                        log::debug!(
-                            "Closing Linkage socket: Linkage socket received UnexpectedEof"
-                        );
-                        break;
-                    }
-                    _ => {}
-                }
-            }
+            _ => {}
         }
     }
 }

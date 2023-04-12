@@ -24,6 +24,8 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
     ));
 
     thread::spawn({
+        log::debug!("Started gamepad event listener");
+
         let bus = bus.clone();
         move || {
             loop {
