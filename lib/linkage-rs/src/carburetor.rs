@@ -2,12 +2,14 @@ use std::io::{self, Write};
 use std::net::TcpStream;
 use std::sync::mpsc::Receiver;
 
+use common::config::Address;
 use common::messages::{Bytes, LinkageToCarburetor};
 
-pub(crate) fn open_connection(message_receiver: Receiver<LinkageToCarburetor>) -> io::Result<()> {
-    // FIXME: Get this address from the config.
-    let address = "raspberrypi.local:48862";
-    let mut stream = TcpStream::connect(address)?;
+pub(crate) fn open_connection(
+    message_receiver: Receiver<LinkageToCarburetor>,
+    address: &Address,
+) -> io::Result<()> {
+    let mut stream = TcpStream::connect(address.to_string())?;
 
     log::info!("Opened connection with Carburetor on '{address}'");
 

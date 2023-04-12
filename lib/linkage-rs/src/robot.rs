@@ -1,3 +1,4 @@
+use std::io::{self, Read};
 use std::sync::mpsc::channel;
 use std::sync::{Arc, Mutex};
 
@@ -44,24 +45,31 @@ impl Robot {
 
     pub fn run(mut self) {
         setup_logger(7640).expect("logger should be able to start");
+        let config = common::config::config().expect("failed to load config");
 
         let (carburetor_message_sender, carburetor_message_receiver) = channel();
 
         let state = Arc::new(Mutex::new(RobotState::new(carburetor_message_sender)));
 
-        cockpit::start_listener(state.clone())
+        cockpit::start_listener(state.clone(), &config.linkage_lib().port())
             .expect("failed to start listening for Cockpit connections.");
 
-        carburetor::open_connection(carburetor_message_receiver)
-            .expect("failed to open connection with Cockpit.");
+        carburetor::open_connection(
+            carburetor_message_receiver,
+            &config.linkage_lib().carburetor_address(),
+        )
+        .expect("failed to open connection with Cockpit.");
 
         self.is_running = true;
         let (term_tx, term_rx) = std::sync::mpsc::channel();
 
-        ctrlc::set_handler(move || {
-            term_tx
-                .send(())
-                .expect("could not send termination signal over channel")
+        ctrlc::set_handler({
+            let term_tx = term_tx.clone();
+            move || {
+                term_tx
+                    .send(())
+                    .expect("could not send termination signal over channel")
+            }
         })
         .expect("failed to set termination handler");
 

@@ -6,14 +6,13 @@ use common::messages::{Bytes, CockpitToLinkage};
 use crate::gamepads::gamepad::GamepadData;
 use crate::state::RobotStateHandle;
 
-pub(crate) fn start_listener(state: RobotStateHandle) -> io::Result<()> {
-    // FIXME: Get this port from the config.
-    let port = 12362;
+pub(crate) fn start_listener(state: RobotStateHandle, port: &usize) -> io::Result<()> {
     let listener = TcpListener::bind(format!("0.0.0.0:{port}"))?;
 
     // FIXME: This thread does not automatically close when we call shutdown on the Robot.
     std::thread::spawn(move || {
         for cockpit_stream in listener.incoming() {
+            log::info!("Cockpit connected!");
             handle_cockpit_client(cockpit_stream.unwrap(), state.clone());
         }
     });
