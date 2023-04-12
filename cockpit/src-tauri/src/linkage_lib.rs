@@ -68,8 +68,7 @@ pub fn enable<R: Runtime>(
             thread::spawn({
                 let disabled = disabled.clone();
                 move || {
-                    start_linkage_lib_communication(config, gamepad_event_bus_rx, disabled.clone());
-                    log::warn!("END");
+                    start_linkage_lib_communication(config, gamepad_event_bus_rx, disabled);
                 }
             });
 
