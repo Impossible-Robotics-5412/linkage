@@ -1,3 +1,5 @@
+use common::messages::LinkageToCarburetor;
+
 use crate::state::RobotStateHandle;
 pub struct SparkMotorController {
     state: RobotStateHandle,
@@ -13,7 +15,7 @@ impl SparkMotorController {
         let sender = self.state.lock().unwrap().carburetor_message_sender.clone();
 
         sender
-            .send(common::messages::LinkageToCarburetor::MotorInstruction {
+            .send(LinkageToCarburetor::MotorInstruction {
                 channel: self.channel,
                 speed,
             })
