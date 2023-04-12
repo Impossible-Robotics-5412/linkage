@@ -76,6 +76,8 @@ pub fn enable<R: Runtime>(
             )
             .unwrap();
 
+            socket.shutdown(std::net::Shutdown::Both).unwrap();
+
             log::debug!("Closed Linkage-lib service socket.");
         }
     });
