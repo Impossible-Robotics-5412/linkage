@@ -6,7 +6,7 @@ Requires=linkage.socket
 Type=simple
 # FIXME: Create custom user for running linkage processes
 User=pi
-ExecStart=/usr/bin/node /home/pi/robot_code/build/main.js
+ExecStart=/home/pi/robot_code/main
 StandardInput=socket
 StandardError=journal  
 TimeoutStopSec=5

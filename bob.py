@@ -81,43 +81,16 @@ def build_carburetor(cargo_path=None, release=False):
     cargo_build(cargo_path, "carburetor", release=release)
 
 
-def build_lib():
-    styled_print("Building Linkage-lib...")
-    subprocess.run(["pnpm", "run", "build"], cwd="lib/linkage-node")
-
-
-def build_lib_example():
-    styled_print("Building Linkage-lib example...")
-    # FIXME: We need to use sudo here because of permission issues, but we should try to find a workaround for this...
-    subprocess.run(["npm", "link"], cwd="lib/linkage-node")
-    subprocess.run(
-        ["npm", "link", "@impossiblerobotics/linkage", "--save"],
-        cwd="examples/lib/linkage-node",
-    )
-    subprocess.run(["npm", "run", "build"], cwd="examples/lib/linkage-node")
-
-
 def build(args: Namespace):
     if args.part == "all":
         styled_print("Building all parts...")
         cargo_build(release=args.release)
-        build_lib()
-        build_lib_example()
         build_cockpit()
     elif args.part == "cockpit":
         styled_print("Building cockpit frontend and backend...")
         build_cockpit()
     elif args.part == "carburetor":
         build_carburetor(release=args.release)
-    elif args.part == "lib-example":
-        styled_print("Building Linkage-lib and its example...")
-        build_lib()
-        build_lib_example()
-    elif args.part == "lib-example-only":
-        styled_print("Building only Linkage-lib example...")
-        build_lib_example()
-    elif args.part == "lib":
-        build_lib()
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
@@ -135,21 +108,13 @@ def deploy_gauge():
     subprocess.run(["./deploy.sh"], cwd="gauge")
 
 
-def deploy_example():
-    styled_print("Deploying Linkage-lib example...")
-    subprocess.run(["./deploy.sh"], cwd="examples/lib/linkage-node")
-
-
 def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
         deploy_carburetor()
-        deploy_example()
         deploy_gauge()
     elif args.part == "carburetor":
         deploy_carburetor()
-    elif args.part == "lib-example":
-        deploy_example()
     elif args.part == "gauge":
         deploy_gauge()
     else:
@@ -234,9 +199,6 @@ if __name__ == "__main__":
             "cockpit",
             "gauge",
             "carburetor",
-            "lib",
-            "lib-example",
-            "lib-example-only",
         ],
     )
 
@@ -256,7 +218,7 @@ if __name__ == "__main__":
     deploy_subcommand.add_argument(
         "part",
         help="the part of linkage to deploy",
-        choices=["all", "carburetor", "lib-example", "gauge"],
+        choices=["all", "carburetor", "gauge"],
     )
 
     # Run subcommand
