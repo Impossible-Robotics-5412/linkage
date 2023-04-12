@@ -1,7 +1,11 @@
+use std::sync::mpsc::channel;
+use std::sync::{Arc, Mutex};
+
 use common::logging::setup_logger;
 
-use crate::cockpit::start_cockpit_listener;
-use crate::state::RobotStateHandle;
+use crate::carburetor;
+use crate::cockpit;
+use crate::state::RobotState;
 use crate::subsystem::Subsystem;
 
 #[derive(Default)]
@@ -41,10 +45,15 @@ impl Robot {
     pub fn run(mut self) {
         setup_logger(7640).expect("logger should be able to start");
 
-        let state: RobotStateHandle = Default::default();
+        let (carburetor_message_sender, carburetor_message_receiver) = channel();
 
-        start_cockpit_listener(state.clone())
+        let state = Arc::new(Mutex::new(RobotState::new(carburetor_message_sender)));
+
+        cockpit::start_listener(state.clone())
             .expect("failed to start listening for Cockpit connections.");
+
+        carburetor::open_connection(carburetor_message_receiver)
+            .expect("failed to open connection with Cockpit.");
 
         self.is_running = true;
         let (term_tx, term_rx) = std::sync::mpsc::channel();

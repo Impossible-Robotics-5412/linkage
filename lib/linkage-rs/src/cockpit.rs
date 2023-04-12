@@ -6,7 +6,7 @@ use common::messages::{Bytes, CockpitToLinkage};
 use crate::gamepads::gamepad::GamepadData;
 use crate::state::RobotStateHandle;
 
-pub fn start_cockpit_listener(state: RobotStateHandle) -> io::Result<()> {
+pub fn start_listener(state: RobotStateHandle) -> io::Result<()> {
     // FIXME: Get this port from the config.
     let port = 12362;
     let listener = TcpListener::bind(format!("0.0.0.0:{port}"))?;
