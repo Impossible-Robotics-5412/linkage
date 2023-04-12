@@ -73,6 +73,30 @@ impl Robot {
         })
         .expect("failed to set termination handler");
 
+        // NOTE: This makes sure we close the connection when te systemd socket
+        //       is closed. It will close when the stdin stream is closed.
+        std::thread::spawn(move || {
+            let mut stdin = io::stdin();
+            let mut buffer = [0; 1024];
+
+            loop {
+                match stdin.read(&mut buffer) {
+                    Ok(n) => {
+                        if n == 0 {
+                            term_tx
+                                .send(())
+                                .expect("could not send termination signal over channel");
+                            break;
+                        }
+                    }
+                    Err(e) => {
+                        log::debug!("Error reading from stdin: {}", e);
+                        break;
+                    }
+                }
+            }
+        });
+
         if let Some(setup) = &self.setup_handler {
             setup();
         };
