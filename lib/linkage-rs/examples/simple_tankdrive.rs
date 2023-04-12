@@ -9,16 +9,15 @@ use linkage_rs::subsystem::Subsystem;
 struct TankDrivetrainSubsystem {}
 
 impl Subsystem for TankDrivetrainSubsystem {
-    fn tick(&mut self, robot_state: RobotStateHandle) {
-        let mut gamepads = robot_state.lock().unwrap().gamepads.to_owned();
-        let gamepad = gamepads.entry(0).or_default();
-        let ps_controller = PsController::new(gamepad.clone());
+    fn tick(&mut self, state: RobotStateHandle) {
+        let left_motor = SparkMotorController::new(state.clone(), 0);
+        let right_motor = SparkMotorController::new(state.clone(), 1);
 
-        let motor = SparkMotorController::new(robot_state.clone(), 0);
-        motor.set_speed_percentage(ps_controller.left_joystick_y());
+        let mut gamepads = state.lock().unwrap().gamepads.to_owned();
+        let primary_gamepad = PsController::new(gamepads.entry(0).or_default().to_owned());
 
-        let motor = SparkMotorController::new(robot_state, 1);
-        motor.set_speed_percentage(ps_controller.right_joystick_y());
+        left_motor.set_speed_percentage(primary_gamepad.left_joystick_y());
+        right_motor.set_speed_percentage(primary_gamepad.right_joystick_y());
     }
 }
 
