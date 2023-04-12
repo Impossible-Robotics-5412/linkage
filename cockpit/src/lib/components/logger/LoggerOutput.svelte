@@ -25,7 +25,7 @@
 			}
 
 			logs = [...logs, value];
-			// FIXME: When we exeed the maxScrollback no new logs are shown.
+			// BUG: When we exeed the maxScrollback no new logs are shown.
 			if (logs.length > maxScrollback) {
 				logs.shift();
 				logs = logs;

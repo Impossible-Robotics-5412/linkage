@@ -9,7 +9,7 @@ use crate::state::RobotStateHandle;
 pub(crate) fn start_listener(state: RobotStateHandle, port: &usize) -> io::Result<()> {
     let listener = TcpListener::bind(format!("0.0.0.0:{port}"))?;
 
-    // FIXME: This thread does not automatically close when we call shutdown on the Robot.
+    // BUG: This thread does not automatically close when we call shutdown on the Robot.
     std::thread::spawn(move || {
         for cockpit_stream in listener.incoming() {
             log::info!("Cockpit connected!");
@@ -45,7 +45,7 @@ fn handle_cockpit_message(message: CockpitToLinkage, state: RobotStateHandle) {
                 .entry(gamepad_id)
                 .or_insert(GamepadData::default());
 
-            // FIXME: Handle Connect and Disconnect EventType
+            // TODO: Handle Connect and Disconnect EventType
 
             gamepad
                 .handle_cockpit_message(event_type, control, value)

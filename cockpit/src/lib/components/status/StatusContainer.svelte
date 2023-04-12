@@ -39,7 +39,7 @@
 		<h3>Status</h3>
 	</div>
 
-	<!-- FIXME: Add indicator telling if the robot is enabled -->
+	<!-- TODO: Add indicator that shows if Cockpit is connected to the robot. -->
 
 	<div class="status">
 		<h3>Robot Code</h3>

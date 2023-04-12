@@ -106,7 +106,6 @@ impl Gauge {
 pub fn config() -> Result<Config, Box<dyn Error>> {
     let config_path = xdg::BaseDirectories::with_prefix("linkage")?.get_config_file("config.toml");
     if !config_path.exists() {
-        // FIXME: Create config file if it does not exist.
         panic!(
             "No config file found at {}",
             config_path.as_path().to_str().unwrap_or("UNKNOWN")

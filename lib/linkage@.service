@@ -4,7 +4,7 @@ Requires=linkage.socket
 
 [Service]
 Type=simple
-# FIXME: Create custom user for running linkage processes
+# TODO: Create custom user for running linkage processes
 User=pi
 ExecStart=/home/pi/robot_code/main
 StandardInput=socket

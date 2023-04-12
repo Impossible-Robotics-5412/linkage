@@ -13,7 +13,7 @@ pub(crate) fn open_connection(
 
     log::info!("Opened connection with Carburetor on '{address}'");
 
-    // FIXME: This thread does not automatically close when we call shutdown on the Robot.
+    // BUG: This thread does not automatically close when we call shutdown on the Robot.
     std::thread::spawn(move || loop {
         match message_receiver.recv() {
             Ok(message) => {

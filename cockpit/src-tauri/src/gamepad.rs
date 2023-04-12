@@ -75,7 +75,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
                     }
                 }
 
-                // FIXME: This is needed until the gilrs crate supports blocking next_event calls.
+                // HACK: This is needed until the gilrs crate supports blocking next_event calls.
                 //        https://gitlab.com/gilrs-project/gilrs/-/merge_requests/86
                 thread::sleep(Duration::from_micros(100));
             }
@@ -85,7 +85,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
     bus
 }
 
-// FIXME: This is needed because of the gilrs crate being neglectant.
+// HACK: This is needed because of the gilrs crate being neglectant.
 fn gamepad_id_into_u8(gamepad_id: gilrs::GamepadId) -> u8 {
     unsafe { std::mem::transmute_copy::<gilrs::GamepadId, usize>(&gamepad_id) as u8 }
 }

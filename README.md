@@ -37,7 +37,7 @@ After cloning the repo run `pnpm install`. This will add a config file to `~/.co
 Now you should be able to run `./bob.py run cockpit` from the root of the project to start Cockpit.
 
 ## Deploying robot code
-FIXME: Write
+TODO: Write
 
 ## Windows support
 Currently windows is not supported, but we are looking into this to make sure everyone can enjoy Linkage!

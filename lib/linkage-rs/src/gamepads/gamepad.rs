@@ -90,7 +90,7 @@ impl GamepadData {
 }
 
 pub trait Gamepad {
-    // FIXME: Should this be using a From trait?
+    // FIXME: It would be nicer to use a From trait here.
     fn new(gamepad_data: GamepadData) -> Self;
 
     fn control_button_value(&self, map: &HashMap<u8, u8>, control: u8) -> bool {

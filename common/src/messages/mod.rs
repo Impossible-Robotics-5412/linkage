@@ -48,8 +48,8 @@ impl TryFrom<Bytes> for CockpitToLinkage {
 impl From<CockpitToLinkage> for Bytes {
     fn from(value: CockpitToLinkage) -> Self {
         match value {
-            // FIXME: We could use a f32 byte representation for the value
-            //        just like we do with LinkageToCarburetor::MotorInstruction
+            // TODO: We could use a f32 byte representation for the value
+            //       just like we do with LinkageToCarburetor::MotorInstruction
             CockpitToLinkage::GamepadInputEvent {
                 gamepad_id,
                 event_type,

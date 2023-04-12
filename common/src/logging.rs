@@ -70,8 +70,9 @@ fn start_websocket_server(port: AddressPort, log_bus: Arc<Mutex<Bus<String>>>) {
         ws::listen(format!("0.0.0.0:{port}"), |frontend| {
             let log_bus = log_bus.clone();
             thread::spawn({
-                // FIXME: We should support sending a backlog of all messages
-                //        sent before connecting with the logger.
+                // BUG: We dont show the backlog of messages before the logger is connected.
+                //      We should support sending a backlog of all messages
+                //      sent before connecting with the logger.
                 let mut log_bus_rx = log_bus.lock().unwrap().add_rx();
 
                 move || loop {
