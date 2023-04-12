@@ -4,7 +4,8 @@ use std::io;
 pub type GamepadId = u8;
 
 #[repr(u8)]
-pub enum EventType {
+#[allow(dead_code)]
+pub(crate) enum EventType {
     ButtonChanged = 0,
     AxisChanged = 1,
     Connected = 2,
@@ -12,7 +13,8 @@ pub enum EventType {
 }
 
 #[repr(u8)]
-pub enum ButtonControl {
+#[allow(dead_code)]
+pub(crate) enum ButtonControl {
     // Action Pad
     South = 1,
     East = 2,
@@ -42,7 +44,8 @@ pub enum ButtonControl {
 }
 
 #[repr(u8)]
-pub enum AxisControl {
+#[allow(dead_code)]
+pub(crate) enum AxisControl {
     LeftStickX = 1,
     LeftStickY = 2,
     LeftZ = 3,
