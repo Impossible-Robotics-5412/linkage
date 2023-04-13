@@ -108,6 +108,11 @@ def deploy_gauge():
     subprocess.run(["./deploy.sh"], cwd="gauge")
 
 
+def deploy_example():
+    styled_print("Deploying Example...")
+    subprocess.run(["./deploy.sh"], cwd="lib/linkage-rs")
+
+
 def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
@@ -115,6 +120,8 @@ def deploy(args: Namespace):
         deploy_gauge()
     elif args.part == "carburetor":
         deploy_carburetor()
+    elif args.part == "example":
+        deploy_example()
     elif args.part == "gauge":
         deploy_gauge()
     else:
@@ -218,7 +225,7 @@ if __name__ == "__main__":
     deploy_subcommand.add_argument(
         "part",
         help="the part of linkage to deploy",
-        choices=["all", "carburetor", "gauge"],
+        choices=["all", "carburetor", "gauge", "example"],
     )
 
     # Run subcommand
