@@ -3,7 +3,6 @@ use std::net::{TcpListener, TcpStream};
 
 use common::messages::{Bytes, CockpitToLinkage};
 
-use crate::gamepads::gamepad::{EventType, GamepadData};
 use crate::state::RobotStateHandle;
 
 pub(crate) fn start_listener(state: RobotStateHandle, port: &usize) -> io::Result<()> {
@@ -23,33 +22,12 @@ fn handle_cockpit_client(mut cockpit_stream: TcpStream, state: RobotStateHandle)
     let mut message_bytes = Bytes::default();
     while let Ok(()) = cockpit_stream.read_exact(&mut message_bytes) {
         match CockpitToLinkage::try_from(message_bytes) {
-            Ok(message) => handle_cockpit_message(message, state.clone()),
+            Ok(message) => state
+                .lock()
+                .unwrap()
+                .gamepad_manager
+                .handle_cockpit_message(message),
             Err(error) => log::error!("Failed to parse bytes into message: {error}"),
-        }
-    }
-}
-
-fn handle_cockpit_message(message: CockpitToLinkage, state: RobotStateHandle) {
-    match message {
-        CockpitToLinkage::GamepadInputEvent {
-            gamepad_id,
-            event_type,
-            control,
-            value,
-        } => {
-            if event_type == EventType::Disconnected as u8 {
-                state.lock().unwrap().gamepads.remove_entry(&gamepad_id);
-            } else {
-                let mut state = state.lock().unwrap();
-                let gamepad = state
-                    .gamepads
-                    .entry(gamepad_id)
-                    .or_insert(GamepadData::default());
-
-                gamepad
-                    .handle_cockpit_message(event_type, control, value)
-                    .unwrap();
-            }
         }
     }
 }

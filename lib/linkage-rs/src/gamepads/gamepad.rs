@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io;
+use std::io::{self, ErrorKind};
 
 pub type GamepadId = u8;
 
@@ -10,6 +10,27 @@ pub(crate) enum EventType {
     AxisChanged = 1,
     Connected = 2,
     Disconnected = 3,
+}
+
+impl TryFrom<u8> for EventType {
+    type Error = io::Error;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if value == EventType::ButtonChanged as u8 {
+            Ok(EventType::ButtonChanged)
+        } else if value == EventType::AxisChanged as u8 {
+            Ok(EventType::AxisChanged)
+        } else if value == EventType::Connected as u8 {
+            Ok(EventType::Connected)
+        } else if value == EventType::Disconnected as u8 {
+            Ok(EventType::Disconnected)
+        } else {
+            Err(io::Error::new(
+                ErrorKind::InvalidInput,
+                "Failed to convert u8 into EventType",
+            ))
+        }
+    }
 }
 
 #[repr(u8)]
@@ -59,14 +80,17 @@ pub(crate) enum AxisControl {
 
 #[derive(Default, Debug, Clone)]
 pub struct GamepadData {
-    pub(crate) gamepad_id: GamepadId,
+    gamepad_id: GamepadId,
     pub(crate) buttons: HashMap<u8, u8>,
     pub(crate) axis: HashMap<u8, u8>,
 }
 
 impl GamepadData {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(gamepad_id: GamepadId) -> Self {
+        Self {
+            gamepad_id,
+            ..Default::default()
+        }
     }
 
     pub fn handle_cockpit_message(
