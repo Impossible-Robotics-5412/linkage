@@ -1,4 +1,4 @@
-use linkage_rs::gamepads::gamepad::Gamepad;
+use linkage_rs::gamepads::gamepad_manager::GamepadIndex;
 use linkage_rs::gamepads::ps_controller::PsController;
 use linkage_rs::motors::spark_motor_controller::SparkMotorController;
 use linkage_rs::robot::Robot;
@@ -13,11 +13,16 @@ impl Subsystem for TankDrivetrainSubsystem {
         let left_motor = SparkMotorController::new(state.clone(), 0);
         let right_motor = SparkMotorController::new(state.clone(), 1);
 
-        let mut gamepads = state.lock().unwrap().gamepads.to_owned();
-        let primary_gamepad = PsController::new(gamepads.entry(0).or_default().to_owned());
+        let gamepad = state
+            .lock()
+            .unwrap()
+            .gamepad_manager
+            .get::<PsController>(GamepadIndex::Primary);
 
-        left_motor.set_speed_percentage(primary_gamepad.left_joystick_y());
-        right_motor.set_speed_percentage(primary_gamepad.right_joystick_y());
+        if let Some(gamepad) = gamepad {
+            left_motor.set_speed_percentage(gamepad.left_joystick_y());
+            right_motor.set_speed_percentage(gamepad.right_joystick_y());
+        }
     }
 }
 
