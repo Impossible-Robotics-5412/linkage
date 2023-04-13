@@ -50,35 +50,6 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(@types/node@18.15.3)(sass@1.60.0)
 
-  examples/lib/linkage-node:
-    dependencies:
-      '@impossiblerobotics/linkage':
-        specifier: file:../../../lib/linkage-node
-        version: file:lib/linkage-node
-    devDependencies:
-      typescript:
-        specifier: ^4.9.5
-        version: 4.9.5
-
-  lib/linkage-node:
-    dependencies:
-      toml:
-        specifier: ^3.0.0
-        version: 3.0.0
-      ws:
-        specifier: ^8.13.0
-        version: 8.13.0
-    devDependencies:
-      '@types/node':
-        specifier: ^18.15.3
-        version: 18.15.3
-      '@types/ws':
-        specifier: ^8.5.4
-        version: 8.5.4
-      typescript:
-        specifier: ^4.9.5
-        version: 4.9.5
-
 packages:
 
   /@esbuild/android-arm64@0.16.17:
@@ -454,12 +425,6 @@ packages:
     deprecated: This is a stub types definition. sass provides its own type definitions, so you do not need this installed.
     dependencies:
       sass: 1.60.0
-    dev: true
-
-  /@types/ws@8.5.4:
-    resolution: {integrity: sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==}
-    dependencies:
-      '@types/node': 18.15.3
     dev: true
 
   /anymatch@3.1.3:
@@ -1028,10 +993,6 @@ packages:
       is-number: 7.0.0
     dev: true
 
-  /toml@3.0.0:
-    resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
-    dev: false
-
   /tslib@2.4.1:
     resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
     dev: true
@@ -1091,28 +1052,3 @@ packages:
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
-
-  /ws@8.13.0:
-    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
-
-  file:lib/linkage-node:
-    resolution: {directory: lib/linkage-node, type: directory}
-    name: '@impossiblerobotics/linkage'
-    version: 0.0.2
-    dependencies:
-      toml: 3.0.0
-      ws: 8.13.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false

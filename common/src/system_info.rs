@@ -71,7 +71,7 @@ impl SystemInfo {
 
 fn robot_code_exists() -> bool {
     match home::home_dir() {
-        Some(home) => home.join("robot_code/build/main.js").is_file(),
+        Some(home) => home.join("robot_code/main").is_file(),
         None => false,
     }
 }

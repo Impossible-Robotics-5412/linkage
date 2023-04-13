@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::io::{ErrorKind, Read, Write};
+use std::io::{ErrorKind, Read};
 use std::net::TcpListener;
 use std::process::exit;
 use std::sync::mpsc::channel;
@@ -8,12 +8,13 @@ use std::time::Duration;
 
 use common::logging::setup_logger;
 
+use common::messages::LinkageToCarburetor;
 #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
 use rppal::pwm::Channel;
 use simple_signal::{self, Signal};
 
 use crate::control_channel::control_channel;
-use crate::instruction::{decode, Instruction, MessageBytes, Speed};
+use crate::instruction::{MessageBytes, Speed};
 
 mod control_channel;
 mod instruction;
@@ -87,10 +88,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let local = stream.local_addr()?;
         log::info!("({n}) Received stream from {peer} on {local}.",);
 
-        let mut buf = MessageBytes::default();
+        let mut message_bytes = MessageBytes::default();
         loop {
             // We read from this stream until the end of this connection into buf.
-            match stream.read_exact(&mut buf) {
+            match stream.read_exact(&mut message_bytes) {
                 Ok(_) => {}
                 // If the connection was closed, break the loop.
                 Err(e) if e.kind() == ErrorKind::UnexpectedEof => break,
@@ -98,31 +99,26 @@ fn main() -> Result<(), Box<dyn Error>> {
                 Err(e) => return Err(e)?,
             }
 
-            log::trace!("Received message: {buf:?}");
+            log::trace!("Received message: {message_bytes:?}");
 
-            // Decode the received json into a Vec of instructions.
-            let instruction = match decode(buf) {
-                Some(instr) => instr,
-                None => {
-                    log::error!("|\tInvalid message: {buf:?}");
-                    writeln!(stream, "Invalid message: {buf:?}")?;
-                    continue;
-                }
-            };
+            match LinkageToCarburetor::try_from(message_bytes) {
+                Ok(message) => match message {
+                    LinkageToCarburetor::MotorInstruction { channel, speed } => {
+                        let sender = match channel {
+                            0 => tx0.clone(),
+                            1 => tx1.clone(),
+                            channel => {
+                                log::error!("Instruction channel {channel} does not exist.");
+                                continue;
+                            }
+                        };
 
-            match instruction {
-                Instruction::Motor(instr) => {
-                    let sender = match instr.channel() {
-                        0 => tx0.clone(),
-                        1 => tx1.clone(),
-                        channel => {
-                            log::error!("|\tInstruction channel {channel} does not exist.");
-                            continue;
+                        if let Some(speed) = Speed::new(speed) {
+                            sender.send(speed)?;
                         }
-                    };
-
-                    sender.send(instr.speed())?;
-                }
+                    }
+                },
+                Err(e) => return Err(e)?,
             }
         }
 

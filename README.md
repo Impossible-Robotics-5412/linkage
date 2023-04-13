@@ -38,8 +38,8 @@ Now you should be able to run `./bob.py run cockpit` from the root of the projec
 
 ## Deploying robot code
 To get started, you can deploy the example robot code:
-1. Navigate into the example folder using `cd examples/lib/linkage-node`.
-2. Run `./deploy.sh`
+
+At the root of the project, run `./bob.py deploy example simple_tankdrive`
 
 ## Windows support
 Currently windows is not supported, but we are looking into this to make sure everyone can enjoy Linkage!
@@ -53,7 +53,7 @@ that for the system. We call the whole project *linkage*.
 
   _Carburetor_ is the executable responsible for the actual communication with the motor drivers and other peripherals connected to the Pi.
   It accepts a TCP stream of control instructions and executes these.
-  The stream of control instructions is sent by the robot code, which is built on the linkage library (e.g., _linkage-node_).
+  The stream of control instructions is sent by the robot code, which is built on the linkage library (e.g., _linkage-rs_).
   On shutdown or termination, Carburetor tries its best to shut down gracefully by putting all motors it controls into a neutral state.
 
 - **cockpit**
@@ -78,10 +78,10 @@ that for the system. We call the whole project *linkage*.
 
   Because the other programs that are part of this project are built on communication via TCP, the library can be implemented in any number of languages.
 
-    - [**linkage-node**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/lib/linkage-node)
+    - [**linkage-rs**](https://github.com/Impossible-Robotics-5412/linkage/tree/main/lib/linkage-rs)
 
       At this moment, there is one implementation of the _linkage_ library.
-      It is written in Node and is also available through npm.
+      It is written in Rust.
 
 ## Contribution
 

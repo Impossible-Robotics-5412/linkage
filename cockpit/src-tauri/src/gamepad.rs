@@ -24,6 +24,11 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
     ));
 
     thread::spawn({
+        log::debug!("Started gamepad event listener");
+
+        // FIXME: We currently only tell Linkage-lib we have connected controllers by sending an event, but no initial information.
+        //        This means Linkage-lib will only know if a gamepad is connected as soon as we send some kind of event.
+
         let bus = bus.clone();
         move || {
             loop {
@@ -44,7 +49,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
                                 gamepad_id: gamepad_id_into_u8(event.id),
                                 event_type: EventType::AxisChanged as u8,
                                 control: axis as u8,
-                                value: (value.clamp(0.0, 1.0) * 255.0) as u8,
+                                value: (127.0 + (value.clamp(-1.0, 1.0)) * 255.0) as u8,
                             };
 
                             bus.lock().unwrap().broadcast(Some(message));
@@ -73,7 +78,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
                     }
                 }
 
-                // FIXME: This is needed until the gilrs crate supports blocking next_event calls.
+                // HACK: This is needed until the gilrs crate supports blocking next_event calls.
                 //        https://gitlab.com/gilrs-project/gilrs/-/merge_requests/86
                 thread::sleep(Duration::from_micros(100));
             }
@@ -83,7 +88,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
     bus
 }
 
-// FIXME: This is needed because of the gilrs crate being neglectant.
+// HACK: This is needed because of the gilrs crate being neglectant.
 fn gamepad_id_into_u8(gamepad_id: gilrs::GamepadId) -> u8 {
     unsafe { std::mem::transmute_copy::<gilrs::GamepadId, usize>(&gamepad_id) as u8 }
 }
