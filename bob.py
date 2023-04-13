@@ -132,14 +132,14 @@ def create_config_file():
     config_folder_path = f"{home_dir()}/.config/linkage"
     config_file_path = f"{config_folder_path}/config.toml"
 
-    example_config_file_path = f"{linkage_dir()}/examples/config/config.toml"
+    default_config_file_path = f"{linkage_dir()}/config.toml"
     if path.isfile(config_file_path):
         styled_print(f"Config file already exists at '{config_file_path}'.")
     else:
         styled_print(f"Creating default config file at '{config_file_path}'.")
         makedirs(config_folder_path, exist_ok=True)
         shutil.copy(
-            src=example_config_file_path,
+            src=default_config_file_path,
             dst=config_file_path,
         )
 

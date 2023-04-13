@@ -10,7 +10,7 @@ readonly CARGO_PATH=$HOME/.cargo/bin/cargo
 readonly CARBURETOR_BUILD_PATH=./target/release/carburetor
 readonly GAUGE_BUILD_PATH=./target/release/gauge
 
-readonly CONFIG_SOURCE_FILE=./examples/config/config.toml
+readonly CONFIG_SOURCE_FILE=./config.toml
 readonly CONFIG_TARGET_FOLDER=$HOME/.config/linkage/
 
 readonly LINKAGE_SYSTEMD_SOCKET=./lib/linkage.socket
