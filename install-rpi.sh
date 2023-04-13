@@ -18,6 +18,12 @@ readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=./lib/linkage@.service
 readonly CARBURETOR_SERVICE=./carburetor/carburetor.service
 readonly GAUGE_SERVICE=./gauge/gauge.service
 
+# Install git
+sudo apt install git
+
+# Clone the repo
+git clone https://github.com/Impossible-Robotics-5412/linkage.git
+
 # Install NodeJS
 curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
 sudo apt install nodejs
