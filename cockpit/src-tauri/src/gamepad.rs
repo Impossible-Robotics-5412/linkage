@@ -26,6 +26,9 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
     thread::spawn({
         log::debug!("Started gamepad event listener");
 
+        // FIXME: We currently only tell Linkage-lib we have connected controllers by sending an event, but no initial information.
+        //        This means Linkage-lib will only know if a gamepad is connected as soon as we send some kind of event.
+
         let bus = bus.clone();
         move || {
             loop {

@@ -1,7 +1,12 @@
 use std::collections::HashMap;
 use std::io::{self, ErrorKind};
 
+use enum_iterator::Sequence;
+
 pub type GamepadId = u8;
+
+const AXIS_DEFAULT: u8 = 127;
+const BUTTON_DEFAULT: u8 = 0;
 
 #[repr(u8)]
 #[allow(dead_code)]
@@ -35,6 +40,7 @@ impl TryFrom<u8> for EventType {
 
 #[repr(u8)]
 #[allow(dead_code)]
+#[derive(Sequence)]
 pub(crate) enum ButtonControl {
     // Action Pad
     South = 1,
@@ -66,6 +72,7 @@ pub(crate) enum ButtonControl {
 
 #[repr(u8)]
 #[allow(dead_code)]
+#[derive(Sequence)]
 pub(crate) enum AxisControl {
     LeftStickX = 1,
     LeftStickY = 2,
@@ -87,9 +94,21 @@ pub struct GamepadData {
 
 impl GamepadData {
     pub fn new(gamepad_id: GamepadId) -> Self {
+        let mut axis = HashMap::<u8, u8>::new();
+        let mut buttons = HashMap::<u8, u8>::new();
+
+        for control in enum_iterator::all::<AxisControl>() {
+            axis.insert(control as u8, AXIS_DEFAULT);
+        }
+
+        for control in enum_iterator::all::<ButtonControl>() {
+            buttons.insert(control as u8, BUTTON_DEFAULT);
+        }
+
         Self {
             gamepad_id,
-            ..Default::default()
+            buttons,
+            axis,
         }
     }
 
@@ -114,7 +133,6 @@ impl GamepadData {
 }
 
 pub trait Gamepad {
-    // FIXME: It would be nicer to use a From trait here.
     fn new(gamepad_data: GamepadData) -> Self;
 
     fn control_button_value(&self, map: &HashMap<u8, u8>, control: u8) -> bool {
