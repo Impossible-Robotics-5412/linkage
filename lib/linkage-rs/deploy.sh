@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-readonly EXAMPLE_NAME=simple_tankdrive
+readonly EXAMPLE_NAME=$1
 readonly TARGET_ARCH=armv7-unknown-linux-gnueabihf
 readonly SOURCE_PATH=../../target/${TARGET_ARCH}/release/examples/${EXAMPLE_NAME}
 
