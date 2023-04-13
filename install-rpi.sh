@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-readonly LINKAGE_PATH=$HOME/linkage
+readonly LINKAGE_PATH=/home/pi/linkage
 
 readonly CARGO_PATH=$HOME/.cargo/bin/cargo
 
