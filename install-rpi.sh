@@ -19,6 +19,7 @@ readonly CARBURETOR_SERVICE=./carburetor/carburetor.service
 readonly GAUGE_SERVICE=./gauge/gauge.service
 
 # Install git
+sudo apt update
 sudo apt install git
 
 # Clone the repo
