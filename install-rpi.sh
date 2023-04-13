@@ -24,6 +24,7 @@ sudo apt install git -y
 
 # Clone the repo
 git clone https://github.com/Impossible-Robotics-5412/linkage.git
+cd linkage
 
 # Install NodeJS
 curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
