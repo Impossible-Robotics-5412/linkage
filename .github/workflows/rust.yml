@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Cache Rust files
+        uses: Swatinem/rust-cache@v2
+
       - name: Install dependencies
         run: >-
           sudo apt-get update &&
@@ -22,8 +26,9 @@ jobs:
           libayatana-appindicator3-dev
           libwebkit2gtk-4.0-dev
           libudev-dev
+
       - name: Create dist folder for Tauri
         run: mkdir -p ${{ github.workspace }}/cockpit/dist
+
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
-      - uses: Swatinem/rust-cache@v2
