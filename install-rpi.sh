@@ -5,26 +5,28 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+readonly LINKAGE_PATH=$HOME/linkage
+
 readonly CARGO_PATH=$HOME/.cargo/bin/cargo
 
-readonly CARBURETOR_BUILD_PATH=./target/release/carburetor
-readonly GAUGE_BUILD_PATH=./target/release/gauge
+readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
+readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
 
-readonly CONFIG_SOURCE_FILE=./config.toml
+readonly CONFIG_SOURCE_FILE=${LINKAGE_PATH}/config.toml
 readonly CONFIG_TARGET_FOLDER=$HOME/.config/linkage/
 
-readonly LINKAGE_SYSTEMD_SOCKET=./lib/linkage.socket
-readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=./lib/linkage@.service
-readonly CARBURETOR_SERVICE=./carburetor/carburetor.service
-readonly GAUGE_SERVICE=./gauge/gauge.service
+readonly LINKAGE_SYSTEMD_SOCKET=${LINKAGE_PATH}/lib/linkage.socket
+readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=${LINKAGE_PATH}/lib/linkage@.service
+readonly CARBURETOR_SERVICE=${LINKAGE_PATH}/carburetor/carburetor.service
+readonly GAUGE_SERVICE=${LINKAGE_PATH}/gauge/gauge.service
 
 # Install git
 sudo apt update
 sudo apt install git -y
 
 # Clone the repo
-git clone https://github.com/Impossible-Robotics-5412/linkage.git
-cd linkage
+git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
+cd ${LINKAGE_PATH}
 
 # Install NodeJS
 curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
