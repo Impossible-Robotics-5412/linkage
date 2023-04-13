@@ -30,7 +30,6 @@
 
 		&:disabled {
 			opacity: 0.5;
-			cursor: wait;
 		}
 	}
 </style>
