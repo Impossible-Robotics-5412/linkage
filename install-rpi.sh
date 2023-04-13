@@ -20,7 +20,7 @@ readonly GAUGE_SERVICE=./gauge/gauge.service
 
 # Install git
 sudo apt update
-sudo apt install git
+sudo apt install git -y
 
 # Clone the repo
 git clone https://github.com/Impossible-Robotics-5412/linkage.git
