@@ -18,12 +18,19 @@
 		})
 		.catch(error => {
 			console.error('Could connect to Gauge: ' + error);
+			systemInfo = undefined;
 		});
 
 	let robotCodeStatus = Status.BAD;
 	$: {
 		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
 		else robotCodeStatus = Status.BAD;
+	}
+
+	let robotConnectionStatus = Status.BAD;
+	$: {
+		if (systemInfo) robotConnectionStatus = Status.GOOD;
+		else robotConnectionStatus = Status.BAD;
 	}
 
 	$: robotCodeFoundInfo = systemInfo?.robot_code_exists
@@ -39,9 +46,13 @@
 		<h3>Status</h3>
 	</div>
 
-	<!-- TODO: Add indicator that shows if Cockpit is connected to the robot. -->
-
 	<div class="status">
+		<h3>Robot Connection</h3>
+		<StatusItem
+			info={`${robotConnectionStatus ? 'Connected' : 'Not Connected'}`}
+			label="Connection"
+			status={robotConnectionStatus} />
+
 		<h3>Robot Code</h3>
 		<StatusItem
 			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
