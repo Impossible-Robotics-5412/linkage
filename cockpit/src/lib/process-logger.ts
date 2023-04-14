@@ -3,6 +3,7 @@ export interface Log {
 	level: LogLevel;
 	file?: string;
 	line?: number;
+	date: Date;
 }
 
 export enum LogLevel {

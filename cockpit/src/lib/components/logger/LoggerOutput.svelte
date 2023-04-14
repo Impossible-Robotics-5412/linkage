@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
-	import { onMount, tick } from 'svelte';
+	import { tick } from 'svelte';
 
 	export let stream: ReadableStream<Log> | undefined;
 	export let maxScrollback = 500;
@@ -24,12 +24,11 @@
 				break;
 			}
 
-			logs = [...logs, value];
-			// BUG: When we exeed the maxScrollback no new logs are shown.
-			if (logs.length > maxScrollback) {
-				logs.shift();
-				logs = logs;
-			}
+			value.date = new Date();
+
+			logs.push(value);
+			if (logs.length > maxScrollback) logs.shift();
+			logs = logs;
 		}
 		reader.cancel();
 		stream?.cancel();
@@ -38,6 +37,8 @@
 	async function scrollToBottom() {
 		if (!loggerElement) return;
 
+		// BUG: When we press the Enable/Disable button this won't update
+		//      as the scrollheight is 0 because we just made the other log invisible.
 		const isScrolledToBottom =
 			loggerElement.scrollHeight - loggerElement.clientHeight <=
 			loggerElement.scrollTop + 32;
@@ -64,7 +65,7 @@
 				class:level-debug={log.level === LogLevel.DEBUG}
 				class:level-trace={log.level === LogLevel.TRACE}>
 				<span title={`${log.file}:${log.line}`}>
-					[{new Date().toLocaleTimeString()}
+					[{log.date.toLocaleTimeString()}
 					{logLevelLabel(log.level)}] {log.msg}
 				</span>
 			</div>
