@@ -8,18 +8,33 @@
 	import { listen } from '@tauri-apps/api/event';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
 	import type { SystemInfo } from '$lib/types/system-info';
+	import { onDestroy } from 'svelte';
+
+	const timeout = 1000;
 
 	let systemInfo: SystemInfo | undefined;
+	let lastCheck = Date.now();
+
+	const timeoutTimer = setInterval(() => {
+		if (Date.now() - lastCheck >= timeout) {
+			systemInfo = undefined;
+		}
+	}, timeout);
+
 	invoke('start_gauge_connection')
 		.then(() => {
 			listen('received-system-info', event => {
 				systemInfo = event.payload as SystemInfo;
+				lastCheck = Date.now();
 			});
 		})
 		.catch(error => {
 			console.error('Could connect to Gauge: ' + error);
-			systemInfo = undefined;
 		});
+
+	onDestroy(() => {
+		clearInterval(timeoutTimer);
+	});
 
 	let robotCodeStatus = Status.BAD;
 	$: {
