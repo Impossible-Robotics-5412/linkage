@@ -23,7 +23,7 @@
 
 	invoke('start_gauge_connection')
 		.then(() => {
-			listen('received-system-info', event => {
+			listen('received_system_info', event => {
 				systemInfo = event.payload as SystemInfo;
 				lastCheck = Date.now();
 			});

@@ -5,7 +5,7 @@
 	import { robotCodeState } from '$lib/state/robot-code';
 	import { loggerState } from '$lib/state/logger';
 
-	listen('linkage-lib-state-change', event => {
+	listen('linkage_lib_state_change', event => {
 		$robotCodeState.changing = false;
 		if (event.payload === 'Enabled') {
 			$robotCodeState.enabled = true;

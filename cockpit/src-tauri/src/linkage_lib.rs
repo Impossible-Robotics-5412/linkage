@@ -14,7 +14,7 @@ use common::{
 };
 use tauri::{Manager, Runtime};
 
-const EVENT_LINKAGE_LIB_STATE_CHANGE: &str = "linkage-lib-state-change";
+const EVENT_LINKAGE_LIB_STATE_CHANGE: &str = "linkage_lib_state_change";
 
 #[derive(serde::Serialize, Clone, Copy)]
 enum LinkageLibStateChange {

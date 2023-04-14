@@ -7,7 +7,7 @@ use std::{
 use common::system_info::SystemInfo;
 use tauri::Manager;
 
-const EVENT_RECEIVED_SYSTEM_INFO: &str = "received-system-info";
+const EVENT_RECEIVED_SYSTEM_INFO: &str = "received_system_info";
 
 #[tauri::command]
 pub fn start_gauge_connection<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<(), String> {
