@@ -8,22 +8,47 @@
 	import { listen } from '@tauri-apps/api/event';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
 	import type { SystemInfo } from '$lib/types/system-info';
+	import { onDestroy } from 'svelte';
+
+	const timeout = 1000;
 
 	let systemInfo: SystemInfo | undefined;
+	let lastCheck = Date.now();
+
+	const timeoutTimer = setInterval(() => {
+		if (Date.now() - lastCheck >= timeout) {
+			systemInfo = undefined;
+		}
+	}, timeout);
+
 	invoke('start_gauge_connection')
 		.then(() => {
 			listen('received-system-info', event => {
 				systemInfo = event.payload as SystemInfo;
+				lastCheck = Date.now();
 			});
 		})
 		.catch(error => {
 			console.error('Could connect to Gauge: ' + error);
 		});
 
+	onDestroy(() => {
+		clearInterval(timeoutTimer);
+	});
+
+	// TODO: Periodically if we have a connection with the robot. Currently you have to reload the app to
+	//       Connect after a restart of the robot.
+
 	let robotCodeStatus = Status.BAD;
 	$: {
 		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
 		else robotCodeStatus = Status.BAD;
+	}
+
+	let robotConnectionStatus = Status.BAD;
+	$: {
+		if (systemInfo) robotConnectionStatus = Status.GOOD;
+		else robotConnectionStatus = Status.BAD;
 	}
 
 	$: robotCodeFoundInfo = systemInfo?.robot_code_exists
@@ -39,9 +64,13 @@
 		<h3>Status</h3>
 	</div>
 
-	<!-- TODO: Add indicator that shows if Cockpit is connected to the robot. -->
-
 	<div class="status">
+		<h3>Robot Connection</h3>
+		<StatusItem
+			info={`${robotConnectionStatus ? 'Connected' : 'Not Connected'}`}
+			label="Connection"
+			status={robotConnectionStatus} />
+
 		<h3>Robot Code</h3>
 		<StatusItem
 			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
