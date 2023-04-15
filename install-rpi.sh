@@ -14,7 +14,7 @@ readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
 readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
 
 readonly CONFIG_SOURCE_FILE=${LINKAGE_PATH}/config.toml
-readonly CONFIG_TARGET_FOLDER=${LINKAGE_PATH}/.config/linkage/
+readonly CONFIG_TARGET_FOLDER=${HOME}/.config/linkage/
 
 readonly LINKAGE_SYSTEMD_SOCKET=${LINKAGE_PATH}/lib/linkage.socket
 readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=${LINKAGE_PATH}/lib/linkage@.service
