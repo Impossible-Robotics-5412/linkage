@@ -11,6 +11,11 @@
 ## Getting started
 
 ### Installing Linkage on a Pi
+#### Automatic install
+1. Run the install script with `curl -sL https://raw.githubusercontent.com/Impossible-Robotics-5412/linkage/main/install-rpi.sh | sudo bash -`
+2. [Deploy your robot code](#deploy-robot-code).
+
+#### Manual install
 1. Clone the repo to the Pi using `git clone https://github.com/Impossible-Robotics-5412/linkage.git`.
 2. Navigate into the downloaded repo using `cd linkage`.
 3. Run `./install-rpi.sh`. (Please note this might take quite a few minutes as it will install and compile all necessary dependencies!)
