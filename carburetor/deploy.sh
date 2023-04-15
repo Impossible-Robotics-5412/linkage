@@ -10,8 +10,8 @@ readonly TARGET_ARCH=armv7-unknown-linux-gnueabihf
 readonly SOURCE_PATH=../target/${TARGET_ARCH}/release/${PROJECT_NAME}
 
 # If necessary, change the following values.
-readonly TARGET_HOST=pi@raspberrypi
-readonly TARGET_BIN=/home/pi/${PROJECT_NAME}
+readonly TARGET_HOST=linkage@raspberrypi
+readonly TARGET_BIN=/home/linkage/${PROJECT_NAME}
 
 cross build --release --target=${TARGET_ARCH}
 rsync -aP ${SOURCE_PATH} ${TARGET_HOST}:${TARGET_BIN}
