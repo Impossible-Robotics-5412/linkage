@@ -5,9 +5,10 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-readonly LINKAGE_PATH=/home/pi/linkage
-
-readonly CARGO_PATH=$HOME/.cargo/bin/cargo
+readonly DEFAULT_PASSWORD='$1$jc0n4fft$HOqLVaOFH9EaAoFdphY/f1'
+readonly USER=linkage
+readonly HOME=/home/linkage
+readonly LINKAGE_PATH=${HOME}/linkage
 
 readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
 readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
@@ -19,6 +20,11 @@ readonly LINKAGE_SYSTEMD_SOCKET=${LINKAGE_PATH}/lib/linkage.socket
 readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=${LINKAGE_PATH}/lib/linkage@.service
 readonly CARBURETOR_SERVICE=${LINKAGE_PATH}/carburetor/carburetor.service
 readonly GAUGE_SERVICE=${LINKAGE_PATH}/gauge/gauge.service
+
+readonly CARGO_PATH=${HOME}/.cargo/bin/cargo
+
+sudo useradd --password ${DEFAULT_PASSWORD} --create-home --home-dir ${HOME} ${USER}
+sudo usermod -aG sudo ${USER}
 
 # Install git
 sudo apt update
@@ -56,7 +62,7 @@ mkdir -p ${CONFIG_TARGET_FOLDER}
 cp ${CONFIG_SOURCE_FILE} ${CONFIG_TARGET_FOLDER}
 
 # Create folder for the robot code
-mkdir -p $HOME/robot_code/
+mkdir -p "${HOME}/robot_code/"
 
 # Setup services
 sudo cp ${LINKAGE_SYSTEMD_SOCKET} /etc/systemd/system/
@@ -72,8 +78,6 @@ sudo systemctl restart carburetor.service
 sudo systemctl enable gauge.service
 sudo systemctl restart gauge.service
 
-echo \n
 echo "--------------------------------"
 echo "Please restart the Raspberry Pi!"
 echo "--------------------------------"
-echo \n
