@@ -5,7 +5,7 @@ Requires=linkage.socket
 [Service]
 Type=simple
 User=linkage
-ExecStart=/home/pi/robot_code/main
+ExecStart=/home/linkage/robot_code/main
 StandardInput=socket
 StandardError=journal  
 TimeoutStopSec=5
