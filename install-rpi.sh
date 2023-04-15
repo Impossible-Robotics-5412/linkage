@@ -25,6 +25,7 @@ readonly CARGO_PATH=${HOME}/.cargo/bin/cargo
 
 sudo useradd --password ${DEFAULT_PASSWORD} --create-home --home-dir ${HOME} ${USER}
 sudo usermod -aG sudo ${USER}
+sudo usermod -aG gpio ${USER}
 
 # Install git
 sudo apt update
@@ -52,6 +53,8 @@ sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
 
 # Make sure we can use PWM channels.
 echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
+echo "SUBSYSTEM=="pwm*", PROGRAM=\"/bin/sh -c 'chown -R root:gpio /sys/class/pwm && chmod -R 770 /sys/class/pwm; chown -R root:gpio /sys/devices/platform/soc/*.pwm/pwm/pwmchip* && chmod -R 770 /sys/devices/platform/soc/*.pwm/pwm/pwmchip*'\"" | sudo tee -a /etc/udev/rules.d/99-com.rules >/dev/null
+
 
 # Install Gauge
 ${CARGO_PATH} build -p gauge --release
