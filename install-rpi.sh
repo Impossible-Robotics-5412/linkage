@@ -63,6 +63,9 @@ cp ${CONFIG_SOURCE_FILE} ${CONFIG_TARGET_FOLDER}
 
 # Create folder for the robot code
 mkdir -p "${HOME}/robot_code/"
+# Give the linkage user permission to the robot_code folder, so we can deploy the code using rsync
+sudo chgrp linkage "${HOME}/robot_code/"
+chmod g+rwx "${HOME}/robot_code/"
 
 # Setup services
 sudo cp ${LINKAGE_SYSTEMD_SOCKET} /etc/systemd/system/
