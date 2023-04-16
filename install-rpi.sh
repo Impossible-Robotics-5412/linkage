@@ -56,9 +56,6 @@ sudo install ${GAUGE_BUILD_PATH} /usr/bin/gauge
 mkdir -p ${CONFIG_TARGET_FOLDER}
 cp ${CONFIG_SOURCE_FILE} ${CONFIG_TARGET_FOLDER}
 
-# Create folder for the robot code
-mkdir -p ${HOME}/robot_code/
-
 # Setup services
 sudo cp ${LINKAGE_SYSTEMD_SOCKET} /etc/systemd/system/
 sudo cp ${LINKAGE_SYSTEMD_SOCKET_SERVICE} /etc/systemd/system/
@@ -73,8 +70,4 @@ sudo systemctl restart carburetor.service
 sudo systemctl enable gauge.service
 sudo systemctl restart gauge.service
 
-echo \n
-echo "--------------------------------"
 echo "Please restart the Raspberry Pi!"
-echo "--------------------------------"
-echo \n
