@@ -1,12 +1,6 @@
-<script lang="ts" context="module">
-	export enum Status {
-		BAD,
-		SEMI,
-		GOOD
-	}
-</script>
-
 <script lang="ts">
+	import { Status } from '$lib/types/status';
+
 	export let info: string;
 	export let label: string;
 	export let status: Status | undefined = undefined;

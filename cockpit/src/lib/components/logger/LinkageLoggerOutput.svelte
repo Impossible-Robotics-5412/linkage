@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getConfig } from '$lib/config';
 	import { ProcessLogger } from '$lib/process-logger';
-	import { robotCodeState } from '$lib/state/robot-code';
 	import LoggerOutput from './LoggerOutput.svelte';
+	import { robotCode } from '$lib/backend';
 
 	let processLogger: ProcessLogger;
 	getConfig().then(config => {
@@ -12,7 +12,7 @@
 	});
 
 	let stream: ReadableStream;
-	$: if (processLogger && $robotCodeState.enabled) {
+	$: if (processLogger && $robotCode.enabled) {
 		processLogger.start().then(logStream => {
 			stream = logStream;
 		});

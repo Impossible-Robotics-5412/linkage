@@ -1,41 +1,23 @@
 <script lang="ts">
 	import Button from './ui/Button.svelte';
-	import { invoke } from '@tauri-apps/api/tauri';
-	import { listen } from '@tauri-apps/api/event';
-	import { robotCodeState } from '$lib/state/robot-code';
-	import { loggerState } from '$lib/state/logger';
+	import {
+		disableRobotCode,
+		enableRobotCode,
+		robotCode,
+		systemInfo
+	} from '$lib/backend';
 
-	listen('linkage_lib_state_change', event => {
-		$robotCodeState.changing = false;
-		if (event.payload === 'Enabled') {
-			$robotCodeState.enabled = true;
-			$loggerState.selectedTabId = 'linkage';
-		} else if (event.payload === 'Disabled') {
-			$robotCodeState.enabled = false;
-			$loggerState.selectedTabId = 'cockpit-backend';
-		}
-	});
-
-	async function enable() {
-		$robotCodeState.changing = true;
-		invoke('enable');
-	}
-
-	async function disable() {
-		$robotCodeState.changing = true;
-		invoke('disable');
-	}
+	$: buttonDisabled =
+		$robotCode.changingState || !$systemInfo?.robot_code_exists;
 </script>
 
-<div
-	class:enabled={$robotCodeState.enabled}
-	class="enable-disable-robot-button">
-	{#if $robotCodeState.enabled}
-		<Button disabled={$robotCodeState.changing} on:click={disable}>
+<div class:enabled={$robotCode.enabled} class="enable-disable-robot-button">
+	{#if $robotCode.enabled}
+		<Button disabled={buttonDisabled} on:click={disableRobotCode}>
 			Disable
 		</Button>
 	{:else}
-		<Button disabled={$robotCodeState.changing} on:click={enable}>
+		<Button disabled={buttonDisabled} on:click={enableRobotCode}>
 			Enable
 		</Button>
 	{/if}

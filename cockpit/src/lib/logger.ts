@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 
 import LinkageLoggerOutput from '$lib/components/logger/LinkageLoggerOutput.svelte';
 import CockpitBackendLoggerOutput from '$lib/components/logger/CockpitBackendLoggerOutput.svelte';
-import CarbutetorLoggerOutput from '$lib/components/logger/CarbutetorLoggerOutput.svelte';
+import CarburetorLoggerOutput from '$lib/components/logger/CarburetorLoggerOutput.svelte';
 
 export interface Tab {
 	name: string;
@@ -21,7 +21,7 @@ export const tabs = {
 	} satisfies Tab,
 	'carburetor': {
 		name: 'Carburetor',
-		loggerOutputComponent: CarbutetorLoggerOutput
+		loggerOutputComponent: CarburetorLoggerOutput
 	} satisfies Tab
 };
 
