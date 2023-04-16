@@ -8,7 +8,7 @@ from os import makedirs, path
 
 
 def styled_print(message):
-    print(f"[👷🏼‍♂️ Bob]: {message}")
+    print(f"[🦺 Bob]: {message}")
 
 
 def linkage_dir():
