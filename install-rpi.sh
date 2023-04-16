@@ -5,15 +5,16 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-readonly LINKAGE_PATH=/home/pi/linkage
+readonly HOME=/home/pi
+readonly LINKAGE_PATH=${HOME}/linkage
 
-readonly CARGO_PATH=$HOME/.cargo/bin/cargo
+readonly CARGO_PATH=${HOME}/.cargo/bin/cargo
 
 readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
 readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
 
 readonly CONFIG_SOURCE_FILE=${LINKAGE_PATH}/config.toml
-readonly CONFIG_TARGET_FOLDER=${LINKAGE_PATH}/.config/linkage/
+readonly CONFIG_TARGET_FOLDER=${HOME}/.config/linkage/
 
 readonly LINKAGE_SYSTEMD_SOCKET=${LINKAGE_PATH}/lib/linkage.socket
 readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=${LINKAGE_PATH}/lib/linkage@.service
@@ -56,7 +57,7 @@ mkdir -p ${CONFIG_TARGET_FOLDER}
 cp ${CONFIG_SOURCE_FILE} ${CONFIG_TARGET_FOLDER}
 
 # Create folder for the robot code
-mkdir -p $HOME/robot_code/
+mkdir -p ${HOME}/robot_code/
 
 # Setup services
 sudo cp ${LINKAGE_SYSTEMD_SOCKET} /etc/systemd/system/
