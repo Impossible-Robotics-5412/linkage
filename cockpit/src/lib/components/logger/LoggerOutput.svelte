@@ -38,7 +38,7 @@
 		if (!loggerElement) return;
 
 		// BUG: When we press the Enable/Disable button this won't update
-		//      as the scrollheight is 0 because we just made the other log invisible.
+		//	 	as the scrollheight is 0 because we just made the other log invisible.
 		const isScrolledToBottom =
 			loggerElement.scrollHeight - loggerElement.clientHeight <=
 			loggerElement.scrollTop + 32;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Container from '$lib/components/Container.svelte';
-	import { loggerState, tabs } from '$lib/state/logger';
+	import { loggerState, tabs } from '$lib/logger';
 </script>
 
 <Container noPadding>

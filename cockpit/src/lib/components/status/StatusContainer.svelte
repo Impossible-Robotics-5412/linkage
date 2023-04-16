@@ -1,60 +1,18 @@
 <script lang="ts">
 	import StatusItem from './StatusItem.svelte';
-	import { Status } from './StatusItem.svelte';
 	import Container from '../Container.svelte';
-	import { robotCodeState } from '$lib/state/robot-code';
 	import RobotSystemStatus from './RobotSystemStatus.svelte';
-	import { invoke } from '@tauri-apps/api/tauri';
-	import { listen } from '@tauri-apps/api/event';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
-	import type { SystemInfo } from '$lib/types/system-info';
-	import { onDestroy } from 'svelte';
+	import { robotCode, systemInfo } from '$lib/backend';
+	import { Status } from '$lib/types/status';
 
-	const timeout = 1000;
+	$: robotCodeStatus = $robotCode.enabled ? Status.GOOD : Status.BAD;
+	$: robotConnectionStatus = $systemInfo ? Status.GOOD : Status.BAD;
 
-	let systemInfo: SystemInfo | undefined;
-	let lastCheck = Date.now();
-
-	const timeoutTimer = setInterval(() => {
-		if (Date.now() - lastCheck >= timeout) {
-			systemInfo = undefined;
-		}
-	}, timeout);
-
-	invoke('start_gauge_connection')
-		.then(() => {
-			listen('received_system_info', event => {
-				systemInfo = event.payload as SystemInfo;
-				lastCheck = Date.now();
-			});
-		})
-		.catch(error => {
-			console.error('Could connect to Gauge: ' + error);
-		});
-
-	onDestroy(() => {
-		clearInterval(timeoutTimer);
-	});
-
-	// TODO: Periodically if we have a connection with the robot. Currently you have to reload the app to
-	//       Connect after a restart of the robot.
-
-	let robotCodeStatus = Status.BAD;
-	$: {
-		if ($robotCodeState.enabled) robotCodeStatus = Status.GOOD;
-		else robotCodeStatus = Status.BAD;
-	}
-
-	let robotConnectionStatus = Status.BAD;
-	$: {
-		if (systemInfo) robotConnectionStatus = Status.GOOD;
-		else robotConnectionStatus = Status.BAD;
-	}
-
-	$: robotCodeFoundInfo = systemInfo?.robot_code_exists
+	$: robotCodeFoundInfo = $systemInfo?.robot_code_exists
 		? 'Found'
 		: 'Not Found';
-	$: robotCodeFoundStatus = systemInfo?.robot_code_exists
+	$: robotCodeFoundStatus = $systemInfo?.robot_code_exists
 		? Status.GOOD
 		: Status.BAD;
 </script>
@@ -81,16 +39,16 @@
 			label="Entrypoint"
 			status={robotCodeFoundStatus} />
 
-		{#if systemInfo?.cpu && systemInfo?.memory}
+		{#if $systemInfo?.cpu && $systemInfo?.memory}
 			<h3>Robot System</h3>
 			<RobotSystemStatus
-				memory={systemInfo.memory}
-				cpu={systemInfo.cpu} />
+				memory={$systemInfo.memory}
+				cpu={$systemInfo.cpu} />
 		{/if}
 
-		{#if systemInfo?.service_info}
+		{#if $systemInfo?.service_info}
 			<h3>Robot Services</h3>
-			<RobotServicesStatus serviceInfo={systemInfo?.service_info} />
+			<RobotServicesStatus serviceInfo={$systemInfo?.service_info} />
 		{/if}
 	</div>
 </Container>
