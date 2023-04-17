@@ -45,7 +45,7 @@ impl Robot {
 
     pub fn run(mut self) {
         setup_logger(7640).expect("logger should be able to start");
-        let config = common::config::config().expect("failed to load config");
+        let config = config::config().expect("failed to load config");
 
         let (carburetor_message_sender, carburetor_message_receiver) = channel();
 

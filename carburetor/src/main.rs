@@ -48,7 +48,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
     log::info!("Carburetor detected you are running on a Raspberry Pi!");
 
-    let config = common::config::config()?;
+    let config = config::config()?;
     let address = format!("0.0.0.0:{}", config.carburetor().port());
 
     log::info!("Setting up...");

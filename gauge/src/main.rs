@@ -9,7 +9,7 @@ use crossbeam::channel::Receiver;
 use systemstat::Platform;
 
 fn main() {
-    let config = common::config::config().unwrap();
+    let config = config::config().unwrap();
     let system = systemstat::System::new();
     let (tx, rx) = crossbeam::channel::unbounded();
     let client_count = Arc::new(AtomicUsize::new(0));

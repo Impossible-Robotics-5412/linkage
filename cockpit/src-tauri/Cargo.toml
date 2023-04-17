@@ -19,7 +19,8 @@ tauri-build = { version = "1.2", features = [] }
 tauri = { version = "1.2", features = ["shell-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-common = { path = "../../common", features = ["messages", "config", "logging", "system_info"] }
+common = { path = "../../common", features = ["messages", "logging", "system_info"] }
+config = { path = "../../common/config"}
 log = "0.4.17"
 gilrs = "0.10.1"
 bus = "2.4.0"

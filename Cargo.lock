@@ -51,13 +51,13 @@ checksum = "7de8ce5e0f9f8d88245311066a578d72b7af3e7088f32783804676302df237e4"
 
 [[package]]
 name = "async-trait"
-version = "0.1.65"
+version = "0.1.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "095183a3539c7c7649b2beb87c2d3f0591f3a7fed07761cc546d244e27e0238c"
+checksum = "b9ccdd8f2a161be9bd5c023df56f1b2a0bd1d83872ae53b71a84a12c9bf6e842"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.13",
 ]
 
 [[package]]
@@ -261,6 +261,7 @@ name = "carburetor"
 version = "0.1.0"
 dependencies = [
  "common",
+ "config 0.1.0",
  "log",
  "rppal",
  "simple-signal",
@@ -334,6 +335,7 @@ version = "0.1.0"
 dependencies = [
  "bus",
  "common",
+ "config 0.1.0",
  "gilrs",
  "log",
  "serde",
@@ -394,7 +396,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "bus",
- "config",
+ "config 0.1.0",
  "fern",
  "home",
  "log",
@@ -403,6 +405,15 @@ dependencies = [
  "serde_json",
  "systemstat",
  "ws",
+]
+
+[[package]]
+name = "config"
+version = "0.1.0"
+dependencies = [
+ "config 0.13.3",
+ "serde",
+ "serde_json",
  "xdg",
 ]
 
@@ -1000,6 +1011,7 @@ name = "gauge"
 version = "0.1.0"
 dependencies = [
  "common",
+ "config 0.1.0",
  "crossbeam",
  "serde",
  "serde_json",
@@ -1675,6 +1687,7 @@ name = "linkage-rs"
 version = "0.1.0"
 dependencies = [
  "common",
+ "config 0.1.0",
  "ctrlc",
  "enum-iterator",
  "log",
@@ -2138,9 +2151,9 @@ checksum = "478c572c3d73181ff3c2539045f6eb99e5491218eae919370993b890cdbdd98e"
 
 [[package]]
 name = "pest"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "028accff104c4e513bad663bbcd2ad7cfd5304144404c31ed0a77ac103d00660"
+checksum = "7b1403e8401ad5dedea73c626b99758535b342502f8d1e361f4a2dd952749122"
 dependencies = [
  "thiserror",
  "ucd-trie",
@@ -2148,9 +2161,9 @@ dependencies = [
 
 [[package]]
 name = "pest_derive"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ac3922aac69a40733080f53c1ce7f91dcf57e1a5f6c52f421fadec7fbdc4b69"
+checksum = "be99c4c1d2fc2769b1d00239431d711d08f6efedcecb8b6e30707160aee99c15"
 dependencies = [
  "pest",
  "pest_generator",
@@ -2158,22 +2171,22 @@ dependencies = [
 
 [[package]]
 name = "pest_generator"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d06646e185566b5961b4058dd107e0a7f56e77c3f484549fb119867773c0f202"
+checksum = "e56094789873daa36164de2e822b3888c6ae4b4f9da555a1103587658c805b1e"
 dependencies = [
  "pest",
  "pest_meta",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.13",
 ]
 
 [[package]]
 name = "pest_meta"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6f60b2ba541577e2a0c307c8f39d1439108120eb7903adeb6497fa880c59616"
+checksum = "6733073c7cff3d8459fda0e42f13a047870242aed8b509fe98000928975f359e"
 dependencies = [
  "once_cell",
  "pest",

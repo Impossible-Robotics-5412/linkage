@@ -2,8 +2,8 @@ use std::io::{self, Write};
 use std::net::TcpStream;
 use std::sync::mpsc::Receiver;
 
-use common::config::Address;
 use common::messages::{Bytes, LinkageToCarburetor};
+use config::Address;
 
 pub(crate) fn open_connection(
     message_receiver: Receiver<LinkageToCarburetor>,

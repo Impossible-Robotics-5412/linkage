@@ -1,14 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod config;
+mod commands;
 mod gamepad;
-mod gauge;
-mod linkage_lib;
 
-use config::config;
-use gauge::start_gauge_connection;
-use linkage_lib::{disable, enable, LinkageLibState};
+use commands::config::config;
+use commands::gauge::start_gauge_connection;
+use commands::linkage_lib::{disable, enable, LinkageLibState};
 
 fn main() {
     common::logging::setup_logger(7642).expect("should be able to start logger");

@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 common = { path = "../../common", features = ["logging", "messages"]}
+config = { path = "../../common/config" }
 ctrlc = { version = "3.2.5", features = ["termination"] }
 enum-iterator = "1.4.0"
 log = "0.4.17"

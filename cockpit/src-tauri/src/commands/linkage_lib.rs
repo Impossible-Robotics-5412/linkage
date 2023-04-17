@@ -8,10 +8,8 @@ use std::{
 };
 
 use bus::{Bus, BusReader};
-use common::{
-    config::Config,
-    messages::{CockpitToLinkage, Message},
-};
+use common::messages::{CockpitToLinkage, Message};
+use config::Config;
 use tauri::{Manager, Runtime};
 
 const EVENT_LINKAGE_LIB_STATE_CHANGE: &str = "linkage_lib_state_change";
@@ -41,7 +39,7 @@ pub fn enable<R: Runtime>(
     app: tauri::AppHandle<R>,
     state: tauri::State<'_, LinkageLibState>,
 ) -> Result<(), String> {
-    let config = common::config::config().map_err(|err| format!("Failed to load config: {err}"))?;
+    let config = config::config().map_err(|err| format!("Failed to load config: {err}"))?;
     log::debug!("Received enable command");
 
     state.disabled.store(false, Ordering::Relaxed);
