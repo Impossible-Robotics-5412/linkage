@@ -3,8 +3,6 @@ use std::time::Duration;
 use std::{process::Command, thread};
 use systemstat::{saturating_sub_bytes, Platform, System};
 
-const UPDATE_INTERVAL_MILLIS: u64 = 500;
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServiceInfo {
     pub carburetor_status: bool,
@@ -48,7 +46,7 @@ pub struct SystemInfo {
 }
 
 impl SystemInfo {
-    pub fn new(system: &systemstat::System) -> Self {
+    pub fn new(system: &System, delay: Duration) -> Self {
         let service_info = ServiceInfo {
             carburetor_status: service_is_active("carburetor.service"),
             gauge_status: service_is_active("gauge.service"),
@@ -56,7 +54,7 @@ impl SystemInfo {
         };
 
         Self {
-            cpu: get_cpu(system),
+            cpu: get_cpu(system, delay),
             memory: Memory {
                 swap: get_swap(system),
                 mem: get_mem(system),
@@ -94,10 +92,10 @@ fn get_cpu_temp(system: &System) -> Option<f32> {
     }
 }
 
-fn get_cpu(system: &System) -> Option<Cpu> {
+fn get_cpu(system: &System, delay: Duration) -> Option<Cpu> {
     match system.cpu_load_aggregate() {
         Ok(cpu) => {
-            thread::sleep(Duration::from_millis(UPDATE_INTERVAL_MILLIS));
+            thread::sleep(delay);
             match cpu.done() {
                 Ok(cpu_load) => Some(Cpu {
                     user: cpu_load.user * 100.0,

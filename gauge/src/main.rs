@@ -3,10 +3,13 @@ use std::net::{TcpListener, TcpStream};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread;
+use std::time::Duration;
 
 use crossbeam::channel::Receiver;
 use system_info::SystemInfo;
 use systemstat::Platform;
+
+const UPDATE_INTERVAL_MILLIS: u64 = 500;
 
 fn main() {
     let config = config::config().unwrap();
@@ -19,7 +22,8 @@ fn main() {
         let client_count = client_count.clone();
 
         move || loop {
-            let system_info = SystemInfo::new(&system);
+            let system_info =
+                SystemInfo::new(&system, Duration::from_millis(UPDATE_INTERVAL_MILLIS));
 
             if client_count.load(Ordering::Relaxed) == 0 {
                 continue;
