@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
 	import { tick } from 'svelte';
+	import { loggerState } from '$lib/logger';
 
 	export let stream: ReadableStream<Log> | undefined;
 	export let maxScrollback = 500;
@@ -57,17 +58,19 @@
 <div class="logger-output" bind:this={loggerElement}>
 	{#if stream}
 		{#each logs as log}
-			<div
-				class="line"
-				class:level-error={log.level === LogLevel.ERROR}
-				class:level-warn={log.level === LogLevel.WARN}
-				class:level-info={log.level === LogLevel.INFO}
-				class:level-debug={log.level === LogLevel.DEBUG}>
-				<span title={`${log.file}:${log.line}`}>
-					[{log.date.toLocaleTimeString()}
-					{logLevelLabel(log.level)}] {log.msg}
-				</span>
-			</div>
+			{#if log.level <= $loggerState.level}
+				<div
+					class="line"
+					class:level-error={log.level === LogLevel.ERROR}
+					class:level-warn={log.level === LogLevel.WARN}
+					class:level-info={log.level === LogLevel.INFO}
+					class:level-debug={log.level === LogLevel.DEBUG}>
+					<span title={`${log.file}:${log.line}`}>
+						[{log.date.toLocaleTimeString()}
+						{logLevelLabel(log.level)}] {log.msg}
+					</span>
+				</div>
+			{/if}
 		{/each}
 	{:else}
 		<div class="logger-closed-message">

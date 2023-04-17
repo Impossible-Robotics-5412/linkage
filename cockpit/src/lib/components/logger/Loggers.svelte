@@ -12,7 +12,7 @@
 			<select bind:value={$loggerState.selectedTabId}>
 				{#each Object.keys(tabs) as tabId}
 					<option value={tabId}>{tabs[tabId].name}</option>
-				{/each}	
+				{/each}
 			</select>
 
 			<select bind:value={$loggerState.level}>
