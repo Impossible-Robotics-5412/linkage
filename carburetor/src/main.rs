@@ -6,9 +6,6 @@ use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
 
-use common::logging::setup_logger;
-
-use common::messages::LinkageToCarburetor;
 #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
 use rppal::pwm::Channel;
 use simple_signal::{self, Signal};
@@ -21,6 +18,7 @@ mod instruction;
 
 #[cfg(not(all(target_arch = "arm", target_os = "linux", target_env = "gnu")))]
 use control_channel::Channel;
+use messaging::LinkageToCarburetor;
 
 const WELCOME_MESSAGE: &str = r#"
                    _
@@ -41,14 +39,14 @@ const PULSE_DELTA_US: u64 = 500;
 const PULSE_NEUTRAL_US: u64 = 1500;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    setup_logger(7644)?;
+    logging::setup_logger(7644)?;
 
     log::info!("{WELCOME_MESSAGE}");
 
     #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
     log::info!("Carburetor detected you are running on a Raspberry Pi!");
 
-    let config = common::config::config()?;
+    let config = config::config()?;
     let address = format!("0.0.0.0:{}", config.carburetor().port());
 
     log::info!("Setting up...");

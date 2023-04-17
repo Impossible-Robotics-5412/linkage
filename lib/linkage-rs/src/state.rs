@@ -1,7 +1,7 @@
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
-use common::messages::LinkageToCarburetor;
+use messaging::LinkageToCarburetor;
 
 use crate::gamepads::gamepad_manager::GamepadManager;
 

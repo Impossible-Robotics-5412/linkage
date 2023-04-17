@@ -111,6 +111,7 @@ pub fn config() -> Result<Config, Box<dyn Error>> {
             config_path.as_path().to_str().unwrap_or("UNKNOWN")
         );
     }
+
     let config_file = config::File::try_from(config_path)?;
 
     let config = config::Config::builder()

@@ -1,11 +1,10 @@
-use crate::config::AddressPort;
-
 use std::error::Error;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
 use bus::Bus;
+use config::AddressPort;
 use log::info;
 use serde::Serialize;
 

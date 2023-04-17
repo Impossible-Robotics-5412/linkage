@@ -1,6 +1,5 @@
-use common::messages::CockpitToLinkage;
-
 use super::gamepad::{EventType, Gamepad, GamepadData, GamepadId};
+use messaging::CockpitToLinkage;
 
 #[repr(usize)]
 pub enum GamepadIndex {

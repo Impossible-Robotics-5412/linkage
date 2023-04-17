@@ -6,7 +6,9 @@ authors.workspace = true
   
 [dependencies]
 simple-signal = "1.1.1"
-common = { path = "../common", features = ["logging", "messages", "config"]}
+logging = { path = "../common/logging" }
+messaging = { path = "../common/messaging" }
+config = { path = "../common/config"}
 log = "0.4.17"
 
 [target.'cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))'.dependencies]

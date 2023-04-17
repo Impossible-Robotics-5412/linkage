@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-
 use std::time::Duration;
 use std::{process::Command, thread};
 use systemstat::{saturating_sub_bytes, Platform, System};

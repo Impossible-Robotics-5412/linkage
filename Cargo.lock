@@ -51,13 +51,13 @@ checksum = "7de8ce5e0f9f8d88245311066a578d72b7af3e7088f32783804676302df237e4"
 
 [[package]]
 name = "async-trait"
-version = "0.1.65"
+version = "0.1.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "095183a3539c7c7649b2beb87c2d3f0591f3a7fed07761cc546d244e27e0238c"
+checksum = "b9ccdd8f2a161be9bd5c023df56f1b2a0bd1d83872ae53b71a84a12c9bf6e842"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.13",
 ]
 
 [[package]]
@@ -260,8 +260,10 @@ dependencies = [
 name = "carburetor"
 version = "0.1.0"
 dependencies = [
- "common",
+ "config 0.1.0",
  "log",
+ "logging",
+ "messaging",
  "rppal",
  "simple-signal",
 ]
@@ -333,11 +335,14 @@ name = "cockpit"
 version = "0.1.0"
 dependencies = [
  "bus",
- "common",
+ "config 0.1.0",
  "gilrs",
  "log",
+ "logging",
+ "messaging",
  "serde",
  "serde_json",
+ "system_info",
  "tauri",
  "tauri-build",
 ]
@@ -390,19 +395,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
+name = "config"
 version = "0.1.0"
 dependencies = [
- "bus",
- "config",
- "fern",
- "home",
- "log",
- "message_derive",
+ "config 0.13.3",
  "serde",
  "serde_json",
- "systemstat",
- "ws",
  "xdg",
 ]
 
@@ -999,10 +997,12 @@ dependencies = [
 name = "gauge"
 version = "0.1.0"
 dependencies = [
- "common",
+ "config 0.1.0",
  "crossbeam",
+ "messaging",
  "serde",
  "serde_json",
+ "system_info",
  "systemstat",
 ]
 
@@ -1674,10 +1674,12 @@ dependencies = [
 name = "linkage-rs"
 version = "0.1.0"
 dependencies = [
- "common",
+ "config 0.1.0",
  "ctrlc",
  "enum-iterator",
  "log",
+ "logging",
+ "messaging",
 ]
 
 [[package]]
@@ -1709,6 +1711,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if 1.0.0",
+]
+
+[[package]]
+name = "logging"
+version = "0.1.0"
+dependencies = [
+ "bus",
+ "config 0.1.0",
+ "fern",
+ "log",
+ "serde",
+ "serde_json",
+ "ws",
 ]
 
 [[package]]
@@ -1800,6 +1815,13 @@ version = "0.1.0"
 dependencies = [
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "messaging"
+version = "0.1.0"
+dependencies = [
+ "message_derive",
 ]
 
 [[package]]
@@ -2138,9 +2160,9 @@ checksum = "478c572c3d73181ff3c2539045f6eb99e5491218eae919370993b890cdbdd98e"
 
 [[package]]
 name = "pest"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "028accff104c4e513bad663bbcd2ad7cfd5304144404c31ed0a77ac103d00660"
+checksum = "7b1403e8401ad5dedea73c626b99758535b342502f8d1e361f4a2dd952749122"
 dependencies = [
  "thiserror",
  "ucd-trie",
@@ -2148,9 +2170,9 @@ dependencies = [
 
 [[package]]
 name = "pest_derive"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ac3922aac69a40733080f53c1ce7f91dcf57e1a5f6c52f421fadec7fbdc4b69"
+checksum = "be99c4c1d2fc2769b1d00239431d711d08f6efedcecb8b6e30707160aee99c15"
 dependencies = [
  "pest",
  "pest_generator",
@@ -2158,22 +2180,22 @@ dependencies = [
 
 [[package]]
 name = "pest_generator"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d06646e185566b5961b4058dd107e0a7f56e77c3f484549fb119867773c0f202"
+checksum = "e56094789873daa36164de2e822b3888c6ae4b4f9da555a1103587658c805b1e"
 dependencies = [
  "pest",
  "pest_meta",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.13",
 ]
 
 [[package]]
 name = "pest_meta"
-version = "2.5.5"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6f60b2ba541577e2a0c307c8f39d1439108120eb7903adeb6497fa880c59616"
+checksum = "6733073c7cff3d8459fda0e42f13a047870242aed8b509fe98000928975f359e"
 dependencies = [
  "once_cell",
  "pest",
@@ -2666,18 +2688,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.159"
+version = "1.0.160"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c04e8343c3daeec41f58990b9d77068df31209f2af111e059e9fe9646693065"
+checksum = "bb2f3770c8bce3bcda7e149193a069a0f4365bda1fa5cd88e03bca26afc1216c"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.159"
+version = "1.0.160"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c614d17805b093df4b147b51339e7e44bf05ef59fba1e45d83500bcfb4d8585"
+checksum = "291a097c63d8497e00160b166a967a4a79c64f3facdd01cbd7502231688d77df"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2686,9 +2708,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.95"
+version = "1.0.96"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d721eca97ac802aa7777b701877c8004d950fc142651367300d21c1cc0194744"
+checksum = "057d394a50403bcac12672b2b18fb387ab6d289d957dab67dd201875391e52f1"
 dependencies = [
  "itoa 1.0.6",
  "ryu",
@@ -2959,6 +2981,16 @@ dependencies = [
  "pkg-config",
  "toml 0.7.3",
  "version-compare 0.1.1",
+]
+
+[[package]]
+name = "system_info"
+version = "0.1.0"
+dependencies = [
+ "home",
+ "serde",
+ "serde_json",
+ "systemstat",
 ]
 
 [[package]]

@@ -2,8 +2,6 @@ use std::io::{self, Read};
 use std::sync::mpsc::channel;
 use std::sync::{Arc, Mutex};
 
-use common::logging::setup_logger;
-
 use crate::carburetor;
 use crate::cockpit;
 use crate::state::RobotState;
@@ -44,8 +42,8 @@ impl Robot {
     }
 
     pub fn run(mut self) {
-        setup_logger(7640).expect("logger should be able to start");
-        let config = common::config::config().expect("failed to load config");
+        logging::setup_logger(7640).expect("logger should be able to start");
+        let config = config::config().expect("failed to load config");
 
         let (carburetor_message_sender, carburetor_message_receiver) = channel();
 

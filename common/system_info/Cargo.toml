@@ -1,0 +1,12 @@
+[package]
+name = "system_info"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.152" }
+serde_json = { version = "1.0.95" }
+systemstat = { version = "0.2.3" }
+home = { version = "0.5.4" }
