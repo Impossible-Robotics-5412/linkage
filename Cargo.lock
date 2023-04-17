@@ -260,10 +260,10 @@ dependencies = [
 name = "carburetor"
 version = "0.1.0"
 dependencies = [
- "common",
  "config 0.1.0",
  "log",
  "logging",
+ "messaging",
  "rppal",
  "simple-signal",
 ]
@@ -335,11 +335,11 @@ name = "cockpit"
 version = "0.1.0"
 dependencies = [
  "bus",
- "common",
  "config 0.1.0",
  "gilrs",
  "log",
  "logging",
+ "messaging",
  "serde",
  "serde_json",
  "system_info",
@@ -392,14 +392,6 @@ checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
 dependencies = [
  "bytes 1.4.0",
  "memchr",
-]
-
-[[package]]
-name = "common"
-version = "0.1.0"
-dependencies = [
- "config 0.1.0",
- "message_derive",
 ]
 
 [[package]]
@@ -1005,9 +997,9 @@ dependencies = [
 name = "gauge"
 version = "0.1.0"
 dependencies = [
- "common",
  "config 0.1.0",
  "crossbeam",
+ "messaging",
  "serde",
  "serde_json",
  "system_info",
@@ -1682,12 +1674,12 @@ dependencies = [
 name = "linkage-rs"
 version = "0.1.0"
 dependencies = [
- "common",
  "config 0.1.0",
  "ctrlc",
  "enum-iterator",
  "log",
  "logging",
+ "messaging",
 ]
 
 [[package]]
@@ -1823,6 +1815,13 @@ version = "0.1.0"
 dependencies = [
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "messaging"
+version = "0.1.0"
+dependencies = [
+ "message_derive",
 ]
 
 [[package]]

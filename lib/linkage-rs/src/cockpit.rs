@@ -1,7 +1,6 @@
+use messaging::{Bytes, CockpitToLinkage};
 use std::io::{self, Read};
 use std::net::{TcpListener, TcpStream};
-
-use common::messages::{Bytes, CockpitToLinkage};
 
 use crate::state::RobotStateHandle;
 

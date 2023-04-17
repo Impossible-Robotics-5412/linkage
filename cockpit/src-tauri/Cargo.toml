@@ -16,7 +16,7 @@ edition = "2021"
 tauri-build = { version = "1.2", features = [] }
 
 [dependencies]
-common = { path = "../../common", features = ["messages"] }
+messaging = { path = "../../common/messaging" }
 logging = { path = "../../common/logging" }
 config = { path = "../../common/config" }
 system_info = { path = "../../common/system_info" }

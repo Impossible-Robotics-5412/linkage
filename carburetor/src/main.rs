@@ -6,7 +6,6 @@ use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
 
-use common::messages::LinkageToCarburetor;
 #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
 use rppal::pwm::Channel;
 use simple_signal::{self, Signal};
@@ -19,6 +18,7 @@ mod instruction;
 
 #[cfg(not(all(target_arch = "arm", target_os = "linux", target_env = "gnu")))]
 use control_channel::Channel;
+use messaging::LinkageToCarburetor;
 
 const WELCOME_MESSAGE: &str = r#"
                    _

@@ -8,8 +8,8 @@ use std::{
 };
 
 use bus::{Bus, BusReader};
-use common::messages::{CockpitToLinkage, Message};
 use config::Config;
+use messaging::{CockpitToLinkage, Message};
 use tauri::{Manager, Runtime};
 
 const EVENT_LINKAGE_LIB_STATE_CHANGE: &str = "linkage_lib_state_change";

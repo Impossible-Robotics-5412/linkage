@@ -5,8 +5,8 @@ use std::{
 };
 
 use bus::Bus;
-use common::messages::CockpitToLinkage;
 use gilrs::Gilrs;
+use messaging::CockpitToLinkage;
 
 #[repr(u8)]
 enum EventType {

@@ -1,4 +1,4 @@
-use common::messages::LinkageToCarburetor;
+use messaging::LinkageToCarburetor;
 
 use crate::state::RobotStateHandle;
 pub struct SparkMotorController {
