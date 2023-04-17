@@ -4,8 +4,8 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread;
 
-use common::system_info::SystemInfo;
 use crossbeam::channel::Receiver;
+use system_info::SystemInfo;
 use systemstat::Platform;
 
 fn main() {

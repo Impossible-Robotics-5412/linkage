@@ -5,7 +5,7 @@ use std::{
     thread,
 };
 
-use common::system_info::SystemInfo;
+use system_info::SystemInfo;
 use tauri::Manager;
 
 const EVENT_RECEIVED_SYSTEM_INFO: &str = "received_system_info";
