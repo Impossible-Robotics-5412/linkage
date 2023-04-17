@@ -26,7 +26,7 @@ export enum LogLevel {
 	 * The "debug" level.
 	 * Designates lower priority information.
 	 */
-	DEBUG,
+	DEBUG
 }
 
 export function logLevelLabel(level: LogLevel) {

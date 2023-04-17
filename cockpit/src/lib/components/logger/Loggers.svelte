@@ -16,10 +16,18 @@
 			</select>
 
 			<select bind:value={$loggerState.level}>
-				<option value={LogLevel.ERROR}>{logLevelLabel(LogLevel.ERROR)}</option>
-				<option value={LogLevel.WARN}>{logLevelLabel(LogLevel.WARN)}</option>
-				<option value={LogLevel.INFO}>{logLevelLabel(LogLevel.INFO)}</option>
-				<option value={LogLevel.DEBUG}>{logLevelLabel(LogLevel.DEBUG)}</option>
+				<option value={LogLevel.ERROR}>
+					{logLevelLabel(LogLevel.ERROR)}
+				</option>
+				<option value={LogLevel.WARN}>
+					{logLevelLabel(LogLevel.WARN)}
+				</option>
+				<option value={LogLevel.INFO}>
+					{logLevelLabel(LogLevel.INFO)}
+				</option>
+				<option value={LogLevel.DEBUG}>
+					{logLevelLabel(LogLevel.DEBUG)}
+				</option>
 			</select>
 		</div>
 	</div>
