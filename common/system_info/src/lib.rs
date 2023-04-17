@@ -3,16 +3,14 @@ use std::time::Duration;
 use std::{process::Command, thread};
 use systemstat::{saturating_sub_bytes, Platform, System};
 
-const UPDATE_INTERVAL_MILLIS: u64 = 500;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ServiceInfo {
     pub carburetor_status: bool,
     pub gauge_status: bool,
     pub linkage_socket_status: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Cpu {
     pub user: f32,
     pub system: f32,
@@ -20,25 +18,25 @@ pub struct Cpu {
     pub temp: Option<f32>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Swap {
     pub used: u64,
     pub total: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Mem {
     pub used: u64,
     pub total: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Memory {
     pub swap: Option<Swap>,
     pub mem: Option<Mem>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SystemInfo {
     pub cpu: Option<Cpu>,
     pub memory: Memory,
@@ -48,7 +46,7 @@ pub struct SystemInfo {
 }
 
 impl SystemInfo {
-    pub fn new(system: &systemstat::System) -> Self {
+    pub fn new(system: &System, delay: Duration) -> Self {
         let service_info = ServiceInfo {
             carburetor_status: service_is_active("carburetor.service"),
             gauge_status: service_is_active("gauge.service"),
@@ -56,7 +54,7 @@ impl SystemInfo {
         };
 
         Self {
-            cpu: get_cpu(system),
+            cpu: get_cpu(system, delay),
             memory: Memory {
                 swap: get_swap(system),
                 mem: get_mem(system),
@@ -94,10 +92,10 @@ fn get_cpu_temp(system: &System) -> Option<f32> {
     }
 }
 
-fn get_cpu(system: &System) -> Option<Cpu> {
+fn get_cpu(system: &System, delay: Duration) -> Option<Cpu> {
     match system.cpu_load_aggregate() {
         Ok(cpu) => {
-            thread::sleep(Duration::from_millis(UPDATE_INTERVAL_MILLIS));
+            thread::sleep(delay);
             match cpu.done() {
                 Ok(cpu_load) => Some(Cpu {
                     user: cpu_load.user * 100.0,
@@ -151,5 +149,58 @@ fn get_mem(system: &System) -> Option<Mem> {
             println!("Failed to get mem: {}", error);
             None
         }
+    }
+}
+
+pub fn encode_system_info(system_info: &SystemInfo) -> String {
+    // Jsonify the system info.
+    let mut json_string = serde_json::to_string(system_info).unwrap();
+    json_string.push('\n');
+    json_string
+}
+
+pub fn decode_system_info_from_string(data: String) -> SystemInfo {
+    serde_json::from_str(data.trim()).unwrap()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        decode_system_info_from_string, encode_system_info, Cpu, Mem, Memory, ServiceInfo, Swap,
+        SystemInfo,
+    };
+
+    #[test]
+    fn encode_decode() {
+        let mock_system_info = SystemInfo {
+            cpu: Some(Cpu {
+                user: 42.0,
+                system: 43.0,
+                idle: 44.0,
+                temp: Some(45.0),
+            }),
+            memory: Memory {
+                swap: Some(Swap {
+                    used: 46,
+                    total: 47,
+                }),
+                mem: Some(Mem {
+                    used: 48,
+                    total: 49,
+                }),
+            },
+            uptime: Some(50),
+            service_info: ServiceInfo {
+                carburetor_status: true,
+                gauge_status: true,
+                linkage_socket_status: true,
+            },
+            robot_code_exists: true,
+        };
+
+        let encoded = encode_system_info(&mock_system_info);
+        let decoded = decode_system_info_from_string(encoded);
+
+        assert_eq!(decoded, mock_system_info);
     }
 }
