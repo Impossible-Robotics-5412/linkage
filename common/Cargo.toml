@@ -4,17 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-logging = ["dep:config", "dep:log", "dep:fern", "dep:ws", "dep:bus"]
 messages = ["dep:message_derive"]
 
 [dependencies]
 config = { path = "config", optional = true }
 message_derive = { path = "message_derive", optional = true }
-
-log = { version = "0.4.17", optional = true }
-fern = { version = "0.6.2", optional = true }
-ws = { version = "0.9.2", optional = true }
-bus = { version = "2.4.0", optional = true }
-# Still needed for logging
-serde = "1.0.160"
-serde_json = "1.0.96"

@@ -263,6 +263,7 @@ dependencies = [
  "common",
  "config 0.1.0",
  "log",
+ "logging",
  "rppal",
  "simple-signal",
 ]
@@ -338,6 +339,7 @@ dependencies = [
  "config 0.1.0",
  "gilrs",
  "log",
+ "logging",
  "serde",
  "serde_json",
  "system_info",
@@ -396,14 +398,8 @@ dependencies = [
 name = "common"
 version = "0.1.0"
 dependencies = [
- "bus",
  "config 0.1.0",
- "fern",
- "log",
  "message_derive",
- "serde",
- "serde_json",
- "ws",
 ]
 
 [[package]]
@@ -1691,6 +1687,7 @@ dependencies = [
  "ctrlc",
  "enum-iterator",
  "log",
+ "logging",
 ]
 
 [[package]]
@@ -1722,6 +1719,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if 1.0.0",
+]
+
+[[package]]
+name = "logging"
+version = "0.1.0"
+dependencies = [
+ "bus",
+ "config 0.1.0",
+ "fern",
+ "log",
+ "serde",
+ "serde_json",
+ "ws",
 ]
 
 [[package]]

@@ -6,7 +6,8 @@ authors.workspace = true
   
 [dependencies]
 simple-signal = "1.1.1"
-common = { path = "../common", features = ["logging", "messages"]}
+common = { path = "../common", features = ["messages"]}
+logging = { path = "../common/logging" }
 config = { path = "../common/config"}
 log = "0.4.17"
 

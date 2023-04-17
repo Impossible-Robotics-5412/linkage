@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-common = { path = "../../common", features = ["logging", "messages"]}
+common = { path = "../../common", features = ["messages"]}
+logging = { path = "../../common/logging" }
 config = { path = "../../common/config" }
+
 ctrlc = { version = "3.2.5", features = ["termination"] }
 enum-iterator = "1.4.0"
 log = "0.4.17"
