@@ -27,11 +27,6 @@ export enum LogLevel {
 	 * Designates lower priority information.
 	 */
 	DEBUG,
-	/**
-	 * The "trace" level.
-	 * Designates very low priority, often extremely verbose, information.
-	 */
-	TRACE
 }
 
 export function logLevelLabel(level: LogLevel) {
@@ -44,8 +39,6 @@ export function logLevelLabel(level: LogLevel) {
 			return 'Info';
 		case LogLevel.DEBUG:
 			return 'Debug';
-		case LogLevel.TRACE:
-			return 'Trace';
 	}
 }
 
