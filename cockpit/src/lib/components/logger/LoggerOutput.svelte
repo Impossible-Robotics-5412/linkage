@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
 	import { tick } from 'svelte';
+	import { loggerState } from '$lib/logger';
 
 	export let stream: ReadableStream<Log> | undefined;
 	export let maxScrollback = 500;
@@ -30,15 +31,15 @@
 			if (logs.length > maxScrollback) logs.shift();
 			logs = logs;
 		}
-		reader.cancel();
-		stream?.cancel();
+		await reader.cancel();
+		await stream?.cancel();
 	}
 
 	async function scrollToBottom() {
 		if (!loggerElement) return;
 
 		// BUG: When we press the Enable/Disable button this won't update
-		//	 	as the scrollheight is 0 because we just made the other log invisible.
+		// 		as the scrollheight is 0 because we just made the other log invisible.
 		const isScrolledToBottom =
 			loggerElement.scrollHeight - loggerElement.clientHeight <=
 			loggerElement.scrollTop + 32;
@@ -57,18 +58,19 @@
 <div class="logger-output" bind:this={loggerElement}>
 	{#if stream}
 		{#each logs as log}
-			<div
-				class="line"
-				class:level-error={log.level === LogLevel.ERROR}
-				class:level-warn={log.level === LogLevel.WARN}
-				class:level-info={log.level === LogLevel.INFO}
-				class:level-debug={log.level === LogLevel.DEBUG}
-				class:level-trace={log.level === LogLevel.TRACE}>
-				<span title={`${log.file}:${log.line}`}>
-					[{log.date.toLocaleTimeString()}
-					{logLevelLabel(log.level)}] {log.msg}
-				</span>
-			</div>
+			{#if log.level <= $loggerState.level}
+				<div
+					class="line"
+					class:level-error={log.level === LogLevel.ERROR}
+					class:level-warn={log.level === LogLevel.WARN}
+					class:level-info={log.level === LogLevel.INFO}
+					class:level-debug={log.level === LogLevel.DEBUG}>
+					<span title={`${log.file}:${log.line}`}>
+						[{log.date.toLocaleTimeString()}
+						{logLevelLabel(log.level)}] {log.msg}
+					</span>
+				</div>
+			{/if}
 		{/each}
 	{:else}
 		<div class="logger-closed-message">
@@ -158,5 +160,4 @@
 	);
 	@include log-level('.level-info', $c-primary, $c-background, $c-gray-2);
 	@include log-level('.level-debug', $c-secondary, $c-background, $c-gray-2);
-	@include log-level('.level-trace', $c-secondary, $c-background, $c-gray-2);
 </style>
