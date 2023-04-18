@@ -10,8 +10,8 @@ pub trait Message: TryFrom<Bytes> + Into<Bytes> {
     fn to_bytes(&self) -> Bytes;
 }
 
-// Backend ------> Linkage Lib
-#[derive(Debug, Clone, Copy)]
+// Cockpit ------> Linkage Lib
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CockpitToLinkage {
     GamepadInputEvent {
         gamepad_id: u8,
@@ -61,7 +61,7 @@ impl From<CockpitToLinkage> for Bytes {
 }
 
 // Linkage ------> Carburetor
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LinkageToCarburetor {
     MotorInstruction { channel: u8, speed: f32 },
 }
@@ -95,5 +95,92 @@ impl From<LinkageToCarburetor> for Bytes {
                 [0x40, channel, 0, 0, speed[0], speed[1], speed[2], speed[3]]
             }
         }
+    }
+}
+
+impl Message for LinkageToCarburetor {
+    fn to_bytes(&self) -> Bytes {
+        Bytes::from(*self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{CockpitToLinkage, LinkageToCarburetor, Message};
+
+    #[test]
+    fn cockpit_to_linkage_try_from_bytes() {
+        let message = CockpitToLinkage::try_from([0x20, 0, 0, 0, 42, 43, 44, 45]).unwrap();
+
+        assert_eq!(
+            message,
+            CockpitToLinkage::GamepadInputEvent {
+                gamepad_id: 42,
+                event_type: 43,
+                control: 44,
+                value: 45,
+            }
+        )
+    }
+
+    #[test]
+    fn cockpit_to_linkage_try_from_bytes_wrong_unused_bytes() {
+        let result = CockpitToLinkage::try_from([0x20, 69, 69, 69, 42, 43, 44, 45]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn cockpit_to_linkage_try_from_bytes_wrong_instruction() {
+        let result = CockpitToLinkage::try_from([0x10, 0, 0, 0, 42, 43, 44, 45]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn bytes_from_cockpit_to_linkage() {
+        let bytes = CockpitToLinkage::GamepadInputEvent {
+            gamepad_id: 42,
+            event_type: 43,
+            control: 44,
+            value: 45,
+        }
+        .to_bytes();
+
+        assert_eq!(bytes, [0x20, 0, 0, 0, 42, 43, 44, 45])
+    }
+
+    #[test]
+    fn linkage_to_carburetor_from_bytes() {
+        let message = LinkageToCarburetor::try_from([0x40, 1, 0, 0, 63, 49, 183, 23]).unwrap();
+
+        assert_eq!(
+            message,
+            LinkageToCarburetor::MotorInstruction {
+                channel: 1,
+                speed: 0.69420f32
+            }
+        )
+    }
+
+    #[test]
+    fn linkage_to_carburetor_from_bytes_wrong_instruction() {
+        let result = LinkageToCarburetor::try_from([0x10, 1, 0, 0, 63, 49, 183, 23]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn linkage_to_carburetor_from_bytes_wrong_unused_bytes() {
+        let result = LinkageToCarburetor::try_from([0x40, 1, 69, 69, 63, 49, 183, 23]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn bytes_from_linkage_to_carburetor() {
+        let bytes = LinkageToCarburetor::MotorInstruction {
+            channel: 1,
+            speed: 0.69420f32,
+        }
+        .to_bytes();
+
+        assert_eq!(bytes, [0x40, 1, 0, 0, 63, 49, 183, 23])
     }
 }

@@ -1,6 +1,6 @@
 use super::Bytes;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MessageError {
     UnknownMessage(Bytes),
 }
