@@ -1,3 +1,4 @@
+use std::io::ErrorKind;
 use std::time::Duration;
 use std::{
     io::{BufRead, BufReader},
@@ -28,9 +29,14 @@ pub fn start_gauge_connection<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Re
                         on_receive_system_info(&app, decode_system_info_from_string(json_string))
                             .unwrap();
                     }
-                    Err(error) => {
-                        log::error!("Failed to read message from Gauge TcpStream: {error}")
+                    Err(error) if error.kind() != ErrorKind::WouldBlock => {
+                        log::error!(
+                            "Failed to read message from Gauge TcpStream: {}, {}",
+                            error.kind(),
+                            error
+                        )
                     }
+                    _ => {}
                 }
             }
         }

@@ -54,7 +54,12 @@ pub fn enable<R: Runtime>(
             let mut socket = TcpStream::connect(socket_address.to_string()).unwrap();
 
             // Make sure the service has started
-            socket.read_exact(&mut [0]).unwrap();
+            if let Err(_) = socket.read_exact(&mut [0]) {
+                disabled.store(true, Ordering::Relaxed);
+                log::warn!("Failed to check if Linkage service has been started. Disabling...");
+                _ = socket.shutdown(std::net::Shutdown::Both);
+                return;
+            }
 
             log::debug!("Started Linkage-lib socket.");
             app.emit_all(
