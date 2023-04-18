@@ -39,6 +39,7 @@ jobs:
       - name: cargo fmt --check
         run: cargo fmt --check
   clippy:
+    needs: deps
     runs-on: ubuntu-latest
     name: ${{ matrix.toolchain }} / clippy
     permissions:
@@ -62,6 +63,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
   doc:
+    needs: deps
     runs-on: ubuntu-latest
     name: nightly / doc
     steps:
