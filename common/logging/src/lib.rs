@@ -62,16 +62,19 @@ impl Logger {
                     let log_rx = self.log_rx.clone();
                     let log_history = history.lock().unwrap().to_vec();
 
-                    if let Ok(log_history_json) = log_vec_to_json(&log_history) {
-                        frontend.send(ws::Message::Text(log_history_json)).unwrap()
-                    }
-
                     thread::spawn({
-                        move || loop {
-                            if let Ok(json_log) = log_rx.recv() {
-                                let log = json_to_log(&json_log).unwrap();
-                                let json_logs = log_vec_to_json(&vec![log]).unwrap();
-                                frontend.send(ws::Message::Text(json_logs)).unwrap()
+                        move || {
+                            // Send log history first.
+                            if let Ok(log_history_json) = log_vec_to_json(&log_history) {
+                                frontend.send(ws::Message::Text(log_history_json)).unwrap()
+                            }
+
+                            loop {
+                                if let Ok(json_log) = log_rx.recv() {
+                                    let log = json_to_log(&json_log).unwrap();
+                                    let json_logs = log_vec_to_json(&vec![log]).unwrap();
+                                    frontend.send(ws::Message::Text(json_logs)).unwrap()
+                                }
                             }
                         }
                     });
