@@ -7,7 +7,8 @@ import { invoke } from '@tauri-apps/api/tauri';
 export const systemInfo = writable<SystemInfo | undefined>(
 	undefined,
 	$systemInfo => {
-		// TODO: Periodically if we have a connection with the robot. Currently you have to reload the app to
+		// TODO: Periodically if we have a connection with the robot.
+		//  	 Currently you have to reload the app to
 		//       Connect after a restart of the robot.
 
 		const timeout_ms = 1000;

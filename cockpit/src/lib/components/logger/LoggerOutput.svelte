@@ -25,8 +25,6 @@
 				break;
 			}
 
-			value.date = new Date();
-
 			logs.push(value);
 			if (logs.length > maxScrollback) logs.shift();
 			logs = logs;
@@ -38,7 +36,7 @@
 	async function scrollToBottom() {
 		if (!loggerElement) return;
 
-		// BUG: When we press the Enable/Disable button this won't update
+		// BUG:	When we press the Enable/Disable button this won't update
 		// 		as the scrollheight is 0 because we just made the other log invisible.
 		const isScrolledToBottom =
 			loggerElement.scrollHeight - loggerElement.clientHeight <=
@@ -66,7 +64,7 @@
 					class:level-info={log.level === LogLevel.INFO}
 					class:level-debug={log.level === LogLevel.DEBUG}>
 					<span title={`${log.file}:${log.line}`}>
-						[{log.date.toLocaleTimeString()}
+						[{log.timestampString}
 						{logLevelLabel(log.level)}] {log.msg}
 					</span>
 				</div>

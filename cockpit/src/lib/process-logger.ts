@@ -3,7 +3,8 @@ export interface Log {
 	level: LogLevel;
 	file?: string;
 	line?: number;
-	date: Date;
+	timestamp: number;
+	timestampString: string;
 }
 
 export enum LogLevel {
@@ -63,6 +64,7 @@ export class ProcessLogger {
 							msg => {
 								const log: Log = JSON.parse(msg.data);
 								log.msg = log.msg.trimEnd();
+								log.timestampString = new Date(log.timestamp).toLocaleTimeString()
 								controller.enqueue(log);
 							}
 						);
