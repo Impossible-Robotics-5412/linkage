@@ -13,6 +13,7 @@ env:
   CARGO_TERM_COLOR: always
 jobs:
   deps:
+    runs-on: ubuntu-latest
     name: Install dependencies
     steps:
       - run: >-
