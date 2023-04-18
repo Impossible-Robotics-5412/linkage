@@ -60,7 +60,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
   doc:
-    needs: deps
     runs-on: ubuntu-latest
     name: nightly / doc
     steps:

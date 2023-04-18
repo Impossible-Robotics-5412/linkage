@@ -45,7 +45,6 @@ jobs:
       - name: cargo test --doc
         run: cargo test --locked --all-features --doc
   minimal:
-    needs: deps
     runs-on: ubuntu-latest
     name: ubuntu / stable / minimal-versions
     steps:
