@@ -1,10 +1,15 @@
+extern crate core;
+
 use config::AddressPort;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Clone, Serialize)]
+type SingleLogJsonString = String;
+type MultipleLogsJsonString = String;
+
+#[derive(Clone, Serialize, Deserialize)]
 struct Log {
     msg: String,
     level: u8,
@@ -15,17 +20,17 @@ struct Log {
 
 pub struct Logger {
     port: AddressPort,
-    history: Arc<Mutex<Vec<String>>>,
-    fern_tx: std::sync::mpsc::Sender<String>,
-    fern_rx: std::sync::mpsc::Receiver<String>,
-    log_tx: crossbeam::channel::Sender<String>,
-    log_rx: crossbeam::channel::Receiver<String>,
+    history: Arc<Mutex<Vec<Log>>>,
+    fern_tx: std::sync::mpsc::Sender<SingleLogJsonString>,
+    fern_rx: std::sync::mpsc::Receiver<SingleLogJsonString>,
+    log_tx: crossbeam::channel::Sender<MultipleLogsJsonString>,
+    log_rx: crossbeam::channel::Receiver<MultipleLogsJsonString>,
 }
 
 impl Logger {
     pub fn new(port: AddressPort) -> Self {
-        let (fern_tx, fern_rx) = std::sync::mpsc::channel::<String>();
-        let (log_tx, log_rx) = crossbeam::channel::unbounded::<String>();
+        let (fern_tx, fern_rx) = std::sync::mpsc::channel::<SingleLogJsonString>();
+        let (log_tx, log_rx) = crossbeam::channel::unbounded::<MultipleLogsJsonString>();
         Self {
             port,
             fern_tx,
@@ -43,7 +48,9 @@ impl Logger {
             let history = self.history.clone();
             move || loop {
                 let json_log = self.fern_rx.recv().unwrap();
-                history.lock().unwrap().push(json_log.clone());
+                if let Ok(log) = json_to_log(&json_log) {
+                    history.lock().unwrap().push(log);
+                }
                 self.log_tx.send(json_log).unwrap();
             }
         });
@@ -53,17 +60,18 @@ impl Logger {
             move || {
                 ws::listen(format!("0.0.0.0:{}", self.port), |frontend| {
                     let log_rx = self.log_rx.clone();
+                    let log_history = history.lock().unwrap().to_vec();
 
-                    for json_log in history.lock().unwrap().as_slice() {
-                        frontend
-                            .send(ws::Message::Text(json_log.to_owned()))
-                            .unwrap()
+                    if let Ok(log_history_json) = log_vec_to_json(&log_history) {
+                        frontend.send(ws::Message::Text(log_history_json)).unwrap()
                     }
 
                     thread::spawn({
                         move || loop {
                             if let Ok(json_log) = log_rx.recv() {
-                                frontend.send(ws::Message::Text(json_log)).unwrap()
+                                let log = json_to_log(&json_log).unwrap();
+                                let json_logs = log_vec_to_json(&vec![log]).unwrap();
+                                frontend.send(ws::Message::Text(json_logs)).unwrap()
                             }
                         }
                     });
@@ -77,7 +85,7 @@ impl Logger {
         log::info!("Logger started on port {}", self.port);
     }
 
-    fn setup_fern(&self, fern_tx: std::sync::mpsc::Sender<String>) {
+    fn setup_fern(&self, fern_tx: std::sync::mpsc::Sender<SingleLogJsonString>) {
         fern::Dispatch::new()
             .chain(
                 fern::Dispatch::new()
@@ -101,7 +109,7 @@ impl Logger {
                                 .expect("SystemTime before UNIX EPOCH!")
                                 .as_millis(),
                         };
-                        let json_log = serde_json::to_string(&log).unwrap();
+                        let json_log = log_to_json(&log).unwrap();
                         out.finish(format_args!("{json_log}"));
                     })
                     .chain(fern_tx),
@@ -109,4 +117,16 @@ impl Logger {
             .apply()
             .expect("should connect fern to sender");
     }
+}
+
+fn log_vec_to_json(logs: &Vec<Log>) -> serde_json::Result<MultipleLogsJsonString> {
+    serde_json::to_string(logs.as_slice())
+}
+
+fn json_to_log(json: &SingleLogJsonString) -> serde_json::Result<Log> {
+    serde_json::from_value(json.parse().unwrap())
+}
+
+fn log_to_json(log: &Log) -> serde_json::Result<SingleLogJsonString> {
+    serde_json::to_string(&log)
 }
