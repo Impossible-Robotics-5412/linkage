@@ -23,6 +23,8 @@ impl Subsystem for TankDrivetrainSubsystem {
             left_motor.set_speed_percentage(gamepad.left_joystick_y());
             right_motor.set_speed_percentage(gamepad.right_joystick_y());
         }
+
+        log::warn!("test");
     }
 }
 

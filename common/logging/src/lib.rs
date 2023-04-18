@@ -4,7 +4,7 @@ use config::AddressPort;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 type SingleLogJsonString = String;
 type MultipleLogsJsonString = String;
@@ -69,11 +69,24 @@ impl Logger {
                                 frontend.send(ws::Message::Text(log_history_json)).unwrap()
                             }
 
+                            let interval_backlog = Arc::new(Mutex::new(Vec::<Log>::new()));
+
+                            thread::spawn({
+                                let interval_backlog = Arc::clone(&interval_backlog);
+                                move || loop {
+                                    let json_logs =
+                                        log_vec_to_json(&interval_backlog.lock().unwrap()).unwrap();
+                                    frontend.send(ws::Message::Text(json_logs)).unwrap();
+                                    interval_backlog.lock().unwrap().clear();
+
+                                    thread::sleep(Duration::from_millis(100));
+                                }
+                            });
+
                             loop {
                                 if let Ok(json_log) = log_rx.recv() {
                                     let log = json_to_log(&json_log).unwrap();
-                                    let json_logs = log_vec_to_json(&vec![log]).unwrap();
-                                    frontend.send(ws::Message::Text(json_logs)).unwrap()
+                                    interval_backlog.lock().unwrap().push(log);
                                 }
                             }
                         }
