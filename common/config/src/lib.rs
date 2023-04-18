@@ -112,11 +112,11 @@ pub fn config() -> Result<Config, Box<dyn Error>> {
         );
     }
 
-    let config_file = config::File::try_from(config_path)?;
+    let config_file = config_crate::File::try_from(config_path)?;
 
-    let config = config::Config::builder()
+    let config = config_crate::Config::builder()
         .add_source(config_file)
-        .add_source(config::Environment::with_prefix("LINKAGE"))
+        .add_source(config_crate::Environment::with_prefix("LINKAGE"))
         .build()
         .unwrap()
         .try_deserialize::<Config>()?;
