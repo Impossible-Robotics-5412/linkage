@@ -1,88 +1,112 @@
-use std::error::Error;
-use std::sync::mpsc::{channel, Sender};
+use config::AddressPort;
+use serde::Serialize;
 use std::sync::{Arc, Mutex};
 use std::thread;
-
-use bus::Bus;
-use config::AddressPort;
-use log::info;
-use serde::Serialize;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Clone, Serialize)]
-struct Log<'a> {
+struct Log {
     msg: String,
     level: u8,
-    file: Option<&'a str>,
+    file: Option<String>,
     line: Option<u32>,
+    timestamp: u128,
 }
 
-pub fn setup_logger(port: AddressPort) -> Result<(), Box<dyn Error>> {
-    let (log_tx, log_rx) = channel::<String>();
-    let log_bus = Arc::new(Mutex::new(Bus::<String>::new(1024)));
-
-    setup_fern(log_tx);
-
-    let broadcaster_log_bus = log_bus.clone();
-    thread::spawn(move || loop {
-        let json_log = log_rx.recv().unwrap();
-        broadcaster_log_bus.lock().unwrap().broadcast(json_log);
-    });
-
-    start_websocket_server(port, log_bus);
-
-    info!("Logger has been started on port {port}");
-
-    Ok(())
+pub struct Logger {
+    port: AddressPort,
+    history: Arc<Mutex<Vec<String>>>,
+    fern_tx: std::sync::mpsc::Sender<String>,
+    fern_rx: std::sync::mpsc::Receiver<String>,
+    log_tx: crossbeam::channel::Sender<String>,
+    log_rx: crossbeam::channel::Receiver<String>,
 }
 
-fn setup_fern(sender: Sender<String>) {
-    fern::Dispatch::new()
-        .chain(
-            fern::Dispatch::new()
-                .level(log::LevelFilter::Debug)
-                .format(|out, message, record| {
-                    out.finish(format_args!("[{}] {}", record.level(), message));
-                })
-                .chain(std::io::stdout()),
-        )
-        .chain(
-            fern::Dispatch::new()
-                .level(log::LevelFilter::Debug)
-                .format(|out, message, record| {
-                    let log = Log {
-                        msg: message.to_string(),
-                        level: record.level() as u8,
-                        file: record.file(),
-                        line: record.line(),
-                    };
-                    let json_log = serde_json::to_string(&log).unwrap();
-                    out.finish(format_args!("{json_log}"));
-                })
-                .chain(sender),
-        )
-        .apply()
-        .expect("should connect fern to sender");
-}
+impl Logger {
+    pub fn new(port: AddressPort) -> Self {
+        let (fern_tx, fern_rx) = std::sync::mpsc::channel::<String>();
+        let (log_tx, log_rx) = crossbeam::channel::unbounded::<String>();
+        Self {
+            port,
+            fern_tx,
+            fern_rx,
+            log_tx,
+            log_rx,
+            history: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
 
-fn start_websocket_server(port: AddressPort, log_bus: Arc<Mutex<Bus<String>>>) {
-    thread::spawn(move || {
-        ws::listen(format!("0.0.0.0:{port}"), |frontend| {
-            let log_bus = log_bus.clone();
-            thread::spawn({
-                // BUG: We dont show the backlog of messages before the logger is connected.
-                //      We should support sending a backlog of all messages
-                //      sent before connecting with the logger.
-                let mut log_bus_rx = log_bus.lock().unwrap().add_rx();
+    pub fn start(self) {
+        self.setup_fern(self.fern_tx.clone());
 
-                move || loop {
-                    if let Ok(json_log) = log_bus_rx.recv() {
-                        frontend.send(ws::Message::Text(json_log)).unwrap()
+        thread::spawn({
+            let history = self.history.clone();
+            move || loop {
+                let json_log = self.fern_rx.recv().unwrap();
+                history.lock().unwrap().push(json_log.clone());
+                self.log_tx.send(json_log).unwrap();
+            }
+        });
+
+        thread::spawn({
+            let history = self.history.clone();
+            move || {
+                ws::listen(format!("0.0.0.0:{}", self.port), |frontend| {
+                    let log_rx = self.log_rx.clone();
+
+                    for json_log in history.lock().unwrap().as_slice() {
+                        frontend
+                            .send(ws::Message::Text(json_log.to_owned()))
+                            .unwrap()
                     }
-                }
-            });
 
-            |_msg| Ok(())
-        })
-        .unwrap();
-    });
+                    thread::spawn({
+                        move || loop {
+                            if let Ok(json_log) = log_rx.recv() {
+                                frontend.send(ws::Message::Text(json_log)).unwrap()
+                            }
+                        }
+                    });
+
+                    |_msg| Ok(())
+                })
+                .unwrap();
+            }
+        });
+
+        log::info!("Logger started on port {}", self.port);
+    }
+
+    fn setup_fern(&self, fern_tx: std::sync::mpsc::Sender<String>) {
+        fern::Dispatch::new()
+            .chain(
+                fern::Dispatch::new()
+                    .level(log::LevelFilter::Debug)
+                    .format(|out, message, record| {
+                        out.finish(format_args!("[{}] {}", record.level(), message));
+                    })
+                    .chain(std::io::stdout()),
+            )
+            .chain(
+                fern::Dispatch::new()
+                    .level(log::LevelFilter::Debug)
+                    .format(|out, message, record| {
+                        let log = Log {
+                            msg: message.to_string(),
+                            level: record.level() as u8,
+                            file: record.file().map(|f| f.to_string()),
+                            line: record.line(),
+                            timestamp: SystemTime::now()
+                                .duration_since(UNIX_EPOCH)
+                                .expect("SystemTime before UNIX EPOCH!")
+                                .as_millis(),
+                        };
+                        let json_log = serde_json::to_string(&log).unwrap();
+                        out.finish(format_args!("{json_log}"));
+                    })
+                    .chain(fern_tx),
+            )
+            .apply()
+            .expect("should connect fern to sender");
+    }
 }

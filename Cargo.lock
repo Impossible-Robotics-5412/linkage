@@ -1717,8 +1717,8 @@ dependencies = [
 name = "logging"
 version = "0.1.0"
 dependencies = [
- "bus",
  "config 0.1.0",
+ "crossbeam",
  "fern",
  "log",
  "serde",

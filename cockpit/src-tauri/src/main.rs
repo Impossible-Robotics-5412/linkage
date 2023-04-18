@@ -9,7 +9,7 @@ use commands::gauge::start_gauge_connection;
 use commands::linkage_lib::{disable, enable, LinkageLibState};
 
 fn main() {
-    logging::setup_logger(7642).expect("should be able to start logger");
+    logging::Logger::new(7642).start();
 
     let gamepad_event_bus = gamepad::start_event_listener();
 

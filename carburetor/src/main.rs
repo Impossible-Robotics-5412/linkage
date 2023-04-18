@@ -39,7 +39,7 @@ const PULSE_DELTA_US: u64 = 500;
 const PULSE_NEUTRAL_US: u64 = 1500;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    logging::setup_logger(7644)?;
+    logging::Logger::new(7644).start();
 
     log::info!("{WELCOME_MESSAGE}");
 
