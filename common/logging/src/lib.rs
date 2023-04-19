@@ -9,7 +9,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 type SingleLogJsonString = String;
 type MultipleLogsJsonString = String;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct Log {
     msg: String,
     level: u8,
@@ -55,6 +55,8 @@ impl Logger {
             }
         });
 
+        // BUG: When reloading the app this thread doesn't close.
+        //      Maybe the one above too, not tested yet.
         thread::spawn({
             let history = self.history.clone();
             move || {
@@ -69,15 +71,18 @@ impl Logger {
                                 frontend.send(ws::Message::Text(log_history_json)).unwrap()
                             }
 
+                            // Periodically send logs.
                             let interval_backlog = Arc::new(Mutex::new(Vec::<Log>::new()));
-
                             thread::spawn({
                                 let interval_backlog = Arc::clone(&interval_backlog);
                                 move || loop {
-                                    let json_logs =
-                                        log_vec_to_json(&interval_backlog.lock().unwrap()).unwrap();
-                                    frontend.send(ws::Message::Text(json_logs)).unwrap();
-                                    interval_backlog.lock().unwrap().clear();
+                                    if interval_backlog.lock().unwrap().len() > 0 {
+                                        let json_logs =
+                                            log_vec_to_json(&interval_backlog.lock().unwrap())
+                                                .unwrap();
+                                        frontend.send(ws::Message::Text(json_logs)).unwrap();
+                                        *interval_backlog.lock().unwrap() = Vec::new();
+                                    }
 
                                     thread::sleep(Duration::from_millis(100));
                                 }
