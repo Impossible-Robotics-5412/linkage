@@ -1,3 +1,9 @@
+//! Gamepads are input devices to control your robot.
+
 pub mod gamepad;
-pub mod gamepad_manager;
-pub mod ps_controller;
+mod gamepad_manager;
+mod ps_controller;
+
+pub use gamepad::Gamepad;
+pub use gamepad_manager::{AssociatedGamepad, GamepadManager};
+pub use ps_controller::PsController;

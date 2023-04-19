@@ -3,19 +3,10 @@ use std::io::{self, ErrorKind};
 
 use enum_iterator::Sequence;
 
-pub type GamepadId = u8;
-
 const AXIS_DEFAULT: u8 = 127;
 const BUTTON_DEFAULT: u8 = 0;
 
-#[repr(u8)]
-#[allow(dead_code)]
-pub(crate) enum EventType {
-    ButtonChanged = 0,
-    AxisChanged = 1,
-    Connected = 2,
-    Disconnected = 3,
-}
+pub type GamepadId = u8;
 
 impl TryFrom<u8> for EventType {
     type Error = io::Error;
@@ -38,10 +29,11 @@ impl TryFrom<u8> for EventType {
     }
 }
 
+/// Represents different button controls on a gamepad.
 #[repr(u8)]
 #[allow(dead_code)]
 #[derive(Sequence)]
-pub(crate) enum ButtonControl {
+pub enum ButtonControl {
     // Action Pad
     South = 1,
     East = 2,
@@ -70,10 +62,11 @@ pub(crate) enum ButtonControl {
     Unknown = 0,
 }
 
+/// Represents different axis controls on a gamepad.
 #[repr(u8)]
 #[allow(dead_code)]
 #[derive(Sequence)]
-pub(crate) enum AxisControl {
+pub enum AxisControl {
     LeftStickX = 1,
     LeftStickY = 2,
     LeftZ = 3,
@@ -85,15 +78,16 @@ pub(crate) enum AxisControl {
     Unknown = 0,
 }
 
+/// Represents the data for a specific gamepad.
 #[derive(Default, Debug, Clone)]
 pub struct GamepadData {
     gamepad_id: GamepadId,
-    pub(crate) buttons: HashMap<u8, u8>,
-    pub(crate) axis: HashMap<u8, u8>,
+    pub buttons: HashMap<u8, u8>,
+    pub axis: HashMap<u8, u8>,
 }
 
 impl GamepadData {
-    pub fn new(gamepad_id: GamepadId) -> Self {
+    pub(crate) fn new(gamepad_id: GamepadId) -> Self {
         let mut axis = HashMap::<u8, u8>::new();
         let mut buttons = HashMap::<u8, u8>::new();
 
@@ -112,7 +106,7 @@ impl GamepadData {
         }
     }
 
-    pub fn handle_cockpit_message(
+    pub(crate) fn handle_cockpit_message(
         &mut self,
         event_type: u8,
         control: u8,
@@ -127,14 +121,36 @@ impl GamepadData {
         Ok(())
     }
 
+    /// Returns the gamepad ID.
+    ///
+    /// # Returns
+    /// The [`GamepadId`] associated with this [`GamepadData`] instance.
     pub fn gamepad_id(&self) -> u8 {
         self.gamepad_id
     }
 }
 
+/// Represents a specific Gamepad device. This makes sure you can call functions
+/// With the correct mapping. For examples, The cardinal buttons on a X-Box controller are different
+/// from a PS controller.
 pub trait Gamepad {
+    /// Creates a new instance of a gamepad device.
+    ///
+    /// # Parameters
+    /// - `gamepad_data`: The [`GamepadData`] to be associated with the gamepad device.
+    ///
+    /// # Returns
+    /// A new instance of the implemented gamepad device.
     fn new(gamepad_data: GamepadData) -> Self;
 
+    /// Returns the boolean state of a button control.
+    ///
+    /// # Parameters
+    /// - `map`: A reference to the map with the control you want to check.
+    /// - `control`: The control ID for the button to be checked.
+    ///
+    /// # Returns
+    /// A boolean value indicating whether the specified button is pressed (true) or not (false).
     fn control_button_value(&self, map: &HashMap<u8, u8>, control: u8) -> bool {
         match map.get(&control) {
             Some(value) => value > &127,
@@ -142,6 +158,15 @@ pub trait Gamepad {
         }
     }
 
+    /// Returns the float value of an axis control, mapped to the specified range.
+    ///
+    /// # Parameters
+    /// - `map`: A reference to the map with the control you want to check.
+    /// - `control`: The control ID for the axis to be checked.
+    /// - `axis_range`: A tuple representing the range `(min, max)` to map the axis value to.
+    ///
+    /// # Returns
+    /// A float value representing the axis value mapped to the specified range.
     fn control_axis_value(
         &self,
         map: &HashMap<u8, u8>,
@@ -162,4 +187,14 @@ pub trait Gamepad {
             None => 0f32,
         }
     }
+}
+
+/// Represents different types of gamepad events.
+#[repr(u8)]
+#[allow(dead_code)]
+pub(crate) enum EventType {
+    ButtonChanged = 0,
+    AxisChanged = 1,
+    Connected = 2,
+    Disconnected = 3,
 }

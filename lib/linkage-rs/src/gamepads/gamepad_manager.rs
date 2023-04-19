@@ -1,20 +1,29 @@
 use super::gamepad::{EventType, Gamepad, GamepadData, GamepadId};
 use messaging::CockpitToLinkage;
 
+/// Represents a gamepad index.
 #[repr(usize)]
-pub enum GamepadIndex {
+pub enum AssociatedGamepad {
     Primary = 0,
     Secondary = 1,
 }
 
+/// Manages gamepad devices, providing methods to access and handle gamepad input events.
 #[derive(Debug)]
 pub struct GamepadManager {
     gamepads: Vec<Option<GamepadData>>,
 }
 
 impl GamepadManager {
-    pub fn get<G: Gamepad>(&self, index: GamepadIndex) -> Option<G> {
-        if let Some(Some(gamepad)) = self.gamepads.get(index as usize) {
+    /// Returns a gamepad device associated with the specified [`AssociatedGamepad`], if present.
+    ///
+    /// # Parameters
+    /// - `associated_gamepad`: The [`AssociatedGamepad`] to get the gamepad device for.
+    ///
+    /// # Returns
+    /// An `Option<G>` containing the gamepad device of type `G` if it exists, or `None` otherwise.
+    pub fn get<G: Gamepad>(&self, associated_gamepad: AssociatedGamepad) -> Option<G> {
+        if let Some(Some(gamepad)) = self.gamepads.get(associated_gamepad as usize) {
             return Some(G::new(gamepad.to_owned()));
         }
         None

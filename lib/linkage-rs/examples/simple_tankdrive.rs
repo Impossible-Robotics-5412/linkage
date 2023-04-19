@@ -1,9 +1,9 @@
-use linkage_rs::gamepads::ps_controller::PsController;
-use linkage_rs::motors::spark_motor_controller::SparkMotorController;
+use linkage_rs::gamepads::PsController;
+use linkage_rs::motors::SparkMotorController;
 use linkage_rs::prelude::*;
 
 #[derive(Default)]
-struct TankDrivetrainSubsystem {}
+struct TankDrivetrainSubsystem;
 
 impl Subsystem for TankDrivetrainSubsystem {
     fn tick(&mut self, state: RobotStateHandle) {
@@ -14,7 +14,7 @@ impl Subsystem for TankDrivetrainSubsystem {
             .lock()
             .unwrap()
             .gamepad_manager
-            .get::<PsController>(GamepadIndex::Primary);
+            .get::<PsController>(AssociatedGamepad::Primary);
 
         if let Some(gamepad) = gamepad {
             left_motor.set_speed_percentage(gamepad.left_joystick_y());
