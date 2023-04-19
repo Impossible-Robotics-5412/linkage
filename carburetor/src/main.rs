@@ -39,14 +39,14 @@ const PULSE_DELTA_US: u64 = 500;
 const PULSE_NEUTRAL_US: u64 = 1500;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    logging::Logger::new(7644).start();
+    let config = config::config()?;
+    logging::Logger::new(config.carburetor().logger_port()).start();
 
     log::info!("{WELCOME_MESSAGE}");
 
     #[cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))]
     log::info!("Carburetor detected you are running on a Raspberry Pi!");
 
-    let config = config::config()?;
     let address = format!("0.0.0.0:{}", config.carburetor().port());
 
     log::info!("Setting up...");

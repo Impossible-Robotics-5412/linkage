@@ -48,6 +48,7 @@ impl Config {
 pub struct LinkageLib {
     port: AddressPort,
     carburetor_address: Address,
+    logger_port: AddressPort,
 }
 
 impl LinkageLib {
@@ -58,16 +59,25 @@ impl LinkageLib {
     pub fn carburetor_address(&self) -> &Address {
         &self.carburetor_address
     }
+
+    pub fn logger_port(&self) -> &AddressPort {
+        &self.logger_port
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Carburetor {
     port: AddressPort,
+    logger_port: AddressPort,
 }
 
 impl Carburetor {
     pub fn port(&self) -> AddressPort {
         self.port
+    }
+
+    pub fn logger_port(&self) -> AddressPort {
+        self.logger_port
     }
 }
 
@@ -76,6 +86,7 @@ pub struct Cockpit {
     linkage_lib_address: Address,
     linkage_socket_address: Address,
     linkage_lib_logger_address: Address,
+    logger_port: AddressPort,
 }
 
 impl Cockpit {
@@ -89,6 +100,10 @@ impl Cockpit {
 
     pub fn linkage_lib_logger_address(&self) -> &Address {
         &self.linkage_lib_logger_address
+    }
+
+    pub fn logger_port(&self) -> &AddressPort {
+        &self.logger_port
     }
 }
 
