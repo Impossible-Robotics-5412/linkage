@@ -7,6 +7,23 @@ use std::{
 use bus::Bus;
 use gilrs::Gilrs;
 use messaging::CockpitToLinkage;
+use tauri::{Manager, Runtime};
+
+const EVENT_GAMEPAD_EVENT: &str = "gamepad_event";
+
+pub struct GamepadState {
+    pub gamepad_event_bus: Arc<Mutex<Bus<Option<CockpitToLinkage>>>>,
+}
+
+impl GamepadState {
+    pub fn new() -> Self {
+        Self {
+            gamepad_event_bus: Arc::new(Mutex::new(Bus::new(
+                std::mem::size_of::<CockpitToLinkage>(),
+            ))),
+        }
+    }
+}
 
 #[repr(u8)]
 enum EventType {
@@ -16,12 +33,23 @@ enum EventType {
     Disconnected = 3,
 }
 
-pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
+#[tauri::command]
+pub fn start_event_listener<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    state: tauri::State<'_, GamepadState>,
+) {
     let mut gilrs = Gilrs::new().unwrap();
 
-    let bus = Arc::new(Mutex::new(
-        Bus::new(std::mem::size_of::<CockpitToLinkage>()),
-    ));
+    thread::spawn({
+        let mut rx = state.gamepad_event_bus.lock().unwrap().add_rx();
+
+        move || loop {
+            if let Ok(Some(message)) = rx.recv() {
+                let CockpitToLinkage::GamepadInputEvent { .. } = message;
+                app.emit_all(EVENT_GAMEPAD_EVENT, message).unwrap();
+            }
+        }
+    });
 
     thread::spawn({
         log::debug!("Started gamepad event listener");
@@ -29,7 +57,7 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
         // FIXME: We currently only tell Linkage-lib we have connected controllers by sending an event, but no initial information.
         //        This means Linkage-lib will only know if a gamepad is connected as soon as we send some kind of event.
 
-        let bus = bus.clone();
+        let bus = state.gamepad_event_bus.clone();
         move || {
             loop {
                 if let Some(event) = gilrs.next_event() {
@@ -84,8 +112,6 @@ pub fn start_event_listener() -> Arc<Mutex<Bus<Option<CockpitToLinkage>>>> {
             }
         }
     });
-
-    bus
 }
 
 // HACK: This is needed because of the gilrs crate being neglectant.

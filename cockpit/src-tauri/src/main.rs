@@ -2,10 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod commands;
-mod gamepad;
 
 use crate::commands::config::ConfigState;
+use crate::commands::gamepad::GamepadState;
 use commands::config::config;
+use commands::gamepad::start_event_listener;
 use commands::gauge::start_gauge_connection;
 use commands::linkage_lib::{disable, enable, LinkageLibState};
 use std::sync::Arc;
@@ -20,15 +21,15 @@ fn main() {
     )
     .start();
 
-    let gamepad_event_bus = gamepad::start_event_listener();
-
     tauri::Builder::default()
-        .manage(LinkageLibState::new(gamepad_event_bus))
+        .manage(LinkageLibState::new())
+        .manage(GamepadState::new())
         .manage(ConfigState::new(common_config))
         .invoke_handler(tauri::generate_handler![
             enable,
             disable,
             config,
+            start_event_listener,
             start_gauge_connection
         ])
         .run(tauri::generate_context!())

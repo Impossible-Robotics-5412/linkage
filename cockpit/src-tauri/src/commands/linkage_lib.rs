@@ -2,12 +2,13 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::{
     io::{ErrorKind, Read, Write},
     net::TcpStream,
-    sync::{Arc, Mutex},
+    sync::Arc,
     thread,
     time::Duration,
 };
 
-use bus::{Bus, BusReader};
+use crate::commands::gamepad::GamepadState;
+use bus::BusReader;
 use config::Config;
 use messaging::{CockpitToLinkage, Message};
 use tauri::{Manager, Runtime};
@@ -21,14 +22,12 @@ enum LinkageLibStateChange {
 }
 
 pub struct LinkageLibState {
-    gamepad_event_bus: Arc<Mutex<Bus<Option<CockpitToLinkage>>>>,
     disabled: Arc<AtomicBool>,
 }
 
 impl LinkageLibState {
-    pub fn new(gamepad_event_bus: Arc<Mutex<Bus<Option<CockpitToLinkage>>>>) -> Self {
+    pub fn new() -> Self {
         Self {
-            gamepad_event_bus,
             disabled: Arc::new(AtomicBool::new(false)),
         }
     }
@@ -37,16 +36,17 @@ impl LinkageLibState {
 #[tauri::command]
 pub fn enable<R: Runtime>(
     app: tauri::AppHandle<R>,
-    state: tauri::State<'_, LinkageLibState>,
+    linkage_lib_state: tauri::State<'_, LinkageLibState>,
+    gamepad_state: tauri::State<'_, GamepadState>,
 ) -> Result<(), String> {
     let config = config::config().map_err(|err| format!("Failed to load config: {err}"))?;
     log::debug!("Received enable command");
 
-    state.disabled.store(false, Ordering::Relaxed);
+    linkage_lib_state.disabled.store(false, Ordering::Relaxed);
 
     thread::spawn({
-        let disabled = state.disabled.clone();
-        let gamepad_event_bus_rx = state.gamepad_event_bus.lock().unwrap().add_rx();
+        let disabled = linkage_lib_state.disabled.clone();
+        let gamepad_event_bus_rx = gamepad_state.gamepad_event_bus.lock().unwrap().add_rx();
 
         move || {
             let socket_address = config.cockpit().linkage_socket_address();
