@@ -1,3 +1,4 @@
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::{
     sync::{Arc, Mutex},
     thread,
@@ -13,6 +14,7 @@ const EVENT_GAMEPAD_EVENT: &str = "gamepad_event";
 
 pub struct GamepadState {
     pub gamepad_event_bus: Arc<Mutex<Bus<Option<CockpitToLinkage>>>>,
+    listening: Arc<AtomicBool>,
 }
 
 impl GamepadState {
@@ -21,6 +23,7 @@ impl GamepadState {
             gamepad_event_bus: Arc::new(Mutex::new(Bus::new(
                 std::mem::size_of::<CockpitToLinkage>(),
             ))),
+            listening: Arc::new(AtomicBool::new(false)),
         }
     }
 }
@@ -38,6 +41,11 @@ pub fn start_event_listener<R: Runtime>(
     app: tauri::AppHandle<R>,
     state: tauri::State<'_, GamepadState>,
 ) {
+    if state.listening.load(Ordering::Relaxed) {
+        return;
+    }
+    state.listening.store(true, Ordering::Relaxed);
+
     let mut gilrs = Gilrs::new().unwrap();
 
     thread::spawn({

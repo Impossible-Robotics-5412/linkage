@@ -1,8 +1,10 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type { SystemInfo } from '$lib/types/system-info';
 import { listen } from '@tauri-apps/api/event';
 import { loggerState } from '$lib/logger';
 import { invoke } from '@tauri-apps/api/tauri';
+import type { GamepadId } from '$lib/gamepad-data';
+import { GamepadData, parseGamepadInputEvent } from '$lib/gamepad-data';
 
 export const systemInfo = writable<SystemInfo | undefined>(
 	undefined,
@@ -15,7 +17,7 @@ export const systemInfo = writable<SystemInfo | undefined>(
 
 		let lastCheck = Date.now();
 
-		const timeoutTimer = setInterval(() => {
+		setInterval(() => {
 			if (Date.now() - lastCheck >= timeout_ms) {
 				$systemInfo = undefined;
 			}
@@ -71,6 +73,26 @@ export const robotCode = writable<RobotCodeState>(
 		});
 	}
 );
+
+export interface GamepadState {
+	gamepads: { [id: GamepadId]: GamepadData }
+}
+
+export const gamepadState = writable<GamepadState>({
+	gamepads: {}
+}, set => {
+	invoke('start_event_listener').then(() => {
+		listen('gamepad_event', (event) => {
+			const gamepadInputEvent = parseGamepadInputEvent(event.payload);
+			if (!gamepadInputEvent) return;
+
+			const state = get(gamepadState);
+			if (!state.gamepads[gamepadInputEvent.gamepadId]) state.gamepads[gamepadInputEvent.gamepadId] = new GamepadData();
+			state.gamepads[gamepadInputEvent.gamepadId].handleGamepadInputEvent(gamepadInputEvent);
+			set(state);
+		});
+	});
+})
 
 export async function enableRobotCode() {
 	robotCode.update($robotCode => {

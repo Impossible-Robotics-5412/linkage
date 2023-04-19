@@ -2,6 +2,9 @@
 	import EnableDisableRobotButton from '$lib/components/EnableDisableRobotButton.svelte';
 	import Loggers from '$lib/components/logger/Loggers.svelte';
 	import StatusContainer from '$lib/components/status/StatusContainer.svelte';
+	import { gamepadState } from '$lib/backend';
+
+	$: console.log($gamepadState);
 </script>
 
 <main>
