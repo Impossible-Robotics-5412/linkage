@@ -87,7 +87,7 @@ export const gamepadState = writable<GamepadState>({
 			if (!gamepadInputEvent) return;
 
 			const state = get(gamepadState);
-			if (!state.gamepads[gamepadInputEvent.gamepadId]) state.gamepads[gamepadInputEvent.gamepadId] = new GamepadData();
+			if (!state.gamepads[gamepadInputEvent.gamepadId]) state.gamepads[gamepadInputEvent.gamepadId] = new GamepadData(gamepadInputEvent.gamepadId);
 			state.gamepads[gamepadInputEvent.gamepadId].handleGamepadInputEvent(gamepadInputEvent);
 			set(state);
 		});

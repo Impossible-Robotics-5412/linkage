@@ -3,23 +3,57 @@
 	import Loggers from '$lib/components/logger/Loggers.svelte';
 	import StatusContainer from '$lib/components/status/StatusContainer.svelte';
 	import { gamepadState } from '$lib/backend';
-
-	$: console.log($gamepadState);
+	import { AxisControl, ButtonControl } from '$lib/gamepad-data';
 </script>
 
 <main>
 	<div class="main-window">
 		<StatusContainer />
-		<Loggers />
+<!--		<Loggers />-->
+
+		<div class="gamepads">
+			{#each Object.values($gamepadState.gamepads) as gamepad}
+				<div>
+					<h2>Gamepad {gamepad.id}</h2>
+					<table>
+						<tr>
+							<th>BUTTONS</th>
+							<th>AXIS</th>
+						</tr>
+						{#each Object.entries(gamepad.buttons) as [control, value]}
+							<tr>
+								<td>{ButtonControl[control]}</td>
+								<td>{value}</td>
+							</tr>
+						{/each}
+						{#each Object.entries(gamepad.axis) as [control, value]}
+							<tr>
+								<td>{AxisControl[control]}</td>
+								<td>{value}</td>
+							</tr>
+						{/each}
+					</table>
+				</div>
+			{/each}
+		</div>
 
 		<EnableDisableRobotButton />
 	</div>
 </main>
 
-<style>
+<style lang="scss">
 	main {
 		width: 100vw;
 		height: 100vh;
+	}
+
+	.gamepads {
+		display: flex;
+	  	gap: 4rem;
+
+      table, th, td {
+        border: 1px solid;
+      }
 	}
 
 	.main-window {

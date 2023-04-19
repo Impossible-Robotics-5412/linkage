@@ -1,42 +1,39 @@
-enum ButtonControl {
+export enum ButtonControl {
 	// Action Pad
-	South = 1,
-	East = 2,
-	North = 4,
-	West = 5,
+	SOUTH = 1,
+	EAST = 2,
+	NORTH = 4,
+	WEST = 5,
 	C = 3,
 	Z = 6,
 	// Triggers
-	LeftTrigger = 7,
-	LeftTrigger2 = 9,
-	RightTrigger = 8,
-	RightTrigger2 = 10,
+	LEFT_TRIGGER = 7,
+	LEFT_TRIGGER_2 = 9,
+	RIGHT_TRIGGER = 8,
+	RIGHT_TRIGGER_2 = 10,
 	// Menu Pad
-	Select = 11,
-	Start = 12,
-	Mode = 13,
+	SELECT = 11,
+	START = 12,
+	MODE = 13,
 	// Sticks
-	LeftThumb = 14,
-	RightThumb = 15,
+	LEFT_THUMB = 14,
+	RIGHT_THUMB = 15,
 	// D-Pad
-	DpadUp = 16,
-	DpadDown = 17,
-	DpadLeft = 18,
-	DpadRight = 19,
-
-	Unknown = 0,
+	DPAD_UP = 16,
+	DPAD_DOWN = 17,
+	DPAD_LEFT = 18,
+	DPAD_RIGHT = 19,
 }
 
-enum AxisControl {
-	LeftStickX = 1,
-	LeftStickY = 2,
-	LeftZ = 3,
-	RightStickX = 4,
-	RightStickY = 5,
-	RightZ = 6,
-	DpadX = 7,
-	DpadY = 8,
-	Unknown = 0,
+export enum AxisControl {
+	LEFT_STICK_X = 1,
+	LEFT_STICK_Y = 2,
+	LEFT_Z = 3,
+	RIGHT_STICK_X = 4,
+	RIGHT_STICK_Y = 5,
+	RIGHT_Z = 6,
+	DPAD_X = 7,
+	DPAD_Y = 8,
 }
 
 export type GamepadId = number;
@@ -65,8 +62,40 @@ export function parseGamepadInputEvent(data: unknown): GamepadInputEvent|null {
 }
 
 export class GamepadData {
-	public axis: { [control: typeof AxisControl]: number } = {};
-	public buttons: { [control: typeof ButtonControl]: number } = {};
+	public axis: Record<AxisControl, number> = {
+		[AxisControl.LEFT_STICK_X]: 127.0,
+		[AxisControl.LEFT_STICK_Y]: 127.0,
+		[AxisControl.LEFT_Z]: 127.0,
+		[AxisControl.RIGHT_STICK_X]: 127.0,
+		[AxisControl.RIGHT_STICK_Y]: 127.0,
+		[AxisControl.RIGHT_Z]: 127.0,
+		[AxisControl.DPAD_X]: 127.0,
+		[AxisControl.DPAD_Y]: 127.0,
+	};
+	public buttons: Record<ButtonControl, number> = {
+		[ButtonControl.SOUTH]: 0.0,
+		[ButtonControl.EAST]: 0.0,
+		[ButtonControl.NORTH]: 0.0,
+		[ButtonControl.WEST]: 0.0,
+		[ButtonControl.C]: 0.0,
+		[ButtonControl.Z]: 0.0,
+		[ButtonControl.LEFT_TRIGGER]: 0.0,
+		[ButtonControl.LEFT_TRIGGER_2]: 0.0,
+		[ButtonControl.RIGHT_TRIGGER]: 0.0,
+		[ButtonControl.RIGHT_TRIGGER_2]: 0.0,
+		[ButtonControl.SELECT]: 0.0,
+		[ButtonControl.START]: 0.0,
+		[ButtonControl.MODE]: 0.0,
+		[ButtonControl.LEFT_THUMB]: 0.0,
+		[ButtonControl.RIGHT_THUMB]: 0.0,
+		[ButtonControl.DPAD_UP]: 0.0,
+		[ButtonControl.DPAD_DOWN]: 0.0,
+		[ButtonControl.DPAD_LEFT]: 0.0,
+		[ButtonControl.DPAD_RIGHT]: 0.0,
+	}
+
+	public constructor(public readonly id: GamepadId) {
+	}
 
 	public handleGamepadInputEvent(gamepadInputEvent: GamepadInputEvent) {
 		if (gamepadInputEvent.eventType === EventType.BUTTON_CHANGED) {
