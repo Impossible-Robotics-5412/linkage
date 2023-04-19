@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use ws::Sender;
 
 type SingleLogJsonString = String;
 type MultipleLogsJsonString = String;
@@ -58,44 +59,13 @@ impl Logger {
         // BUG: When reloading the app this thread doesn't close.
         //      Maybe the one above too, not tested yet.
         thread::spawn({
-            let history = self.history.clone();
             move || {
                 ws::listen(format!("0.0.0.0:{}", self.port), |frontend| {
-                    let log_rx = self.log_rx.clone();
-                    let log_history = history.lock().unwrap().to_vec();
-
-                    thread::spawn({
-                        move || {
-                            // Send log history first.
-                            if let Ok(log_history_json) = log_vec_to_json(&log_history) {
-                                frontend.send(ws::Message::Text(log_history_json)).unwrap()
-                            }
-
-                            // Periodically send logs.
-                            let interval_backlog = Arc::new(Mutex::new(Vec::<Log>::new()));
-                            thread::spawn({
-                                let interval_backlog = Arc::clone(&interval_backlog);
-                                move || loop {
-                                    if interval_backlog.lock().unwrap().len() > 0 {
-                                        let json_logs =
-                                            log_vec_to_json(&interval_backlog.lock().unwrap())
-                                                .unwrap();
-                                        frontend.send(ws::Message::Text(json_logs)).unwrap();
-                                        *interval_backlog.lock().unwrap() = Vec::new();
-                                    }
-
-                                    thread::sleep(Duration::from_millis(100));
-                                }
-                            });
-
-                            loop {
-                                if let Ok(json_log) = log_rx.recv() {
-                                    let log = json_to_log(&json_log).unwrap();
-                                    interval_backlog.lock().unwrap().push(log);
-                                }
-                            }
-                        }
-                    });
+                    handle_frontend_client(
+                        frontend,
+                        Arc::clone(&self.history),
+                        self.log_rx.clone(),
+                    );
 
                     |_msg| Ok(())
                 })
@@ -138,6 +108,43 @@ impl Logger {
             .apply()
             .expect("should connect fern to sender");
     }
+}
+
+fn handle_frontend_client(
+    frontend: Sender,
+    history: Arc<Mutex<Vec<Log>>>,
+    log_rx: crossbeam::channel::Receiver<SingleLogJsonString>,
+) {
+    thread::spawn({
+        move || {
+            // Send log history first.
+            if let Ok(log_history_json) = log_vec_to_json(&history.lock().unwrap()) {
+                frontend.send(ws::Message::Text(log_history_json)).unwrap()
+            }
+
+            // Periodically send logs.
+            let interval_backlog = Arc::new(Mutex::new(Vec::<Log>::new()));
+            thread::spawn({
+                let interval_backlog = Arc::clone(&interval_backlog);
+                move || loop {
+                    if interval_backlog.lock().unwrap().len() > 0 {
+                        let json_logs = log_vec_to_json(&interval_backlog.lock().unwrap()).unwrap();
+                        frontend.send(ws::Message::Text(json_logs)).unwrap();
+                        *interval_backlog.lock().unwrap() = Vec::new();
+                    }
+
+                    thread::sleep(Duration::from_millis(100));
+                }
+            });
+
+            loop {
+                if let Ok(json_log) = log_rx.recv() {
+                    let log = json_to_log(&json_log).unwrap();
+                    interval_backlog.lock().unwrap().push(log);
+                }
+            }
+        }
+    });
 }
 
 fn log_vec_to_json(logs: &Vec<Log>) -> serde_json::Result<MultipleLogsJsonString> {
