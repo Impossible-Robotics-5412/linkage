@@ -85,8 +85,10 @@ impl Carburetor {
 pub struct Cockpit {
     linkage_lib_address: Address,
     linkage_socket_address: Address,
+
+    cockpit_backend_logger_address: Address,
     linkage_lib_logger_address: Address,
-    logger_port: AddressPort,
+    carburetor_logger_address: Address,
 }
 
 impl Cockpit {
@@ -98,12 +100,16 @@ impl Cockpit {
         &self.linkage_socket_address
     }
 
+    pub fn cockpit_backend_logger_address(&self) -> &Address {
+        &self.cockpit_backend_logger_address
+    }
+
     pub fn linkage_lib_logger_address(&self) -> &Address {
         &self.linkage_lib_logger_address
     }
 
-    pub fn logger_port(&self) -> &AddressPort {
-        &self.logger_port
+    pub fn carburetor_logger_address(&self) -> &Address {
+        &self.carburetor_logger_address
     }
 }
 

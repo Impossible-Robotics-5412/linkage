@@ -21,7 +21,10 @@ port = 4226
 linkage_socket_address = { host = "raspberrypi.local", port = 9999 }
 # The address Linkage-lib is listening on
 linkage_lib_address = { host = "raspberrypi.local", port = 12362 }
+
+# The address the Cockpit-backend logger is listening on
+cockpit_backend_logger_address = { host = "0.0.0.0", port = 7642 }
 # The address the Linkage-lib logger is listening on
 linkage_lib_logger_address = { host = "raspberrypi.local", port = 7640 }
-# The port on which the logger will send data
-logger_port = 7642
+# The address the Carburetor logger is listening on
+carburetor_logger_address =  { host = "raspberrypi.local", port = 7644 }

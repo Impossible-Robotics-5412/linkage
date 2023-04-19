@@ -43,7 +43,7 @@ impl Robot {
 
     pub fn run(mut self) {
         let config = config::config().expect("failed to load config");
-        logging::Logger::new(config.linkage_lib().logger_port()).start();
+        logging::Logger::new(config.linkage_lib().logger_port().to_owned()).start();
 
         let (carburetor_message_sender, carburetor_message_receiver) = channel();
 

@@ -8,7 +8,9 @@ export interface Address {
 export interface CockpitConfig {
 	linkage_socket_address: Address;
 	linkage_lib_address: Address;
+	cockpit_backend_logger_address: Address;
 	linkage_lib_logger_address: Address;
+	carburetor_logger_address: Address;
 }
 
 export async function getConfig() {

@@ -12,7 +12,13 @@ use std::sync::Arc;
 
 fn main() {
     let common_config = Arc::new(config::config().unwrap());
-    logging::Logger::new(common_config.cockpit().logger_port().to_owned()).start();
+    logging::Logger::new(
+        common_config
+            .cockpit()
+            .cockpit_backend_logger_address()
+            .port,
+    )
+    .start();
 
     let gamepad_event_bus = gamepad::start_event_listener();
 
