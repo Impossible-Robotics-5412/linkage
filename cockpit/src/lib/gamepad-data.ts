@@ -4,8 +4,6 @@ export enum ButtonControl {
 	EAST = 2,
 	NORTH = 4,
 	WEST = 5,
-	C = 3,
-	Z = 6,
 	// Triggers
 	LEFT_TRIGGER = 7,
 	LEFT_TRIGGER_2 = 9,
@@ -23,6 +21,9 @@ export enum ButtonControl {
 	DPAD_DOWN = 17,
 	DPAD_LEFT = 18,
 	DPAD_RIGHT = 19,
+	// Other
+	C = 3,
+	Z = 6,
 }
 
 export enum AxisControl {
@@ -95,7 +96,7 @@ export class GamepadData {
 	}
 
 	public constructor(public readonly id: GamepadId) {
-	}
+	}	
 
 	public handleGamepadInputEvent(gamepadInputEvent: GamepadInputEvent) {
 		if (gamepadInputEvent.eventType === EventType.BUTTON_CHANGED) {
