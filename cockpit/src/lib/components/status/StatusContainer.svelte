@@ -5,6 +5,7 @@
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
 	import { robotCode, systemInfo } from '$lib/backend';
 	import { Status } from '$lib/types/status';
+	import List from '$lib/components/ui/List.svelte';
 
 	$: robotCodeStatus = $robotCode.enabled ? Status.GOOD : Status.BAD;
 	$: robotConnectionStatus = $systemInfo ? Status.GOOD : Status.BAD;
@@ -22,7 +23,7 @@
 		<h3>Status</h3>
 	</div>
 
-	<div class="status">
+	<List>
 		<h3>Robot Connection</h3>
 		<StatusItem
 			info={`${robotConnectionStatus ? 'Connected' : 'Not Connected'}`}
@@ -50,29 +51,9 @@
 			<h3>Robot Services</h3>
 			<RobotServicesStatus serviceInfo={$systemInfo?.service_info} />
 		{/if}
-	</div>
+	</List>
 </Container>
 
 <style lang="scss">
 	@use '../../style/vars' as *;
-
-	.status {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-
-		& :global(> *) {
-			border-bottom: 1px solid $c-gray-1;
-			padding-bottom: 0.5rem;
-
-			&:last-child {
-				border-bottom: none;
-				padding-bottom: 0;
-			}
-		}
-
-		h3:not(:first-child) {
-			padding-top: 1.5rem;
-		}
-	}
 </style>
