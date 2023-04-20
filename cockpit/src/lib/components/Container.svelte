@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let noPadding = false;
+	export let scrollable = false;
 </script>
 
 <div class="container">
@@ -9,7 +10,7 @@
 		</div>
 	{/if}
 
-	<div class:noPadding class="content">
+	<div class:scrollable class:noPadding class="content">
 		<slot />
 	</div>
 </div>
@@ -47,7 +48,16 @@
 
 	.content {
 		&:not(.noPadding) {
-			padding: 1.5rem;
+			&:not(.scrollable) {
+              padding: 1.5rem;
+			}
 		}
+
+	  &.scrollable {
+        height: 100%;
+        overflow-y: scroll;
+        padding: 1.5rem;
+        box-sizing: border-box;
+	  }
 	}
 </style>

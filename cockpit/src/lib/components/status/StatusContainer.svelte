@@ -18,7 +18,7 @@
 		: Status.BAD;
 </script>
 
-<Container>
+<Container scrollable>
 	<div slot="header">
 		<h3>Status</h3>
 	</div>

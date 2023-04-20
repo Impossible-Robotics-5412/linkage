@@ -15,7 +15,7 @@
 	$: gamepad = $gamepadState.gamepads[gamepadId];
 </script>
 
-<Container>
+<Container scrollable>
 	<div class='header' slot='header'>
 		<h3>Gamepads</h3>
 
