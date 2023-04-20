@@ -3,14 +3,30 @@
 	import Loggers from '$lib/components/logger/Loggers.svelte';
 	import StatusContainer from '$lib/components/status/StatusContainer.svelte';
 	import Gamepads from '$lib/components/gamepads/Gamepads.svelte';
+	import Container from '$lib/components/Container.svelte';
+
+	const tabs = [
+		{ label: "Gamepads", component: Gamepads },
+		{ label: "Loggers", component: Loggers },
+	];
+
+	let selectedTab = 0;
+
+	function selectTab(index: number) {
+		selectedTab = index;
+	}
 </script>
 
 <main>
 	<div class="main-window">
 		<StatusContainer />
-<!--		<Loggers />-->
-		<Gamepads/>
+		<svelte:component this={tabs[selectedTab].component} />
 		<EnableDisableRobotButton />
+		<Container>
+			{#each tabs as tab, i}
+				<button on:click={() => selectTab(i)}>{tab.label}</button>
+			{/each}
+		</Container>
 	</div>
 </main>
 
