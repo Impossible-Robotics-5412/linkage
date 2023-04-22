@@ -6,30 +6,30 @@ import CockpitBackendLoggerOutput from '$lib/components/overview/logger/CockpitB
 import CarburetorLoggerOutput from '$lib/components/overview/logger/CarburetorLoggerOutput.svelte';
 import { LogLevel } from '$lib/process-logger';
 
-export interface Tab {
+export interface LoggerTab {
 	name: string;
 	loggerOutputComponent: ComponentType;
 }
 
-export const tabs = {
+export const loggerTabs = {
 	'cockpit-backend': {
 		name: 'Cockpit Backend',
 		loggerOutputComponent: CockpitBackendLoggerOutput
-	} satisfies Tab,
+	} satisfies LoggerTab,
 	'linkage': {
 		name: 'Linkage',
 		loggerOutputComponent: LinkageLoggerOutput
-	} satisfies Tab,
+	} satisfies LoggerTab,
 	'carburetor': {
 		name: 'Carburetor',
 		loggerOutputComponent: CarburetorLoggerOutput
-	} satisfies Tab
+	} satisfies LoggerTab
 };
 
-export type TabId = keyof typeof tabs;
+export type LoggerTabId = keyof typeof loggerTabs;
 
 export interface LoggerState {
-	selectedTabId: TabId;
+	selectedTabId: LoggerTabId;
 	level: LogLevel;
 }
 

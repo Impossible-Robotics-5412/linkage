@@ -1,8 +1,8 @@
 <script lang='ts'>
 	import Sidebar from '$lib/components/Sidebar.svelte';
-	import type { Tab } from '$lib/logger';
+	import type { LoggerTab } from '$lib/logger';
 
-	let selectedTab: Tab;
+	let selectedTab: LoggerTab;
 </script>
 
 <main>
