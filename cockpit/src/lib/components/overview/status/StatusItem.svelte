@@ -20,7 +20,7 @@
 </div>
 
 <style lang="scss">
-	@use '../../style/vars' as *;
+	@use '../../../style/vars' as *;
 
 	.main {
 		display: flex;

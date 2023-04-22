@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ButtonControl, AxisControl } from '$lib/gamepad-data';
 	import { Status } from '$lib/types/status';
-	import StatusItem from '../status/StatusItem.svelte';
+	import StatusItem from '$lib/components/overview/status/StatusItem.svelte';
 
 	export let control: ButtonControl | AxisControl;
 	export let controlMap: {[control: AxisControl|ButtonControl]: number};

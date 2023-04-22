@@ -6,6 +6,9 @@ importers:
 
   cockpit:
     dependencies:
+      '@tabler/icons-svelte':
+        specifier: ^2.17.0
+        version: 2.17.0(svelte@3.54.0)
       '@tauri-apps/api':
         specifier: ^1.2.0
         version: 1.2.0
@@ -305,6 +308,19 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@tabler/icons-svelte@2.17.0(svelte@3.54.0):
+    resolution: {integrity: sha512-q8ieK7bO4sxEs2JmMHIlI83fHQ42s0te6WxbxDeFdTUGVQWsdOcfwP94OEX1e9TT/0NmpfNleriCK9ndx+qp/w==}
+    peerDependencies:
+      svelte: ^3.49.0
+    dependencies:
+      '@tabler/icons': 2.17.0
+      svelte: 3.54.0
+    dev: false
+
+  /@tabler/icons@2.17.0:
+    resolution: {integrity: sha512-UeJaylOGNRhQKyDlgZfrQ3UPSGlfVQuXcmCsTYeXioKKepibW6VZ3H36Lo1jvBTBkQD2e9m+k2NxwkztOTXwrA==}
+    dev: false
 
   /@tauri-apps/api@1.2.0:
     resolution: {integrity: sha512-lsI54KI6HGf7VImuf/T9pnoejfgkNoXveP14pVV7XarrQ46rOejIVJLFqHI9sRReJMGdh2YuCoI3cc/yCWCsrw==}
@@ -984,7 +1000,6 @@ packages:
   /svelte@3.54.0:
     resolution: {integrity: sha512-tdrgeJU0hob0ZWAMoKXkhcxXA7dpTg6lZGxUeko5YqvPdJBiyRspGsCwV27kIrbrqPP2WUoSV9ca0gnLlw8YzQ==}
     engines: {node: '>= 8'}
-    dev: true
 
   /to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}

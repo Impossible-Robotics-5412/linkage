@@ -44,7 +44,7 @@
 </Container>
 
 <style lang="scss">
-	@use '../../style/vars' as *;
+	@use '../../../style/vars' as *;
 
 	.header {
 		display: flex;

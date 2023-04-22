@@ -1,6 +1,6 @@
 <script lang="ts">
 	import StatusItem from './StatusItem.svelte';
-	import Container from '../Container.svelte';
+	import Container from '../../Container.svelte';
 	import RobotSystemStatus from './RobotSystemStatus.svelte';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
 	import { robotCode, systemInfo } from '$lib/backend';
@@ -55,5 +55,5 @@
 </Container>
 
 <style lang="scss">
-	@use '../../style/vars' as *;
+	@use '../../../style/vars' as *;
 </style>

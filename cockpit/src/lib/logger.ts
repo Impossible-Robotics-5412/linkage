@@ -1,9 +1,9 @@
 import type { ComponentType } from 'svelte';
 import { writable } from 'svelte/store';
 
-import LinkageLoggerOutput from '$lib/components/logger/LinkageLoggerOutput.svelte';
-import CockpitBackendLoggerOutput from '$lib/components/logger/CockpitBackendLoggerOutput.svelte';
-import CarburetorLoggerOutput from '$lib/components/logger/CarburetorLoggerOutput.svelte';
+import LinkageLoggerOutput from '$lib/components/overview/logger/LinkageLoggerOutput.svelte';
+import CockpitBackendLoggerOutput from '$lib/components/overview/logger/CockpitBackendLoggerOutput.svelte';
+import CarburetorLoggerOutput from '$lib/components/overview/logger/CarburetorLoggerOutput.svelte';
 import { LogLevel } from '$lib/process-logger';
 
 export interface Tab {
