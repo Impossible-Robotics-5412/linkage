@@ -29,8 +29,8 @@
 
 		background-color: $c-background;
 
-	  width: 100%;
-	  height: 100%;
+		width: 100%;
+		height: 100%;
 
 		display: grid;
 		grid-template-columns: 100%;
@@ -52,15 +52,15 @@
 	.content {
 		&:not(.noPadding) {
 			&:not(.scrollable) {
-              padding: 1.5rem;
+				padding: 1.5rem;
 			}
 		}
 
-	  &.scrollable {
-        height: 100%;
-        overflow-y: scroll;
-        padding: 1.5rem;
-        box-sizing: border-box;
-	  }
+		&.scrollable {
+			height: 100%;
+			overflow-y: scroll;
+			padding: 1.5rem;
+			box-sizing: border-box;
+		}
 	}
 </style>

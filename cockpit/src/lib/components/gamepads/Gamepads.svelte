@@ -1,7 +1,11 @@
-<script lang='ts'>
+<script lang="ts">
 	import Container from '$lib/components/Container.svelte';
 	import { gamepadState } from '$lib/backend';
-	import { AxisControl, ButtonControl, type GamepadId } from '$lib/gamepad-data';
+	import {
+		AxisControl,
+		ButtonControl,
+		type GamepadId
+	} from '$lib/gamepad-data';
 	import List from '$lib/components/ui/List.svelte';
 	import GamepadControlStatus from '$lib/components/gamepads/GamepadControlStatus.svelte';
 
@@ -16,7 +20,7 @@
 </script>
 
 <Container scrollable>
-	<div class='header' slot='header'>
+	<div class="header" slot="header">
 		<h3>Gamepads</h3>
 
 		<select bind:value={gamepadId}>
@@ -31,38 +35,24 @@
 	</div>
 
 	{#if gamepad}
-		<div class='gamepad'>
+		<div class="gamepad">
 			<List>
 				<h3>Cardinal</h3>
-				{#each [
-					ButtonControl.NORTH,
-					ButtonControl.EAST,
-					ButtonControl.SOUTH,
-					ButtonControl.WEST
-				] as control}
+				{#each [ButtonControl.NORTH, ButtonControl.EAST, ButtonControl.SOUTH, ButtonControl.WEST] as control}
 					<GamepadControlStatus
 						{control}
 						label={ButtonControl[control]}
 						controlMap={gamepad.buttons} />
 				{/each}
 				<h3>Dpad</h3>
-				{#each [
-					ButtonControl.DPAD_UP,
-					ButtonControl.DPAD_RIGHT,
-					ButtonControl.DPAD_DOWN,
-					ButtonControl.DPAD_LEFT
-				] as control}
+				{#each [ButtonControl.DPAD_UP, ButtonControl.DPAD_RIGHT, ButtonControl.DPAD_DOWN, ButtonControl.DPAD_LEFT] as control}
 					<GamepadControlStatus
 						{control}
 						label={ButtonControl[control]}
 						controlMap={gamepad.buttons} />
 				{/each}
 				<h3>Menu</h3>
-				{#each [
-					ButtonControl.START,
-					ButtonControl.MODE,
-					ButtonControl.SELECT
-				] as control}
+				{#each [ButtonControl.START, ButtonControl.MODE, ButtonControl.SELECT] as control}
 					<GamepadControlStatus
 						{control}
 						label={ButtonControl[control]}
@@ -85,14 +75,7 @@
 						label={ButtonControl[control]}
 						controlMap={gamepad.buttons} />
 				{/each}
-				{#each [
-					AxisControl.LEFT_STICK_X,
-					AxisControl.LEFT_STICK_Y,
-					AxisControl.LEFT_Z,
-					AxisControl.RIGHT_STICK_X,
-					AxisControl.RIGHT_STICK_Y,
-					AxisControl.RIGHT_Z
-				] as control}
+				{#each [AxisControl.LEFT_STICK_X, AxisControl.LEFT_STICK_Y, AxisControl.LEFT_Z, AxisControl.RIGHT_STICK_X, AxisControl.RIGHT_STICK_Y, AxisControl.RIGHT_Z] as control}
 					<GamepadControlStatus
 						{control}
 						axisPreview
@@ -100,19 +83,13 @@
 						controlMap={gamepad.axis} />
 				{/each}
 				<h3>Triggers</h3>
-				{#each [
-					ButtonControl.LEFT_TRIGGER,
-					ButtonControl.RIGHT_TRIGGER,
-				] as control}
+				{#each [ButtonControl.LEFT_TRIGGER, ButtonControl.RIGHT_TRIGGER] as control}
 					<GamepadControlStatus
 						{control}
 						label={ButtonControl[control]}
 						controlMap={gamepad.buttons} />
 				{/each}
-				{#each [
-					ButtonControl.LEFT_TRIGGER_2,
-					ButtonControl.RIGHT_TRIGGER_2
-				] as control}
+				{#each [ButtonControl.LEFT_TRIGGER_2, ButtonControl.RIGHT_TRIGGER_2] as control}
 					<GamepadControlStatus
 						{control}
 						axisPreview
@@ -122,37 +99,37 @@
 			</List>
 		</div>
 	{:else}
-		<div class='no-gamepads-found'>
+		<div class="no-gamepads-found">
 			<h2>No Gamepads Found</h2>
 		</div>
 	{/if}
 </Container>
 
-<style lang='scss'>
-  @use '../../style/vars' as *;
+<style lang="scss">
+	@use '../../style/vars' as *;
 
-  .header {
-    display: flex;
-    justify-content: space-between;
+	.header {
+		display: flex;
+		justify-content: space-between;
 
-    width: 100%;
-  }
+		width: 100%;
+	}
 
-  .gamepad {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+	.gamepad {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2rem;
 
-	width: 100%;
-	height: 100%;
-  }
+		width: 100%;
+		height: 100%;
+	}
 
-  .no-gamepads-found {
-    width: 100%;
-    height: 100%;
+	.no-gamepads-found {
+		width: 100%;
+		height: 100%;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
 </style>

@@ -4,7 +4,7 @@
 	import StatusItem from '$lib/components/overview/status/StatusItem.svelte';
 
 	export let control: ButtonControl | AxisControl;
-	export let controlMap: {[control: AxisControl|ButtonControl]: number};
+	export let controlMap: { [control: AxisControl | ButtonControl]: number };
 	export let label: string;
 	export let axisPreview = false;
 	$: value = controlMap[control];

@@ -23,7 +23,7 @@ export enum ButtonControl {
 	DPAD_RIGHT = 19,
 	// Other
 	C = 3,
-	Z = 6,
+	Z = 6
 }
 
 export enum AxisControl {
@@ -34,7 +34,7 @@ export enum AxisControl {
 	RIGHT_STICK_Y = 5,
 	RIGHT_Z = 6,
 	DPAD_X = 7,
-	DPAD_Y = 8,
+	DPAD_Y = 8
 }
 
 export type GamepadId = number;
@@ -43,23 +43,25 @@ export enum EventType {
 	BUTTON_CHANGED = 0,
 	AXIS_CHANGED = 1,
 	CONNECTED = 2,
-	DISCONNECTED = 3,
+	DISCONNECTED = 3
 }
 
 export interface GamepadInputEvent {
-	gamepadId: GamepadId,
-	eventType: EventType,
-	control: AxisControl | ButtonControl,
-	value: number
+	gamepadId: GamepadId;
+	eventType: EventType;
+	control: AxisControl | ButtonControl;
+	value: number;
 }
 
-export function parseGamepadInputEvent(data: unknown): GamepadInputEvent|null {
+export function parseGamepadInputEvent(
+	data: unknown
+): GamepadInputEvent | null {
 	return {
 		control: data.GamepadInputEvent.control,
 		eventType: data.GamepadInputEvent.event_type,
 		gamepadId: data.GamepadInputEvent.gamepad_id,
 		value: data.GamepadInputEvent.value
-	}
+	};
 }
 
 export class GamepadData {
@@ -71,7 +73,7 @@ export class GamepadData {
 		[AxisControl.RIGHT_STICK_Y]: 127.0,
 		[AxisControl.RIGHT_Z]: 127.0,
 		[AxisControl.DPAD_X]: 127.0,
-		[AxisControl.DPAD_Y]: 127.0,
+		[AxisControl.DPAD_Y]: 127.0
 	};
 	public buttons: Record<ButtonControl, number> = {
 		[ButtonControl.SOUTH]: 0.0,
@@ -92,17 +94,16 @@ export class GamepadData {
 		[ButtonControl.DPAD_UP]: 0.0,
 		[ButtonControl.DPAD_DOWN]: 0.0,
 		[ButtonControl.DPAD_LEFT]: 0.0,
-		[ButtonControl.DPAD_RIGHT]: 0.0,
-	}
+		[ButtonControl.DPAD_RIGHT]: 0.0
+	};
 
-	public constructor(public readonly id: GamepadId) {
-	}	
+	public constructor(public readonly id: GamepadId) {}
 
 	public handleGamepadInputEvent(gamepadInputEvent: GamepadInputEvent) {
 		if (gamepadInputEvent.eventType === EventType.BUTTON_CHANGED) {
-			this.buttons[gamepadInputEvent.control] = gamepadInputEvent.value
+			this.buttons[gamepadInputEvent.control] = gamepadInputEvent.value;
 		} else if (gamepadInputEvent.eventType === EventType.AXIS_CHANGED) {
-			this.axis[gamepadInputEvent.control] = gamepadInputEvent.value
+			this.axis[gamepadInputEvent.control] = gamepadInputEvent.value;
 		}
 	}
 }

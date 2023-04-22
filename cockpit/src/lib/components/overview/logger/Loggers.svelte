@@ -37,7 +37,8 @@
 			<div
 				class="tab"
 				class:visible={$loggerState.selectedTabId === tabId}>
-				<svelte:component this={loggerTabs[tabId].loggerOutputComponent} />
+				<svelte:component
+					this={loggerTabs[tabId].loggerOutputComponent} />
 			</div>
 		{/each}
 	</div>

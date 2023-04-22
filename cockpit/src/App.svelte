@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import type { LoggerTab } from '$lib/logger';
 
@@ -7,7 +7,7 @@
 
 <main>
 	<Sidebar bind:selectedTab />
-	<div class='main-window'>
+	<div class="main-window">
 		{#if selectedTab}
 			<svelte:component this={selectedTab.component} />
 		{:else}
@@ -16,15 +16,15 @@
 	</div>
 </main>
 
-<style lang='scss'>
-  main {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-  }
+<style lang="scss">
+	main {
+		width: 100vw;
+		height: 100vh;
+		display: flex;
+	}
 
-  .main-window {
-    width: 100%;
-    height: 100%;
-  }
+	.main-window {
+		width: 100%;
+		height: 100%;
+	}
 </style>
