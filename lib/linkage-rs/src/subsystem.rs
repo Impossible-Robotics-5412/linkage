@@ -30,11 +30,9 @@ use crate::state::RobotStateHandle;
 ///     }
 /// }
 ///
-/// fn main() {
-///     Robot::new()
-///         .add_subsystem(ExampleSubsystem::default())
-///         .run();
-/// }
+///  Robot::new()
+///     .add_subsystem(ExampleSubsystem::default())
+///     .run();
 /// ```
 pub trait Subsystem {
     /// Called after the [Robot][`crate::robot::Robot`] has been set up.

@@ -48,11 +48,9 @@ impl SparkMotorController {
     ///     }
     /// }
     ///
-    /// fn main() {
-    ///     Robot::new()
-    ///         .add_subsystem(ExampleSubsystem::default())
-    ///         .run();
-    /// }
+    ///  Robot::new()
+    ///     .add_subsystem(ExampleSubsystem::default())
+    ///     .run();
     /// ```
     pub fn set_speed_percentage(&self, speed: f32) {
         let sender = self.state.lock().unwrap().carburetor_message_sender.clone();

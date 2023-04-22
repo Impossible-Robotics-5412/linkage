@@ -4,10 +4,8 @@
 //! ```
 //! use linkage_rs::prelude::*;
 //!
-//! fn main() {
-//!     Robot::new()
-//!         .run();
-//! }
+//! Robot::new()
+//!     .run();
 //! ```
 pub use crate::gamepads::AssociatedGamepad;
 pub use crate::robot::Robot;

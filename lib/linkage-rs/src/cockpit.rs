@@ -1,10 +1,11 @@
+use config::AddressPort;
 use messaging::{Bytes, CockpitToLinkage};
 use std::io::{self, Read};
 use std::net::{TcpListener, TcpStream};
 
 use crate::state::RobotStateHandle;
 
-pub(crate) fn start_listener(state: RobotStateHandle, port: &usize) -> io::Result<()> {
+pub(crate) fn start_listener(state: RobotStateHandle, port: &AddressPort) -> io::Result<()> {
     let listener = TcpListener::bind(format!("0.0.0.0:{port}"))?;
 
     std::thread::spawn(move || {

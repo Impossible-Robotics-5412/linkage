@@ -7,11 +7,13 @@ use std::{
     time::Duration,
 };
 
-use crate::commands::gamepad::GamepadState;
 use bus::BusReader;
+use tauri::{Manager, Runtime};
+
 use config::Config;
 use messaging::{CockpitToLinkage, Message};
-use tauri::{Manager, Runtime};
+
+use crate::commands::gamepad::GamepadState;
 
 const EVENT_LINKAGE_LIB_STATE_CHANGE: &str = "linkage_lib_state_change";
 
@@ -54,7 +56,7 @@ pub fn enable<R: Runtime>(
             let mut socket = TcpStream::connect(socket_address.to_string()).unwrap();
 
             // Make sure the service has started
-            if let Err(_) = socket.read_exact(&mut [0]) {
+            if socket.read_exact(&mut [0]).is_err() {
                 disabled.store(true, Ordering::Relaxed);
                 log::warn!("Failed to check if Linkage service has been started. Disabling...");
                 _ = socket.shutdown(std::net::Shutdown::Both);

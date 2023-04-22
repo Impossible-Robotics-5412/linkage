@@ -61,7 +61,7 @@ fn handle_client(receiver: crossbeam::channel::Receiver<SystemInfo>, mut stream:
     // When we get updated system information from the channel:
     while let Ok(system_info) = receiver.recv() {
         // Send the system info over the stream to the client (Cockpit).
-        _ = stream.write(&encode_system_info(&system_info).as_bytes());
+        _ = stream.write(encode_system_info(&system_info).as_bytes());
 
         // If the stream is closed, stop this while loop.
         if let Err(error) = stream.read_exact(&mut [0]) {

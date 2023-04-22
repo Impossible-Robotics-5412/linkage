@@ -17,10 +17,8 @@ use crate::subsystem::Subsystem;
 /// ```
 /// use linkage_rs::prelude::*;
 ///
-/// fn main() {
-///     Robot::new()
-///         .run();
-/// }
+/// Robot::new()
+///     .run();
 /// ```
 #[derive(Default)]
 pub struct Robot {
