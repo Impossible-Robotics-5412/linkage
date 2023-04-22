@@ -65,7 +65,9 @@ export class ProcessLogger {
 								const logs: [Log] = JSON.parse(msg.data);
 								for (const log of logs) {
 									log.msg = log.msg.trimEnd();
-									log.timestampString = new Date(log.timestamp).toLocaleTimeString()
+									log.timestampString = new Date(
+										log.timestamp
+									).toLocaleTimeString();
 									controller.enqueue(log);
 								}
 							}

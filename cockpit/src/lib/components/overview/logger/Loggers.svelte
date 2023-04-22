@@ -1,17 +1,17 @@
 <script lang="ts">
 	import Container from '$lib/components/Container.svelte';
-	import { loggerState, tabs } from '$lib/logger';
+	import { loggerState, loggerTabs } from '$lib/logger';
 	import { LogLevel, logLevelLabel } from '$lib/process-logger';
 </script>
 
 <Container noPadding>
 	<div class="header" slot="header">
-		<h3>{tabs[$loggerState.selectedTabId].name}</h3>
+		<h3>{loggerTabs[$loggerState.selectedTabId].name}</h3>
 
 		<div>
 			<select bind:value={$loggerState.selectedTabId}>
-				{#each Object.keys(tabs) as tabId}
-					<option value={tabId}>{tabs[tabId].name}</option>
+				{#each Object.keys(loggerTabs) as tabId}
+					<option value={tabId}>{loggerTabs[tabId].name}</option>
 				{/each}
 			</select>
 
@@ -33,18 +33,19 @@
 	</div>
 
 	<div class="output">
-		{#each Object.keys(tabs) as tabId}
+		{#each Object.keys(loggerTabs) as tabId}
 			<div
 				class="tab"
 				class:visible={$loggerState.selectedTabId === tabId}>
-				<svelte:component this={tabs[tabId].loggerOutputComponent} />
+				<svelte:component
+					this={loggerTabs[tabId].loggerOutputComponent} />
 			</div>
 		{/each}
 	</div>
 </Container>
 
 <style lang="scss">
-	@use '../../style/vars' as *;
+	@use '../../../style/vars' as *;
 
 	.header {
 		display: flex;

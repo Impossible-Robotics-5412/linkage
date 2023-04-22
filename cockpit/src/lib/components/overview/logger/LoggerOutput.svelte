@@ -78,7 +78,7 @@
 </div>
 
 <style lang="scss">
-	@use '../../style/vars' as *;
+	@use '../../../style/vars' as *;
 
 	.logger-closed-message {
 		width: 100%;

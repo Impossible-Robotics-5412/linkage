@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 message_derive = { path = "../message_derive" }
+serde = { version = "1.0.160", features = ["derive"] }

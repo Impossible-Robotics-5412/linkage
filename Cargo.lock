@@ -1822,6 +1822,7 @@ name = "messaging"
 version = "0.1.0"
 dependencies = [
  "message_derive",
+ "serde",
 ]
 
 [[package]]

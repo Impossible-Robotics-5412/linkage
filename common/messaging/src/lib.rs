@@ -1,6 +1,7 @@
 mod error;
 
 use error::MessageError;
+use serde::{Deserialize, Serialize};
 
 /// An 8-byte array that serves as the common message sent between linkage programs.
 pub type Bytes = [u8; 8];
@@ -11,7 +12,7 @@ pub trait Message: TryFrom<Bytes> + Into<Bytes> {
 }
 
 // Cockpit ------> Linkage Lib
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum CockpitToLinkage {
     GamepadInputEvent {
         gamepad_id: u8,
@@ -61,7 +62,7 @@ impl From<CockpitToLinkage> for Bytes {
 }
 
 // Linkage ------> Carburetor
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum LinkageToCarburetor {
     MotorInstruction { channel: u8, speed: f32 },
 }

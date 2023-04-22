@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from './ui/Button.svelte';
+	import Button from '../ui/Button.svelte';
 	import {
 		disableRobotCode,
 		enableRobotCode,
@@ -24,7 +24,7 @@
 </div>
 
 <style lang="scss">
-	@use '../style/vars' as *;
+	@use '../../style/vars' as *;
 
 	:global(.enable-disable-robot-button > button) {
 		background: $c-green;

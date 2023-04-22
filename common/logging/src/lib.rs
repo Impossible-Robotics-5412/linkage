@@ -7,6 +7,8 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use ws::Sender;
 
+const MAX_SCROLLBACK: usize = 200;
+
 type SingleLogJsonString = String;
 type MultipleLogsJsonString = String;
 
@@ -51,6 +53,9 @@ impl Logger {
                 let json_log = self.fern_rx.recv().unwrap();
                 if let Ok(log) = json_to_log(&json_log) {
                     history.lock().unwrap().push(log);
+                    if history.lock().unwrap().len() > MAX_SCROLLBACK {
+                        history.lock().unwrap().remove(0);
+                    }
                 }
                 self.log_tx.send(json_log).unwrap();
             }
