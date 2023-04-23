@@ -1,3 +1,5 @@
+# This is an example of the optional configuration file in ~/.config/linkage/config.toml
+
 [linkage_lib]
 # The port on which Linkage-lib will listen
 port = 12362
