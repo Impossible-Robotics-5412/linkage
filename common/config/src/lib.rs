@@ -44,10 +44,7 @@ impl Config {
     }
 
     pub fn no_connections(&self) -> bool {
-        match std::env::var("LINKAGE_NO_CONNECTIONS") {
-            Ok(_) => true,
-            _ => false,
-        }
+        matches!(std::env::var("LINKAGE_NO_CONNECTIONS"), Ok(_))
     }
 }
 
