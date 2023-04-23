@@ -30,21 +30,23 @@
 			label="Connection"
 			status={robotConnectionStatus} />
 
-		<h3>Robot Code</h3>
-		<StatusItem
-			info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
-			label="State"
-			status={robotCodeStatus} />
-		<StatusItem
-			info={robotCodeFoundInfo}
-			label="Entrypoint"
-			status={robotCodeFoundStatus} />
+		{#if robotConnectionStatus}
+			<h3>Robot Code</h3>
+			<StatusItem
+				info={`${robotCodeStatus ? 'Enabled' : 'Disabled'}`}
+				label="State"
+				status={robotCodeStatus} />
+			<StatusItem
+				info={robotCodeFoundInfo}
+				label="Entrypoint"
+				status={robotCodeFoundStatus} />
 
-		{#if $systemInfo?.cpu && $systemInfo?.memory}
-			<h3>Robot System</h3>
-			<RobotSystemStatus
-				memory={$systemInfo.memory}
-				cpu={$systemInfo.cpu} />
+			{#if $systemInfo?.cpu && $systemInfo?.memory}
+				<h3>Robot System</h3>
+				<RobotSystemStatus
+					memory={$systemInfo.memory}
+					cpu={$systemInfo.cpu} />
+			{/if}
 		{/if}
 
 		{#if $systemInfo?.service_info}
