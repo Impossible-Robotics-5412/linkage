@@ -44,6 +44,48 @@ impl Config {
     }
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            linkage_lib: Box::new(LinkageLib {
+                port: 12362,
+                carburetor_address: Address {
+                    host: "raspberrypi.local".to_string(),
+                    port: 48862,
+                },
+                logger_port: 7640,
+            }),
+            carburetor: Box::new(Carburetor {
+                port: 48862,
+                logger_port: 7644,
+            }),
+            cockpit: Box::new(Cockpit {
+                linkage_lib_address: Address {
+                    host: "raspberrypi.local".to_string(),
+                    port: 12362,
+                },
+                linkage_socket_address: Address {
+                    host: "raspberrypi.local".to_string(),
+                    port: 9999,
+                },
+                cockpit_backend_logger_address: Address {
+                    host: "0.0.0.0".to_string(),
+                    port: 7642,
+                },
+                linkage_lib_logger_address: Address {
+                    host: "raspberrypi.local".to_string(),
+                    port: 7640,
+                },
+                carburetor_logger_address: Address {
+                    host: "raspberrypi.local".to_string(),
+                    port: 7644,
+                },
+            }),
+            gauge: Box::new(Gauge { port: 4226 }),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LinkageLib {
     port: AddressPort,
@@ -127,10 +169,10 @@ impl Gauge {
 pub fn config() -> Result<Config, Box<dyn Error>> {
     let config_path = xdg::BaseDirectories::with_prefix("linkage")?.get_config_file("config.toml");
     if !config_path.exists() {
-        panic!(
-            "No config file found at {}",
-            config_path.as_path().to_str().unwrap_or("UNKNOWN")
-        );
+        // FIXME: This should use the logger, but we can't access it from here.
+        eprintln!("No config found. Using default config.");
+        // No config found. Using default config.
+        return Ok(Config::default());
     }
 
     let config_file = config_crate::File::try_from(config_path)?;
