@@ -113,7 +113,7 @@ impl Robot {
             carburetor_message_receiver,
             config.linkage_lib().carburetor_address(),
         )
-        .expect("failed to open connection with Cockpit.");
+        .expect("failed to open connection with Carburetor.");
 
         self.is_running = true;
         let (term_tx, term_rx) = channel();

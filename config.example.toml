@@ -4,7 +4,7 @@
 # The port on which Linkage-lib will listen
 port = 12362
 # The address Carburetor is listening on
-carburetor_address = { host = "raspberrypi.local", port = 48862 }
+carburetor_address = { host = "0.0.0.0", port = 48862 }
 # The port on which the logger will send data
 logger_port = 7640
 

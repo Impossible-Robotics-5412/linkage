@@ -50,7 +50,7 @@ impl Default for Config {
             linkage_lib: Box::new(LinkageLib {
                 port: 12362,
                 carburetor_address: Address {
-                    host: "raspberrypi.local".to_string(),
+                    host: "0.0.0.0".to_string(),
                     port: 48862,
                 },
                 logger_port: 7640,
