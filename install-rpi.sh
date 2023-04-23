@@ -13,9 +13,6 @@ readonly CARGO_PATH=${HOME}/.cargo/bin/cargo
 readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
 readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
 
-readonly CONFIG_SOURCE_FILE=${LINKAGE_PATH}/config.toml
-readonly CONFIG_TARGET_FOLDER=${HOME}/.config/linkage/
-
 readonly LINKAGE_SYSTEMD_SOCKET=${LINKAGE_PATH}/lib/linkage.socket
 readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=${LINKAGE_PATH}/lib/linkage@.service
 readonly CARBURETOR_SERVICE=${LINKAGE_PATH}/carburetor/carburetor.service
@@ -51,10 +48,6 @@ echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
 # Install Gauge
 ${CARGO_PATH} build -p gauge --release
 sudo install ${GAUGE_BUILD_PATH} /usr/bin/gauge
-
-# Copy config file
-mkdir -p ${CONFIG_TARGET_FOLDER}
-cp ${CONFIG_SOURCE_FILE} ${CONFIG_TARGET_FOLDER}
 
 # Setup services
 sudo cp ${LINKAGE_SYSTEMD_SOCKET} /etc/systemd/system/

@@ -13,13 +13,13 @@
 ### Installing Linkage on a Pi
 #### Automatic install
 1. Run the install script with `curl -sL https://raw.githubusercontent.com/Impossible-Robotics-5412/linkage/main/install-rpi.sh | sudo bash -`
-2. [Deploy your robot code](#deploy-robot-code).
+2. [Deploy your robot code](#deploying-robot-code).
 
 #### Manual install
 1. Clone the repo to the Pi using `git clone https://github.com/Impossible-Robotics-5412/linkage.git`.
 2. Navigate into the downloaded repo using `cd linkage`.
 3. Run `./install-rpi.sh`. (Please note this might take quite a few minutes as it will install and compile all necessary dependencies!)
-4. [Deploy your robot code](#deploy-robot-code).
+4. [Deploy your robot code](#deploying-robot-code).
 
 ### Running Cockpit
 Currently we don't create prebuilt versions of Cockpit, which means you will have to build it from source.
@@ -36,7 +36,7 @@ Please see [Preparing the project](#preparing-the-project) for more information 
 - Follow https://tauri.app/v1/guides/getting-started/prerequisites to install the right dependencies for Tauri.
 
 ### Preparing the project
-After cloning the repo run `pnpm install`. This will add a config file to `~/.config/linkage/config.toml` which is used for general configuration of the project, and will install the necessary dependencies.
+After cloning the repo run `pnpm install`. This will install the necessary dependencies.
 
 ### Running Cockpit
 Now you should be able to run `./bob.py run cockpit` from the root of the project to start Cockpit.

@@ -128,22 +128,6 @@ def deploy(args: Namespace, example=None):
         styled_print("ERROR: Part '{unknown}' not recognized")
 
 
-def create_config_file():
-    config_folder_path = f"{home_dir()}/.config/linkage"
-    config_file_path = f"{config_folder_path}/config.toml"
-
-    default_config_file_path = f"{linkage_dir()}/config.toml"
-    if path.isfile(config_file_path):
-        styled_print(f"Config file already exists at '{config_file_path}'.")
-    else:
-        styled_print(f"Creating default config file at '{config_file_path}'.")
-        makedirs(config_folder_path, exist_ok=True)
-        shutil.copy(
-            src=default_config_file_path,
-            dst=config_file_path,
-        )
-
-
 def run_carburetor(release=False, no_build=False):
     if not no_build:
         build_carburetor(release=release)
