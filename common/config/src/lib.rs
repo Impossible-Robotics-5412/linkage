@@ -42,10 +42,6 @@ impl Config {
     pub fn gauge(&self) -> &Gauge {
         &self.gauge
     }
-
-    pub fn no_connections(&self) -> bool {
-        matches!(std::env::var("LINKAGE_NO_CONNECTIONS"), Ok(_))
-    }
 }
 
 impl Default for Config {

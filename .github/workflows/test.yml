@@ -12,8 +12,6 @@ name: test
 jobs:
   required:
     runs-on: ubuntu-latest
-    env:
-      LINKAGE_NO_CONNECTIONS: true
     name: ubuntu / ${{ matrix.toolchain }}
     strategy:
       matrix:

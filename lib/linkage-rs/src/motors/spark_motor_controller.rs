@@ -33,7 +33,7 @@ impl SparkMotorController {
     ///
     /// # Example
     ///
-    /// ```
+    /// ```no_run
     /// use linkage_rs::gamepads::PsController;
     /// use linkage_rs::motors::SparkMotorController;
     /// use linkage_rs::prelude::*;

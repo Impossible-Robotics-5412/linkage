@@ -8,7 +8,7 @@ use crate::state::RobotStateHandle;
 /// added to a Robot instance and their lifecycle methods (setup, tick, and shutdown) will be called automatically.
 /// Example of how to implement and use the Subsystem trait:
 ///
-/// ```
+/// ```no_run
 /// use linkage_rs::gamepads::PsController;
 /// use linkage_rs::motors::SparkMotorController;
 /// use linkage_rs::prelude::*;

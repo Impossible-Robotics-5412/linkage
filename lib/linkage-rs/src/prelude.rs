@@ -1,7 +1,7 @@
 //! The prelude file provides a simple way to import often used code into your program.
 //!
 //! # Examples
-//! ```
+//! ```no_run
 //! use linkage_rs::prelude::*;
 //!
 //! Robot::new()
