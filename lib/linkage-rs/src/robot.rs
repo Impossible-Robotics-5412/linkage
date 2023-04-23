@@ -106,14 +106,18 @@ impl Robot {
 
         let state = Arc::new(Mutex::new(RobotState::new(carburetor_message_sender)));
 
-        cockpit::start_listener(state.clone(), config.linkage_lib().port())
-            .expect("failed to start listening for Cockpit connections.");
+        if config.no_connections() {
+            log::warn!("Running robot code without connections to Cockpit and Carburetor!");
+        } else {
+            cockpit::start_listener(state.clone(), config.linkage_lib().port())
+                .expect("failed to start listening for Cockpit connections.");
 
-        carburetor::open_connection(
-            carburetor_message_receiver,
-            config.linkage_lib().carburetor_address(),
-        )
-        .expect("failed to open connection with Carburetor.");
+            carburetor::open_connection(
+                carburetor_message_receiver,
+                config.linkage_lib().carburetor_address(),
+            )
+            .expect("failed to open connection with Carburetor.");
+        }
 
         self.is_running = true;
         let (term_tx, term_rx) = channel();

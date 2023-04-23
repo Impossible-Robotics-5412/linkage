@@ -42,6 +42,13 @@ impl Config {
     pub fn gauge(&self) -> &Gauge {
         &self.gauge
     }
+
+    pub fn no_connections(&self) -> bool {
+        match std::env::var("LINKAGE_NO_CONNECTIONS") {
+            Ok(_) => true,
+            _ => false,
+        }
+    }
 }
 
 impl Default for Config {
@@ -179,7 +186,6 @@ pub fn config() -> Result<Config, Box<dyn Error>> {
 
     let config = config_crate::Config::builder()
         .add_source(config_file)
-        .add_source(config_crate::Environment::with_prefix("LINKAGE"))
         .build()
         .unwrap()
         .try_deserialize::<Config>()?;
