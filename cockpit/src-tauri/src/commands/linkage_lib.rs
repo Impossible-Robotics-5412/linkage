@@ -59,25 +59,23 @@ pub fn enable<R: Runtime>(
             if socket.read_exact(&mut [0]).is_err() {
                 disabled.store(true, Ordering::Relaxed);
                 log::warn!("Failed to check if Linkage service has been started. Disabling...");
-                _ = socket.shutdown(std::net::Shutdown::Both);
-                return;
+            } else {
+                log::debug!("Started Linkage-lib socket.");
+                app.emit_all(
+                    EVENT_LINKAGE_LIB_STATE_CHANGE,
+                    LinkageLibStateChange::Enabled,
+                )
+                .unwrap();
+
+                thread::spawn({
+                    let disabled = disabled.clone();
+                    move || {
+                        start_linkage_lib_communication(config, gamepad_event_bus_rx, disabled);
+                    }
+                });
+
+                block_until_disable(&mut socket, disabled.clone());
             }
-
-            log::debug!("Started Linkage-lib socket.");
-            app.emit_all(
-                EVENT_LINKAGE_LIB_STATE_CHANGE,
-                LinkageLibStateChange::Enabled,
-            )
-            .unwrap();
-
-            thread::spawn({
-                let disabled = disabled.clone();
-                move || {
-                    start_linkage_lib_communication(config, gamepad_event_bus_rx, disabled);
-                }
-            });
-
-            block_until_disable(&mut socket, disabled.clone());
 
             app.emit_all(
                 EVENT_LINKAGE_LIB_STATE_CHANGE,
@@ -85,7 +83,7 @@ pub fn enable<R: Runtime>(
             )
             .unwrap();
 
-            socket.shutdown(std::net::Shutdown::Both).unwrap();
+            _ = socket.shutdown(std::net::Shutdown::Both);
 
             log::debug!("Closed Linkage-lib service socket.");
         }
