@@ -3,8 +3,7 @@
 import argparse
 from argparse import Namespace
 import subprocess
-import shutil
-from os import makedirs, path
+from os import path
 
 
 def styled_print(message):
