@@ -109,7 +109,9 @@ fn start_linkage_lib_communication(
                     break;
                 }
 
-                if let Ok(Some(message)) = gamepad_event_bus_rx.try_recv() {
+                if let Ok(Some(message)) =
+                    gamepad_event_bus_rx.recv_timeout(Duration::from_millis(50))
+                {
                     if let Err(err) = linkage_communication_stream.write(&message.to_bytes()) {
                         match err.kind() {
                             ErrorKind::BrokenPipe => {
