@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { disableRobotCode, initializeListeners } from '$lib/backend';
 	import Sidebar from '$lib/components/Sidebar.svelte';
-	import type { LoggerTab } from '$lib/logger';
+	import type { Tab } from '$lib/types/tab';
 
-	let selectedTab: LoggerTab;
+	let selectedTab: Tab;
 
 	const entries = performance.getEntriesByType('navigation');
-	entries.forEach(entry => {
+	entries.forEach((entry: PerformanceNavigationTiming) => {
 		if (entry.type === 'reload') {
 			console.log(`${entry.name} was reloaded. Disabling robot code.`);
 			disableRobotCode();
