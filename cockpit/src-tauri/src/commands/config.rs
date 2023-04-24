@@ -1,12 +1,12 @@
-use config::Config;
+use config::LinkageConfig;
 use std::sync::Arc;
 
 pub struct ConfigState {
-    config: Arc<Config>,
+    config: Arc<LinkageConfig>,
 }
 
 impl ConfigState {
-    pub fn new(config: Arc<Config>) -> Self {
+    pub fn new(config: Arc<LinkageConfig>) -> Self {
         Self { config }
     }
 }

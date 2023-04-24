@@ -19,35 +19,35 @@ impl Display for Address {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Config {
-    linkage_lib: Box<LinkageLib>,
-    carburetor: Box<Carburetor>,
-    cockpit: Box<Cockpit>,
-    gauge: Box<Gauge>,
+pub struct LinkageConfig {
+    linkage_lib: Box<LinkageLibConfig>,
+    carburetor: Box<CarburetorConfig>,
+    cockpit: Box<CockpitConfig>,
+    gauge: Box<GaugeConfig>,
 }
 
-impl Config {
-    pub fn linkage_lib(&self) -> &LinkageLib {
+impl LinkageConfig {
+    pub fn linkage_lib(&self) -> &LinkageLibConfig {
         &self.linkage_lib
     }
 
-    pub fn carburetor(&self) -> &Carburetor {
+    pub fn carburetor(&self) -> &CarburetorConfig {
         &self.carburetor
     }
 
-    pub fn cockpit(&self) -> &Cockpit {
+    pub fn cockpit(&self) -> &CockpitConfig {
         &self.cockpit
     }
 
-    pub fn gauge(&self) -> &Gauge {
+    pub fn gauge(&self) -> &GaugeConfig {
         &self.gauge
     }
 }
 
-impl Default for Config {
+impl Default for LinkageConfig {
     fn default() -> Self {
         Self {
-            linkage_lib: Box::new(LinkageLib {
+            linkage_lib: Box::new(LinkageLibConfig {
                 port: 12362,
                 carburetor_address: Address {
                     host: "0.0.0.0".to_string(),
@@ -55,11 +55,11 @@ impl Default for Config {
                 },
                 logger_port: 7640,
             }),
-            carburetor: Box::new(Carburetor {
+            carburetor: Box::new(CarburetorConfig {
                 port: 48862,
                 logger_port: 7644,
             }),
-            cockpit: Box::new(Cockpit {
+            cockpit: Box::new(CockpitConfig {
                 linkage_lib_address: Address {
                     host: "raspberrypi.local".to_string(),
                     port: 12362,
@@ -81,19 +81,19 @@ impl Default for Config {
                     port: 7644,
                 },
             }),
-            gauge: Box::new(Gauge { port: 4226 }),
+            gauge: Box::new(GaugeConfig { port: 4226 }),
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct LinkageLib {
+pub struct LinkageLibConfig {
     port: AddressPort,
     carburetor_address: Address,
     logger_port: AddressPort,
 }
 
-impl LinkageLib {
+impl LinkageLibConfig {
     pub fn port(&self) -> &AddressPort {
         &self.port
     }
@@ -108,12 +108,12 @@ impl LinkageLib {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Carburetor {
+pub struct CarburetorConfig {
     port: AddressPort,
     logger_port: AddressPort,
 }
 
-impl Carburetor {
+impl CarburetorConfig {
     pub fn port(&self) -> AddressPort {
         self.port
     }
@@ -124,7 +124,7 @@ impl Carburetor {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Cockpit {
+pub struct CockpitConfig {
     linkage_lib_address: Address,
     linkage_socket_address: Address,
 
@@ -133,7 +133,7 @@ pub struct Cockpit {
     carburetor_logger_address: Address,
 }
 
-impl Cockpit {
+impl CockpitConfig {
     pub fn linkage_lib_address(&self) -> &Address {
         &self.linkage_lib_address
     }
@@ -156,23 +156,23 @@ impl Cockpit {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Gauge {
+pub struct GaugeConfig {
     port: AddressPort,
 }
 
-impl Gauge {
+impl GaugeConfig {
     pub fn port(&self) -> AddressPort {
         self.port
     }
 }
 
-pub fn config() -> Result<Config, Box<dyn Error>> {
+pub fn config() -> Result<LinkageConfig, Box<dyn Error>> {
     let config_path = xdg::BaseDirectories::with_prefix("linkage")?.get_config_file("config.toml");
     if !config_path.exists() {
         // FIXME: This should use the logger, but we can't access it from here.
         eprintln!("No config found. Using default config.");
         // No config found. Using default config.
-        return Ok(Config::default());
+        return Ok(LinkageConfig::default());
     }
 
     let file_content = std::fs::read_to_string(config_path)?;

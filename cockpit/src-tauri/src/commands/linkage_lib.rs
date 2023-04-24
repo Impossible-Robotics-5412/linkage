@@ -10,7 +10,7 @@ use std::{
 use bus::BusReader;
 use tauri::{Manager, Runtime};
 
-use config::Config;
+use config::LinkageConfig;
 use messaging::{CockpitToLinkage, Message};
 
 use crate::commands::gamepad::GamepadState;
@@ -93,7 +93,7 @@ pub fn enable<R: Runtime>(
 }
 
 fn start_linkage_lib_communication(
-    config: Config,
+    config: LinkageConfig,
     mut gamepad_event_bus_rx: BusReader<Option<CockpitToLinkage>>,
     disabled: Arc<AtomicBool>,
 ) {
