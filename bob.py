@@ -46,8 +46,6 @@ def cargo_run(cargo_path=None, package=None, release=False):
 def init(no_npm_install):
     if not no_npm_install:
         subprocess.run(["pnpm", "install"])
-    create_config_file()
-
 
 def format():
     styled_print("Formatting entire project...")
