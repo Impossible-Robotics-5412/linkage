@@ -160,7 +160,7 @@ fn block_until_disable(socket: &mut TcpStream, disabled: Arc<AtomicBool>) {
 
         // Didn't receive a disable message from the frontend,
         // so let's see if the connection has been closed.
-        match socket.read_exact(&mut [0]) {
+        match socket.read_exact(&mut [0; 1024]) {
             Err(err) if err.kind() == ErrorKind::UnexpectedEof => {
                 // The socket has been closed.
                 log::debug!("Closing Linkage socket: Linkage socket received UnexpectedEof");

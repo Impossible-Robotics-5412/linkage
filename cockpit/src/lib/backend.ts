@@ -111,7 +111,8 @@ export const gamepadState = writable<GamepadState>(
 
 export async function enableRobotCode() {
 	robotCode.update($robotCode => {
-		$robotCode.changingState = true;
+		if (!$robotCode.enabled)
+			$robotCode.changingState = true;
 		return $robotCode;
 	});
 	return invoke('enable');
@@ -119,7 +120,8 @@ export async function enableRobotCode() {
 
 export async function disableRobotCode() {
 	robotCode.update($robotCode => {
-		$robotCode.changingState = true;
+		if ($robotCode.enabled)
+			$robotCode.changingState = true;
 		return $robotCode;
 	});
 	return invoke('disable');

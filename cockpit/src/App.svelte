@@ -1,8 +1,17 @@
 <script lang="ts">
+	import { disableRobotCode } from '$lib/backend';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import type { LoggerTab } from '$lib/logger';
 
 	let selectedTab: LoggerTab;
+
+	const entries = performance.getEntriesByType('navigation');
+	entries.forEach(entry => {
+		if (entry.type === 'reload') {
+			console.log(`${entry.name} was reloaded. Disabling robot code.`);
+			disableRobotCode();
+		}
+	});
 </script>
 
 <main>
