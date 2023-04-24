@@ -92,13 +92,6 @@ pub fn enable<R: Runtime>(
     Ok(())
 }
 
-#[tauri::command]
-pub fn disable(state: tauri::State<'_, LinkageLibState>) {
-    log::debug!("Received disable command");
-
-    state.disabled.store(true, Ordering::Relaxed);
-}
-
 fn start_linkage_lib_communication(
     config: Config,
     mut gamepad_event_bus_rx: BusReader<Option<CockpitToLinkage>>,
@@ -160,7 +153,7 @@ fn block_until_disable(socket: &mut TcpStream, disabled: Arc<AtomicBool>) {
 
         // Didn't receive a disable message from the frontend,
         // so let's see if the connection has been closed.
-        match socket.read_exact(&mut [0]) {
+        match socket.read_exact(&mut [0; 1024]) {
             Err(err) if err.kind() == ErrorKind::UnexpectedEof => {
                 // The socket has been closed.
                 log::debug!("Closing Linkage socket: Linkage socket received UnexpectedEof");
@@ -169,4 +162,11 @@ fn block_until_disable(socket: &mut TcpStream, disabled: Arc<AtomicBool>) {
             _ => {}
         }
     }
+}
+
+#[tauri::command]
+pub fn disable(state: tauri::State<'_, LinkageLibState>) {
+    log::debug!("Received disable command");
+
+    state.disabled.store(true, Ordering::Relaxed);
 }

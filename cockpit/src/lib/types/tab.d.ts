@@ -1,7 +1,7 @@
-import { SvelteComponent } from 'svelte';
+import { SvelteComponentTyped } from 'svelte';
 
 interface Tab {
 	label: string;
-	component: SvelteComponent;
-	iconComponent: SvelteComponent;
+	component: SvelteComponentTyped;
+	iconComponent: SvelteComponentTyped;
 }
