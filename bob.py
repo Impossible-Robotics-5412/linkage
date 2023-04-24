@@ -47,6 +47,7 @@ def init(no_npm_install):
     if not no_npm_install:
         subprocess.run(["pnpm", "install"])
 
+
 def format():
     styled_print("Formatting entire project...")
     styled_print("Running prettier...")
