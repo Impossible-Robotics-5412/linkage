@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { disableRobotCode } from '$lib/backend';
+	import { disableRobotCode, initializeListeners } from '$lib/backend';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import type { LoggerTab } from '$lib/logger';
 
@@ -12,6 +12,8 @@
 			disableRobotCode();
 		}
 	});
+
+	initializeListeners();
 </script>
 
 <main>
