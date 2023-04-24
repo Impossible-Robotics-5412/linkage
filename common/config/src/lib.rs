@@ -175,13 +175,9 @@ pub fn config() -> Result<Config, Box<dyn Error>> {
         return Ok(Config::default());
     }
 
-    let config_file = config_crate::File::try_from(config_path)?;
+    let file_content = std::fs::read_to_string(config_path)?;
 
-    let config = config_crate::Config::builder()
-        .add_source(config_file)
-        .build()
-        .unwrap()
-        .try_deserialize::<Config>()?;
+    let config = toml::from_str(file_content.as_str())?;
 
     Ok(config)
 }
