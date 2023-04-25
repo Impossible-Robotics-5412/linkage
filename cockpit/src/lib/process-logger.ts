@@ -8,25 +8,9 @@ export interface Log {
 }
 
 export enum LogLevel {
-	/**
-	 * The "error" level.
-	 * Designates very serious errors.
-	 */
 	ERROR = 1,
-	/**
-	 * The "warn" level.
-	 * Designates hazardous situations.
-	 */
 	WARN,
-	/**
-	 * The "info" level.
-	 * Designates useful information.
-	 */
 	INFO,
-	/**
-	 * The "debug" level.
-	 * Designates lower priority information.
-	 */
 	DEBUG
 }
 

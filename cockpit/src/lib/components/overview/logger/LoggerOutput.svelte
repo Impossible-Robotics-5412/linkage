@@ -6,7 +6,7 @@
 		ProcessLogger
 	} from '$lib/process-logger';
 	import { tick } from 'svelte';
-	import { loggerState } from '$lib/logger';
+	import { loggerState } from '$lib/state/loggers';
 	import type { Address } from '$lib/config';
 
 	export let address: Address | undefined;

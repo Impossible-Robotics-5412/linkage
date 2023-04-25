@@ -1,37 +1,20 @@
 import { writable } from 'svelte/store';
 import type { SystemInfo } from '$lib/types/system-info';
 import { listen } from '@tauri-apps/api/event';
-import { loggerState } from '$lib/logger';
 import { invoke } from '@tauri-apps/api/tauri';
-import type { GamepadId } from '$lib/gamepad-data';
 import {
 	EventType,
 	GamepadData,
 	parseGamepadInputEvent
 } from '$lib/gamepad-data';
+import { robotCodeState } from '$lib/state/robot-code';
+import { loggerState } from '$lib/state/loggers';
+import { gamepadState } from '$lib/state/gamepad';
 
 export const systemInfo = writable<SystemInfo | undefined>(undefined);
 
-export interface RobotCodeState {
-	enabled: boolean;
-	changingState: boolean;
-}
-
-export const robotCode = writable<RobotCodeState>({
-	enabled: false,
-	changingState: false
-});
-
-export interface GamepadState {
-	gamepads: { [id: GamepadId]: GamepadData };
-}
-
-export const gamepadState = writable<GamepadState>({
-	gamepads: {}
-});
-
 export async function enableRobotCode() {
-	robotCode.update($robotCode => {
+	robotCodeState.update($robotCode => {
 		if (!$robotCode.enabled) $robotCode.changingState = true;
 		return $robotCode;
 	});
@@ -39,7 +22,7 @@ export async function enableRobotCode() {
 }
 
 export async function disableRobotCode() {
-	robotCode.update($robotCode => {
+	robotCodeState.update($robotCode => {
 		if ($robotCode.enabled) $robotCode.changingState = true;
 		return $robotCode;
 	});
@@ -54,7 +37,7 @@ export function initializeListeners() {
 
 function initializeLinkageLibStateListener() {
 	listen('linkage_lib_state_change', event => {
-		robotCode.update($robotCode => {
+		robotCodeState.update($robotCode => {
 			$robotCode.changingState = false;
 			if (event.payload === 'Enabled') {
 				$robotCode.enabled = true;

@@ -14,12 +14,7 @@ export interface CockpitConfig {
 }
 
 export async function getConfig() {
-	return new Promise<CockpitConfig>((resolve, reject) => {
-		invoke('config')
-			.then((config_json: string) => {
-				const config: CockpitConfig = JSON.parse(config_json);
-				resolve(config);
-			})
-			.catch(reject);
-	});
+	const configJson = (await invoke('config')) as string;
+	const config: CockpitConfig = JSON.parse(configJson);
+	return config;
 }

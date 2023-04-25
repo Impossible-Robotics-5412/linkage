@@ -3,11 +3,12 @@
 	import Container from '../../Container.svelte';
 	import RobotSystemStatus from './RobotSystemStatus.svelte';
 	import RobotServicesStatus from './RobotServicesStatus.svelte';
-	import { robotCode, systemInfo } from '$lib/backend';
-	import { Status } from '$lib/types/status';
 	import List from '$lib/components/ui/List.svelte';
+	import { systemInfo } from '$lib/backend';
+	import { Status } from '$lib/types/status';
+	import { robotCodeState } from '$lib/state/robot-code';
 
-	$: robotCodeStatus = $robotCode.enabled ? Status.GOOD : Status.BAD;
+	$: robotCodeStatus = $robotCodeState.enabled ? Status.GOOD : Status.BAD;
 	$: robotConnectionStatus = $systemInfo ? Status.GOOD : Status.BAD;
 
 	$: robotCodeFoundInfo = $systemInfo?.robot_code_exists

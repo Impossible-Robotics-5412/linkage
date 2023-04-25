@@ -3,16 +3,18 @@
 	import {
 		disableRobotCode,
 		enableRobotCode,
-		robotCode,
 		systemInfo
 	} from '$lib/backend';
+	import { robotCodeState } from '$lib/state/robot-code';
 
 	$: buttonDisabled =
-		$robotCode.changingState || !$systemInfo?.robot_code_exists;
+		$robotCodeState.changingState || !$systemInfo?.robot_code_exists;
 </script>
 
-<div class:enabled={$robotCode.enabled} class="enable-disable-robot-button">
-	{#if $robotCode.enabled}
+<div
+	class:enabled={$robotCodeState.enabled}
+	class="enable-disable-robot-button">
+	{#if $robotCodeState.enabled}
 		<Button disabled={buttonDisabled} on:click={disableRobotCode}>
 			Disable
 		</Button>

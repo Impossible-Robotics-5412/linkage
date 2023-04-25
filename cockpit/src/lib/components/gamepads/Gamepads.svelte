@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Container from '$lib/components/Container.svelte';
-	import { gamepadState } from '$lib/backend';
 	import {
 		AxisControl,
 		ButtonControl,
@@ -8,6 +7,7 @@
 	} from '$lib/gamepad-data';
 	import List from '$lib/components/ui/List.svelte';
 	import GamepadControlStatus from '$lib/components/gamepads/GamepadControlStatus.svelte';
+	import { gamepadState } from '$lib/state/gamepad';
 
 	let gamepadId: GamepadId | null;
 	$: gamepadDatas = Object.values($gamepadState.gamepads);

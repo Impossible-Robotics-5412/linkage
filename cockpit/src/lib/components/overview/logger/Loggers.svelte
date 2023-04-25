@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Container from '$lib/components/Container.svelte';
-	import { loggerState } from '$lib/logger';
+	import { loggerState } from '$lib/state/loggers';
 	import { LogLevel, logLevelLabel } from '$lib/process-logger';
 	import { type Address, getConfig } from '$lib/config';
 	import LoggerOutput from '$lib/components/overview/logger/LoggerOutput.svelte';
-	import { robotCode } from '$lib/backend';
+	import { robotCodeState } from '$lib/state/robot-code';
 
 	interface LoggerTab {
 		name: string;
@@ -26,7 +26,7 @@
 					address: config.linkage_lib_logger_address,
 					closedStreamMessage:
 						'Enable the robot to see Linkage output',
-					canStartLogger: $robotCode.enabled
+					canStartLogger: $robotCodeState.enabled
 				},
 				'carburetor': {
 					name: 'Carburetor',
