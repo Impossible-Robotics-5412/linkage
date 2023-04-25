@@ -121,7 +121,7 @@ def deploy_example(example):
     subprocess.run(["./deploy.sh", example], cwd="lib/linkage-rs")
 
 
-def deploy(args: Namespace, example=None):
+def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
         deploy_carburetor()
@@ -129,7 +129,7 @@ def deploy(args: Namespace, example=None):
     elif args.part == "carburetor":
         deploy_carburetor()
     elif args.part == "example":
-        deploy_example(example)
+        deploy_example("simple_tankdrive")
     elif args.part == "gauge":
         deploy_gauge()
     else:
@@ -223,11 +223,6 @@ if __name__ == "__main__":
         choices=["all", "carburetor", "gauge", "example"],
     )
 
-    deploy_subcommand.add_argument(
-        "example",
-        help="the example to build",
-    )
-
     # Run subcommand
     run_subcommand = subparsers.add_parser(
         "run",
@@ -269,7 +264,7 @@ if __name__ == "__main__":
     elif args.subcommand == "build":
         build(args)
     elif args.subcommand == "deploy":
-        deploy(args, example=args.example)
+        deploy(args)
     elif args.subcommand == "run":
         run(args)
     else:
