@@ -1,17 +1,31 @@
 <script lang="ts">
-	import { LogLevel, logLevelLabel, type Log } from '$lib/process-logger';
+	import {
+		LogLevel,
+		logLevelLabel,
+		type Log,
+		ProcessLogger
+	} from '$lib/process-logger';
 	import { tick } from 'svelte';
 	import { loggerState } from '$lib/logger';
+	import type { Address } from '$lib/config';
 
-	export let stream: ReadableStream<Log> | undefined;
-	export let maxScrollback = 500;
+	export let address: Address | undefined;
 	export let closedStreamMessage = 'Logger stream is closed';
+	export let canStartLogger = true;
+	export let maxScrollback = 500;
 
 	let logs: Log[] = [];
 	let loggerElement: HTMLElement;
+	let stream: ReadableStream<Log> | undefined;
 
-	function clearLogger() {
-		logs = [];
+	$: if (address && canStartLogger) {
+		const processLogger = new ProcessLogger(
+			`ws://${address.host}:${address.port}`
+		);
+
+		processLogger.start().then(logStream => {
+			stream = logStream;
+		});
 	}
 
 	async function startReadingStream() {
@@ -31,6 +45,10 @@
 		}
 		await reader.cancel();
 		await stream?.cancel();
+	}
+
+	function clearLogger() {
+		logs = [];
 	}
 
 	async function scrollToBottom() {
