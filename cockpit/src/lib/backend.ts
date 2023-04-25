@@ -59,7 +59,7 @@ function initializeLinkageLibStateListener() {
 }
 
 function initializeGamepadEventListener() {
-	invoke('start_event_listener').then(() => {
+	invoke('start_gamepad_event_listener').then(() => {
 		listen('gamepad_event', event => {
 			gamepadState.update($gamepadState => {
 				const gamepadInputEvent = parseGamepadInputEvent(event.payload);

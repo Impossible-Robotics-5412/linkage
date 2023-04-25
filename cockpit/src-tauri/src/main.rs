@@ -6,7 +6,7 @@ mod commands;
 use crate::commands::config::ConfigState;
 use crate::commands::gamepad::GamepadState;
 use commands::config::config;
-use commands::gamepad::start_event_listener;
+use commands::gamepad::start_gamepad_event_listener;
 use commands::gauge::start_gauge_connection;
 use commands::linkage_lib::{disable, enable, LinkageLibState};
 use std::sync::Arc;
@@ -29,7 +29,7 @@ fn main() {
             enable,
             disable,
             config,
-            start_event_listener,
+            start_gamepad_event_listener,
             start_gauge_connection
         ])
         .run(tauri::generate_context!())

@@ -37,7 +37,7 @@ enum EventType {
 }
 
 #[tauri::command]
-pub fn start_event_listener<R: Runtime>(
+pub fn start_gamepad_event_listener<R: Runtime>(
     app: tauri::AppHandle<R>,
     state: tauri::State<'_, GamepadState>,
 ) {
