@@ -68,6 +68,16 @@ def format():
     exit(0)
 
 
+def lint():
+    styled_print("Linting entire project...")
+    styled_print("Running eslint...")
+    subprocess.run(["npx", "eslint", "."])
+    styled_print("Running cargo clippy...")
+    subprocess.run(["cargo", "clippy"])
+    styled_print("Done!")
+    exit(0)
+
+
 def build_cockpit():
     styled_print("Building frontend...")
     subprocess.run(["pnpm", "install"], cwd="cockpit")
@@ -175,6 +185,9 @@ if __name__ == "__main__":
     # Format subcommand
     format_subcommand = subparsers.add_parser("format", help="format all files")
 
+    # Lint subcommand
+    lint_subcommand = subparsers.add_parser("lint", help="lints all files")
+
     # Build subcommand
     build_subcommand = subparsers.add_parser(
         "build", help="build the moving parts of linkage"
@@ -251,6 +264,8 @@ if __name__ == "__main__":
         init(no_npm_install=args.no_npm_install)
     elif args.subcommand == "format":
         format()
+    elif args.subcommand == "lint":
+        lint()
     elif args.subcommand == "build":
         build(args)
     elif args.subcommand == "deploy":
