@@ -1,0 +1,30 @@
+{
+	"extends": [
+		"eslint:recommended",
+		"plugin:svelte/recommended",
+		"plugin:svelte/prettier",
+		"plugin:@typescript-eslint/recommended"
+	],
+	"plugins": ["@typescript-eslint"],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": "./cockpit/tsconfig.json",
+		"extraFileExtensions": [".svelte"]
+	},
+	"overrides": [
+		{
+			"files": ["*.svelte"],
+			"rules": {
+				"no-self-assign": "off"
+			},
+			"parser": "svelte-eslint-parser",
+			"parserOptions": {
+				"parser": "@typescript-eslint/parser"
+			}
+		}
+	],
+	"env": {
+		"browser": true,
+		"node": true
+	}
+}
