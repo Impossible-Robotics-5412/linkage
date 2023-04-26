@@ -7,10 +7,10 @@ set -o xtrace
 
 readonly USER=linkage
 readonly DEFAULT_PASSWORD=linkage
-readonly HOME=/home/${USER}
-readonly LINKAGE_PATH=${HOME}/linkage
+readonly LINKAGE_HOME=/home/${USER}
+readonly LINKAGE_PATH=${LINKAGE_HOME}/linkage
 
-readonly CARGO_PATH=$HOME/.cargo/bin/cargo
+readonly CARGO_PATH=~/.cargo/bin/cargo
 
 readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
 readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
@@ -28,10 +28,6 @@ sudo usermod -aG sudo ${USER}
 sudo apt update
 sudo apt install git -y
 
-# Clone the repo
-sudo git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
-cd ${LINKAGE_PATH}
-
 # Install Rust
 # Yes, this is ugly but not sure how to set the -y flag in the script 
 # when running `curl https://sh.rustup.rs -sSf | sh` any other way.
@@ -40,12 +36,16 @@ sudo chmod +x ./install-rust.sh
 sudo ./install-rust.sh -y
 sudo rm ./install-rust.sh
 
+# Make sure we can use PWM channels.
+echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
+
+# Clone the repo
+sudo git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
+cd ${LINKAGE_PATH}
+
 # Install Carburetor
 ${CARGO_PATH} build -p carburetor --release
 sudo install ${CARBURETOR_BUILD_PATH} /usr/bin/carburetor
-
-# Make sure we can use PWM channels.
-echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
 
 # Install Gauge
 ${CARGO_PATH} build -p gauge --release
