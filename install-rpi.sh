@@ -32,10 +32,6 @@ sudo apt install git -y
 sudo git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
 cd ${LINKAGE_PATH}
 
-# Install NodeJS
-curl -sL https://deb.nodesource.com/setup_lts.x | sudo bash -
-sudo apt install nodejs
-
 # Install Rust
 # Yes, this is ugly but not sure how to set the -y flag in the script 
 # when running `curl https://sh.rustup.rs -sSf | sh` any other way.
