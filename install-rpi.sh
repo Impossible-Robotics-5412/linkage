@@ -5,7 +5,9 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-readonly HOME=/home/pi
+readonly USER=linkage
+readonly DEFAULT_PASSWORD=linkage
+readonly HOME=/home/${USER}
 readonly LINKAGE_PATH=${HOME}/linkage
 
 readonly CARGO_PATH=${HOME}/.cargo/bin/cargo
@@ -17,6 +19,9 @@ readonly LINKAGE_SYSTEMD_SOCKET=${LINKAGE_PATH}/lib/linkage.socket
 readonly LINKAGE_SYSTEMD_SOCKET_SERVICE=${LINKAGE_PATH}/lib/linkage@.service
 readonly CARBURETOR_SERVICE=${LINKAGE_PATH}/carburetor/carburetor.service
 readonly GAUGE_SERVICE=${LINKAGE_PATH}/gauge/gauge.service
+
+sudo useradd --create-home ${USER}
+echo ${DEFAULT_PASSWORD}:${USER} | sudo chpasswd
 
 # Install git
 sudo apt update
