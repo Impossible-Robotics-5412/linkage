@@ -22,13 +22,14 @@ readonly GAUGE_SERVICE=${LINKAGE_PATH}/gauge/gauge.service
 
 sudo useradd --create-home ${USER}
 echo ${DEFAULT_PASSWORD}:${USER} | sudo chpasswd
+sudo usermod -aG sudo ${USER}
 
 # Install git
 sudo apt update
 sudo apt install git -y
 
 # Clone the repo
-git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
+sudo git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
 cd ${LINKAGE_PATH}
 
 # Install NodeJS
@@ -38,10 +39,10 @@ sudo apt install nodejs
 # Install Rust
 # Yes, this is ugly but not sure how to set the -y flag in the script 
 # when running `curl https://sh.rustup.rs -sSf | sh` any other way.
-curl https://sh.rustup.rs -sSf -o install-rust.sh
-chmod +x ./install-rust.sh
-./install-rust.sh -y
-rm ./install-rust.sh
+sudo curl https://sh.rustup.rs -sSf -o install-rust.sh
+sudo chmod +x ./install-rust.sh
+sudo ./install-rust.sh -y
+sudo rm ./install-rust.sh
 
 # Install Carburetor
 ${CARGO_PATH} build -p carburetor --release
