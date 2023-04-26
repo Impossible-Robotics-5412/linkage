@@ -3,7 +3,6 @@ Description=Carburetor
 After=multi-user.target
 
 [Service]
-# TODO: Create custom user for running linkage processes
 User=linkage
 ExecStart=/usr/bin/carburetor
 Restart=always
