@@ -10,7 +10,7 @@ readonly DEFAULT_PASSWORD=linkage
 readonly HOME=/home/${USER}
 readonly LINKAGE_PATH=${HOME}/linkage
 
-readonly CARGO_PATH=${HOME}/.cargo/bin/cargo
+readonly CARGO_PATH=$HOME/.cargo/bin/cargo
 
 readonly CARBURETOR_BUILD_PATH=${LINKAGE_PATH}/target/release/carburetor
 readonly GAUGE_BUILD_PATH=${LINKAGE_PATH}/target/release/gauge
