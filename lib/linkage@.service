@@ -6,7 +6,7 @@ Requires=linkage.socket
 Type=simple
 # TODO: Create custom user for running linkage processes
 User=linkage
-ExecStart=/home/pi/robot_code/main
+ExecStart=/home/linkage/robot_code/main
 StandardInput=socket
 StandardError=journal  
 TimeoutStopSec=5
