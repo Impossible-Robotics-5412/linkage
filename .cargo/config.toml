@@ -1,2 +1,5 @@
 [registries.crates-io]
 protocol = "sparse"
+
+[target.armv7-unknown-linux-gnueabihf]
+linker = "arm-linux-gnueabihf-gcc"
