@@ -9,7 +9,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  publish-to-github:
+  publish:
     name: Publish to Github
     runs-on: ${{matrix.os}}
     strategy:
@@ -51,6 +51,9 @@ jobs:
 
       - name: Build
         run: cargo build -p gauge --release --target ${{ matrix.target }}
+
+      - name: LS
+        run: ls
 
       - name: Release
         uses: softprops/action-gh-release@v1
