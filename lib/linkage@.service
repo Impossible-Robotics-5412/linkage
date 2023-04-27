@@ -4,7 +4,7 @@ Requires=linkage.socket
 
 [Service]
 Type=simple
-User=linkage
+WorkingDirectory=/home/linkage
 ExecStart=/home/linkage/robot_code/main
 StandardInput=socket
 StandardError=journal  

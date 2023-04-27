@@ -3,7 +3,7 @@ Description=Gauge
 After=multi-user.target
 
 [Service]
-User=linkage
+WorkingDirectory=/home/linkage
 ExecStart=/usr/bin/gauge
 Restart=always
 RestartSec=3s

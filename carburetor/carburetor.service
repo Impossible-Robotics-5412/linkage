@@ -3,7 +3,7 @@ Description=Carburetor
 After=multi-user.target
 
 [Service]
-User=linkage
+WorkingDirectory=/home/linkage
 ExecStart=/usr/bin/carburetor
 Restart=always
 RestartSec=3s

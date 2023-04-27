@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 use std::time::Duration;
 use std::{process::Command, thread};
 use systemstat::{saturating_sub_bytes, Platform, System};
@@ -67,10 +68,7 @@ impl SystemInfo {
 }
 
 fn robot_code_exists() -> bool {
-    match home::home_dir() {
-        Some(home) => home.join("robot_code/main").is_file(),
-        None => false,
-    }
+    Path::new("/home/linkage/robot_code/main").exists()
 }
 
 fn service_is_active(service_name: &str) -> bool {
