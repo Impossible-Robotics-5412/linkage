@@ -1,5 +1,3 @@
-name: Release
-
 permissions:
   contents: write
 
@@ -52,16 +50,18 @@ jobs:
           rustup target add ${{ matrix.target }}
           rustup show
 
-      - name: Build
+      - name: Build Gauge
         run: cargo build -p gauge --release --target ${{ matrix.target }}
 
-      - name: LS
-        run: ls
+      - name: Build Carburetor
+        run: cargo build -p carburetor --release --target ${{ matrix.target }}
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             target/${{ matrix.target }}/release/gauge
+            target/${{ matrix.target }}/release/carburetor
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
