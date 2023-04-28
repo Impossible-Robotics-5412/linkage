@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 WorkingDirectory=/home/linkage
-ExecStart=/usr/bin/carburetor
+ExecStart=/home/linkage/carburetor
 Restart=always
 RestartSec=3s
 
