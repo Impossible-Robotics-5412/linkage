@@ -12,7 +12,8 @@ env:
 jobs:
   publish:
     name: Publish to Github
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     strategy:
       matrix:
         include:
@@ -21,6 +22,7 @@ jobs:
             rust: stable
             target: armv7-unknown-linux-gnueabihf
             linker: gcc-arm-linux-gnueabihf
+            container: quay.io/pypa/manylinux2014_x86_64 # Needed for the correct version of glibc
             cross: true
     steps:
       - name: Checkout repository
