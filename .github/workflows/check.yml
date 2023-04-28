@@ -83,7 +83,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
   doc:
     runs-on: ubuntu-latest
-    name: check doc | rust nightly / doc
+    name: check doc | rust ${{ matrix.toolchain }} / doc
 
     strategy:
       matrix:
