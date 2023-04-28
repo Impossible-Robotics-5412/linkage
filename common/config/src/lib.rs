@@ -68,6 +68,10 @@ impl Default for LinkageConfig {
                     host: "raspberrypi.local".to_string(),
                     port: 9999,
                 },
+                gauge_address: Address {
+                    host: "raspberrypi.local".to_string(),
+                    port: 4226,
+                },
                 cockpit_backend_logger_address: Address {
                     host: "0.0.0.0".to_string(),
                     port: 7642,
@@ -127,6 +131,7 @@ impl CarburetorConfig {
 pub struct CockpitConfig {
     linkage_lib_address: Address,
     linkage_socket_address: Address,
+    gauge_address: Address,
 
     cockpit_backend_logger_address: Address,
     linkage_lib_logger_address: Address,
@@ -144,6 +149,10 @@ impl CockpitConfig {
 
     pub fn cockpit_backend_logger_address(&self) -> &Address {
         &self.cockpit_backend_logger_address
+    }
+
+    pub fn gauge_address(&self) -> &Address {
+        &self.gauge_address
     }
 
     pub fn linkage_lib_logger_address(&self) -> &Address {

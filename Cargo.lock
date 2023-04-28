@@ -236,7 +236,7 @@ dependencies = [
 
 [[package]]
 name = "carburetor"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "config",
  "log",
@@ -374,7 +374,7 @@ dependencies = [
 
 [[package]]
 name = "config"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -948,7 +948,7 @@ dependencies = [
 
 [[package]]
 name = "gauge"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "config",
  "crossbeam",
@@ -1648,7 +1648,7 @@ dependencies = [
 
 [[package]]
 name = "logging"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "config",
  "crossbeam",
@@ -1744,7 +1744,7 @@ dependencies = [
 
 [[package]]
 name = "message_derive"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "quote",
  "syn 1.0.109",
@@ -1752,7 +1752,7 @@ dependencies = [
 
 [[package]]
 name = "messaging"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "message_derive",
  "serde",
@@ -2844,7 +2844,7 @@ dependencies = [
 
 [[package]]
 name = "system_info"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "home",
  "serde",
