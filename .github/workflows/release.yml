@@ -26,7 +26,7 @@ jobs:
             cross: true
     steps:
       - name: Install sudo package
-        run: apt update && apt install sudo
+        run: apt update && apt install -y sudo
 
       - if: ${{ env.ACT }}
         name: Hack container for local development
@@ -52,11 +52,11 @@ jobs:
         if: matrix.cross
         run: |
           sudo apt update
-          sudo apt install ${{ matrix.linker }}
+          sudo apt install -y ${{ matrix.linker }}
 
       - name: Install Rust
         run: |
-          rustup install ${{ matrix.rust }}
+          rustup install -y ${{ matrix.rust }}
           rustup target add ${{ matrix.target }}
           rustup show
 
