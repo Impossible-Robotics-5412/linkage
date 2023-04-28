@@ -34,9 +34,15 @@ jobs:
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+        run: >-
+          sudo apt-get update &&
+          sudo apt-get install -y 
+          libgtk-3-dev 
+          libwebkit2gtk-4.0-dev 
+          libappindicator3-dev
+          librsvg2-dev 
+          patchelf
+          libudev-dev
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -46,7 +52,8 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Release
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
