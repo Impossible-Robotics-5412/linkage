@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ macos-latest, ubuntu-20.04, windows-latest ]
+        platform: [ macos-latest, ubuntu-20.04 ]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -57,7 +57,6 @@ jobs:
           prerelease: false
 
   publish-parts:
-    name: Publish to Github
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
 
