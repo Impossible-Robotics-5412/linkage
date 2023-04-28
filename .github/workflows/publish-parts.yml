@@ -1,68 +1,15 @@
-permissions:
-  contents: write
-
 on:
   push:
     tags:
-      - 'v*'
+      - "parts-v*.*.*"
+
+permissions:
+  contents: write
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  publish-cockpit:
-    permissions:
-      contents: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ macos-latest, ubuntu-20.04 ]
-
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
-        run: >-
-          sudo apt-get update &&
-          sudo apt-get install -y 
-          libgtk-3-dev 
-          libwebkit2gtk-4.0-dev 
-          libappindicator3-dev
-          librsvg2-dev 
-          patchelf
-          libudev-dev
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6.0.2
-
-      - name: Install frontend dependencies
-        run: pnpm install
-
-      - name: Release
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
-
   publish-parts:
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -77,6 +24,7 @@ jobs:
             linker: gcc-arm-linux-gnueabihf
             container: rust # Needed for the correct version of glibc
             cross: true
+
     steps:
       - name: Install sudo package
         run: apt update && apt install -y sudo
@@ -115,6 +63,10 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          name: 'Linkage Parts'
+          body: 'These executables are used by the Linkage installation on the Raspberry Pi.'
+          draft: false
+          prerelease: false
           files: |
             target/${{ matrix.target }}/release/gauge
             target/${{ matrix.target }}/release/carburetor
