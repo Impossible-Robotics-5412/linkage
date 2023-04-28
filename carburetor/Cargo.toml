@@ -3,13 +3,16 @@ name = "carburetor"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
+repository.workspace = true
+license.workspace = true
   
 [dependencies]
-simple-signal = "1.1.1"
 logging = { path = "../common/logging" }
 messaging = { path = "../common/messaging" }
 config = { path = "../common/config"}
+
 log = "0.4.17"
+simple-signal = "1.1.1"
 
 [target.'cfg(all(target_arch = "arm", target_os = "linux", target_env = "gnu"))'.dependencies]
 rppal = "0.14.1"
