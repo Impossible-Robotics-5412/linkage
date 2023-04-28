@@ -65,7 +65,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: 'Linkage Parts'
+          name: 'Parts ${{ github.ref }}'
           body: 'These executables are used by the Linkage installation on the Raspberry Pi.'
           draft: true
           prerelease: false
