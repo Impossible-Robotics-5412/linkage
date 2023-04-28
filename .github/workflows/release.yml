@@ -22,7 +22,7 @@ jobs:
             rust: stable
             target: armv7-unknown-linux-gnueabihf
             linker: gcc-arm-linux-gnueabihf
-            container: quay.io/pypa/manylinux2014_x86_64 # Needed for the correct version of glibc
+            container: alexcrichton/rust-slave-linux-cross # Needed for the correct version of glibc
             cross: true
     steps:
       - name: Checkout repository
