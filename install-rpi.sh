@@ -32,9 +32,9 @@ echo "dtoverlay=pwm-2chan" | sudo tee -a /boot/config.txt >/dev/null
 # Clone the repo
 sudo git clone https://github.com/Impossible-Robotics-5412/linkage.git ${LINKAGE_PATH}
 
-sudo curl -oL ${CARBURETOR_PATH} https://github.com/Impossible-Robotics-5412/linkage/releases/latest/download/carburetor
+sudo curl -Lo ${CARBURETOR_PATH} https://github.com/Impossible-Robotics-5412/linkage/releases/latest/download/carburetor
 sudo chmod +x ${CARBURETOR_PATH}
-sudo curl -oL ${GAUGE_PATH} https://github.com/Impossible-Robotics-5412/linkage/releases/latest/download/gauge
+sudo curl -Lo ${GAUGE_PATH} https://github.com/Impossible-Robotics-5412/linkage/releases/latest/download/gauge
 sudo chmod +x ${GAUGE_PATH}
 
 # Setup services
