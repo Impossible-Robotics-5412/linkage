@@ -1,38 +1,45 @@
-permissions:
-  contents: read
+name: test
+
 on:
   push:
     branches: [main]
   pull_request:
+
+permissions:
+  contents: read
 
 # Spend CI time only on latest ref: https://github.com/jonhoo/rust-ci-conf/pull/5
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-name: Run tests
 jobs:
   test-cockpit:
+    name: test cockpit | ${{ matrix.platform }} / node ${{ matrix.node }} / rust ${{ matrix.toolchain }}
     runs-on: ${{ matrix.platform }}
 
     strategy:
       fail-fast: false
       matrix:
+        toolchain: [ stable ]
+        node: [ 16 ]
         platform: [ macos-latest, ubuntu-20.04 ]
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: setup node ${{ matrix.node }}
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ matrix.node }}
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install rust ${{ matrix.toolchain }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
 
-      - name: Install dependencies (ubuntu only)
+      - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: >-
           sudo apt-get update &&
@@ -44,32 +51,33 @@ jobs:
           patchelf
           libudev-dev
 
-      - name: Install pnpm
+      - name: install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 6.0.2
 
-      - name: Install frontend dependencies
+      - name: install frontend dependencies
         run: pnpm install
 
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   test-parts:
     runs-on: ubuntu-latest
-    name: Ubuntu / rust ${{ matrix.toolchain }}
+    name: test parts | ubuntu / rust ${{ matrix.toolchain }}
 
     strategy:
       matrix:
         toolchain: [stable, beta]
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v3
         with:
           submodules: true
 
-      - name: Install dependencies
+      - name: install dependencies
         run: >-
           sudo apt-get update &&
           sudo apt-get install -y
@@ -78,10 +86,10 @@ jobs:
           libwebkit2gtk-4.0-dev
           libudev-dev
 
-      - name: Create dist folder for Tauri
+      - name: create dist folder for tauri
         run: mkdir -p ${{ github.workspace }}/cockpit/dist
 
-      - name: Install ${{ matrix.toolchain }}
+      - name: install rust ${{ matrix.toolchain }}
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
