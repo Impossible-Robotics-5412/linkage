@@ -56,7 +56,7 @@ jobs:
 
       - name: Install Rust
         run: |
-          rustup install -y ${{ matrix.rust }}
+          rustup install ${{ matrix.rust }}
           rustup target add ${{ matrix.target }}
           rustup show
 
