@@ -5,16 +5,19 @@ mod commands;
 
 use crate::commands::config::ConfigState;
 use crate::commands::gamepad::GamepadState;
-use commands::config::config;
+use commands::config::get_config;
+use commands::config::set_cockpit_config;
 use commands::gamepad::start_gamepad_event_listener;
 use commands::gauge::start_gauge_connection;
 use commands::linkage_lib::{disable, enable, LinkageLibState};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 fn main() {
-    let common_config = Arc::new(config::config().unwrap());
+    let common_config = Arc::new(Mutex::new(config::config().unwrap()));
     logging::Logger::new(
         common_config
+            .lock()
+            .unwrap()
             .cockpit()
             .cockpit_backend_logger_address()
             .port,
@@ -28,7 +31,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             enable,
             disable,
-            config,
+            set_cockpit_config,
+            get_config,
             start_gamepad_event_listener,
             start_gauge_connection
         ])
