@@ -1,7 +1,9 @@
 use std::error::Error;
 use std::fmt::Display;
+use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+use xdg::BaseDirectoriesError;
 
 pub type AddressHost = String;
 pub type AddressPort = usize;
@@ -37,6 +39,10 @@ impl LinkageConfig {
 
     pub fn cockpit(&self) -> &CockpitConfig {
         &self.cockpit
+    }
+
+    pub fn set_cockpit(&mut self, cockpit_config: CockpitConfig) {
+        self.cockpit = Box::new(cockpit_config);
     }
 
     pub fn gauge(&self) -> &GaugeConfig {
@@ -175,8 +181,13 @@ impl GaugeConfig {
     }
 }
 
+fn config_path() -> Result<PathBuf, BaseDirectoriesError> {
+    let dir = xdg::BaseDirectories::with_prefix("linkage")?;
+    Ok(dir.get_config_file("config.toml"))
+}
+
 pub fn config() -> Result<LinkageConfig, Box<dyn Error>> {
-    let config_path = xdg::BaseDirectories::with_prefix("linkage")?.get_config_file("config.toml");
+    let config_path = config_path()?;
     if !config_path.exists() {
         // FIXME: This should use the logger, but we can't access it from here.
         eprintln!("No config found. Using default config.");
@@ -189,4 +200,11 @@ pub fn config() -> Result<LinkageConfig, Box<dyn Error>> {
     let config = toml::from_str(file_content.as_str())?;
 
     Ok(config)
+}
+
+pub fn write_config_file(config: LinkageConfig) -> Result<(), Box<dyn Error>> {
+    let toml_string = toml::to_string_pretty(&config)?;
+    let config_path = config_path()?;
+    std::fs::write(config_path, toml_string)?;
+    Ok(())
 }

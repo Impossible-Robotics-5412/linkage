@@ -1,8 +1,13 @@
 <script lang="ts">
 	import OverviewTab from '$lib/components/overview/OverviewTab.svelte';
-	import type { Tab } from '$lib/types/tab';
-	import { IconDeviceGamepad2, IconRobot } from '@tabler/icons-svelte';
 	import GamepadsTab from '$lib/components/gamepads/GamepadsTab.svelte';
+	import SettingsTab from '$lib/components/settings/SettingsTab.svelte';
+	import type { Tab } from '$lib/types/tab';
+	import {
+		IconDeviceGamepad2,
+		IconRobot,
+		IconSettings
+	} from '@tabler/icons-svelte';
 
 	const tabs: Tab[] = [
 		{ label: 'Overview', component: OverviewTab, iconComponent: IconRobot },
@@ -10,6 +15,11 @@
 			label: 'Gamepads',
 			component: GamepadsTab,
 			iconComponent: IconDeviceGamepad2
+		},
+		{
+			label: 'Settings',
+			component: SettingsTab,
+			iconComponent: IconSettings
 		}
 	];
 
