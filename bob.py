@@ -106,32 +106,33 @@ def build(args: Namespace):
     exit(0)
 
 
-def deploy_carburetor():
+def deploy_carburetor(host):
     styled_print("Deploying Carburetor...")
-    subprocess.run(["./deploy.sh"], cwd="carburetor")
+    subprocess.run(["./deploy.sh", host], cwd="carburetor")
 
 
-def deploy_gauge():
+def deploy_gauge(host):
     styled_print("Deploying Gauge...")
-    subprocess.run(["./deploy.sh"], cwd="gauge")
+    subprocess.run(["./deploy.sh", host], cwd="gauge")
 
 
-def deploy_example(example):
+def deploy_example(host, example):
     styled_print("Deploying Example...")
-    subprocess.run(["./deploy.sh", example], cwd="lib/linkage-rs")
+    subprocess.run(["./deploy.sh", host, example], cwd="lib/linkage-rs")
 
 
 def deploy(args: Namespace):
     if args.part == "all":
         styled_print("Deploying all parts...")
-        deploy_carburetor()
-        deploy_gauge()
+        deploy_carburetor(args.host)
+        deploy_gauge(args.host)
+        deploy_example(args.host, "simple_tankdrive")
     elif args.part == "carburetor":
-        deploy_carburetor()
+        deploy_carburetor(args.host)
     elif args.part == "example":
-        deploy_example("simple_tankdrive")
+        deploy_example(args.host, "simple_tankdrive")
     elif args.part == "gauge":
-        deploy_gauge()
+        deploy_gauge(args.host)
     else:
         styled_print("ERROR: Part '{unknown}' not recognized")
 
@@ -215,6 +216,11 @@ if __name__ == "__main__":
     deploy_subcommand = subparsers.add_parser(
         "deploy",
         help="deploy the moving parts of linkage",
+    )
+
+    deploy_subcommand.add_argument(
+        "host",
+        help="the host to deploy to",
     )
 
     deploy_subcommand.add_argument(
