@@ -44,7 +44,7 @@ Now you should be able to run `./bob.py run cockpit` from the root of the projec
 ## Deploying robot code
 To get started, you can deploy the example robot code:
 
-At the root of the project, run `./bob.py deploy example simple_tankdrive`
+At the root of the project, run `./bob.py deploy <user@hostname> example`
 
 ## Windows support
 Currently windows is not supported, but we are looking into this to make sure everyone can enjoy Linkage!
